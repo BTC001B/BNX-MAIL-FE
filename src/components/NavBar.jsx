@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { MdSettings, MdEmail, MdLogout, MdLightMode, MdDarkMode, MdNotifications } from "react-icons/md";
-import logo from "../assets/bluechat_logo.webp";
+// import logo from "../assets/bnx.jpeg";
+
+import logo from "../assets/bnx-remove.png";
 
 const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSidebar }) => {
   const navigate = useNavigate();
@@ -58,7 +60,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
 
           <img
             src={logo}
-            alt="Mail"
+            alt="BNX Mail"
             className="h-8 sm:h-9 cursor-pointer drop-shadow-sm transition-transform hover:scale-105"
             onClick={() => navigate("/inbox")}
           />

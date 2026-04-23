@@ -27,6 +27,11 @@ import ComposePage from "./pages/ComposePage";
 import Settings from "./pages/Settings";
 import Groups from "./pages/Groups";
 import GroupDetails from "./pages/GroupDetails";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import VerifyDomain from "./pages/VerifyDomain";
+
+
 
 /* ---------------- PROTECTED ROUTE ---------------- */
 const ProtectedRoute = ({ children }) => {
@@ -267,6 +272,11 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/create-mailbox" element={<CreateMailbox />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/verify-domain" element={<VerifyDomain />} />
+
+
           <Route
             path="/*"
             element={

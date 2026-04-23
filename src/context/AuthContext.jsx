@@ -9,30 +9,41 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         // Check if user is logged in
-        const token = localStorage.getItem('token');
-        const userEmail = localStorage.getItem('userEmail');
-        const username = localStorage.getItem('username');
+        const token = localStorage.getItem('accessToken');
+        const profile = localStorage.getItem('userProfile');
 
-        if (token && userEmail) {
+        if (token && profile) {
             setIsAuthenticated(true);
-            setUser({ email: userEmail, username });
+            setUser(JSON.parse(profile));
         }
         setLoading(false);
     }, []);
 
-    const login = (token, userData) => {
-        localStorage.setItem('token', token);
-        localStorage.setItem('userEmail', userData.email);
-        localStorage.setItem('username', userData.username || userData.email.split('@')[0]);
+    const login = (data) => {
+        const { accessToken, refreshToken, mailboxes, ...profile } = data;
+        
+        // Find primary email for UI consistency
+        const primaryMailbox = mailboxes?.find(m => m.isPrimary) || mailboxes?.[0];
+        const userEmail = primaryMailbox?.email || '';
+
+        const fullProfile = { 
+            ...profile, 
+            email: userEmail, 
+            mailboxes 
+        };
+        
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('userProfile', JSON.stringify(fullProfile));
         
         setIsAuthenticated(true);
-        setUser(userData);
+        setUser(fullProfile);
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userEmail');
-        localStorage.removeItem('username');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userProfile');
         localStorage.removeItem('tempToken');
         
         setIsAuthenticated(false);

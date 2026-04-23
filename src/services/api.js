@@ -15,8 +15,8 @@ export const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        console.log('🌍 Full URL:', config.baseURL + config.url); // ✅ ADD THIS
-        const token = localStorage.getItem('token');
+        console.log('🌍 Full URL:', config.baseURL + config.url);
+        const token = localStorage.getItem('accessToken');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -31,30 +31,22 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => {
         console.log('✅ Response:', response.status, response.config.url);
-        console.log('📦 Data:', response.data);
         return response;
     },
     (error) => {
         console.error('❌ Response Error:', {
             message: error.message,
-            code: error.code,
             status: error.response?.status,
-            data: error.response?.data,
-            url: error.config?.url
+            data: error.response?.data
         });
 
-        if (error.code === 'ECONNABORTED') {
-            console.error('⏱️ Request timeout - backend is taking too long');
-        }
-
-        if (error.code === 'ERR_NETWORK') {
-            console.error('🌐 Network error - cannot reach backend');
-        }
-
         if (error.response?.status === 403 || error.response?.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('userEmail');
-            window.location.href = '/login';
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('userProfile');
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }
@@ -63,12 +55,18 @@ api.interceptors.response.use(
 // Auth APIs
 export const authAPI = {
     register: (data) => {
-        console.log('🔑 Calling register API with:', data);
+        console.log('🔑 Calling register API');
         return api.post('/api/auth/register', data);
     },
     login: (data) => {
-        console.log('🔑 Calling login API with:', { email: data.email });
-        return api.post('/api/auth/login', data);
+        console.log('🔑 Calling login API');
+        // Optional device name header
+        const deviceName = 'Web Browser'; 
+        return api.post('/api/auth/login', data, {
+            headers: {
+                'X-Device-Name': deviceName
+            }
+        });
     },
 };
 

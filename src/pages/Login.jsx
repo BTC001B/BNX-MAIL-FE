@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import logo from '../assets/bluechat_logo.webp';
+// import logo from '../assets/bnx.jpeg';
+
+import logo from "../assets/bnx-remove.png";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -35,15 +37,8 @@ const Login = () => {
             });
 
             if (response.data.success) {
-                const { token, email, username, firstName, lastName } = response.data.data;
-
-                login(token, {
-                    email,
-                    username: username || email.split('@')[0],
-                    firstName,
-                    lastName
-                });
-
+                // Pass the whole data object to login context
+                login(response.data.data);
                 navigate('/inbox');
             }
         } catch (err) {
@@ -54,21 +49,21 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-2xl">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-12 px-4 sm:px-6 lg:px-8 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+            <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 transition-all duration-500">
                 {/* Logo */}
                 <div className="text-center">
-                    <img src={logo} alt="BTC Mail" className="mx-auto h-16 w-auto" />
-                    <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-                        Sign in to BTC Mail
+                    <img src={logo} alt="BNX Mail" className="mx-auto h-24 w-auto drop-shadow-md" />
+                    <h2 className="mt-3 text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                        Welcome Back
                     </h2>
-                    <p className="mt-2 text-sm text-gray-600">
-                        Welcome back! Please login to your account.
+                    <p className="mt-2 text-sm text-gray-500 dark:text-slate-400 font-medium">
+                        Securely access your BNX Mail account.
                     </p>
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl animate-shake">
                         {error}
                     </div>
                 )}
@@ -76,7 +71,7 @@ const Login = () => {
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="space-y-4">
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                 Email Address
                             </label>
                             <input
@@ -86,13 +81,13 @@ const Login = () => {
                                 required
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                placeholder="you@btctech.shop"
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white transition-all"
+                                placeholder="you@bnxmail.com"
                             />
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                 Password
                             </label>
                             <input
@@ -102,8 +97,8 @@ const Login = () => {
                                 required
                                 value={formData.password}
                                 onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                placeholder="Enter your password"
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white transition-all"
+                                placeholder="••••••••"
                             />
                         </div>
                     </div>
@@ -114,15 +109,15 @@ const Login = () => {
                                 id="remember-me"
                                 name="remember-me"
                                 type="checkbox"
-                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded-lg cursor-pointer"
                             />
-                            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                                Remember me
+                            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-600 dark:text-slate-400 cursor-pointer">
+                                Stay signed in
                             </label>
                         </div>
 
                         <div className="text-sm">
-                            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+                            <a href="#" className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
                                 Forgot password?
                             </a>
                         </div>
@@ -131,16 +126,25 @@ const Login = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                        className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50"
                     >
-                        {loading ? 'Signing in...' : 'Sign in'}
+                        {loading ? (
+                            <div className="flex items-center justify-center gap-2">
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <span>Authenticating...</span>
+                            </div>
+                        ) : (
+                            'Sign In →'
+                        )}
                     </button>
 
-                    <div className="text-center text-sm">
-                        <span className="text-gray-600">Don't have an account? </span>
-                        <Link to="/register" className="text-indigo-600 hover:text-indigo-500 font-medium">
-                            Sign up
-                        </Link>
+                    <div className="text-center text-sm space-y-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+                        <div className="text-gray-500 dark:text-slate-400">
+                            Don't have an account?{' '}
+                            <Link to="/register" className="text-indigo-600 dark:text-indigo-400 hover:underline font-bold">
+                                Create one for free
+                            </Link>
+                        </div>
                     </div>
                 </form>
             </div>
