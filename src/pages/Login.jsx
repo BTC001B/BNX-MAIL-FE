@@ -55,7 +55,7 @@ const Login = () => {
                 <div className="text-center">
                     <img src={logo} alt="BNX Mail" className="mx-auto h-24 w-auto drop-shadow-md" />
                     <h2 className="mt-3 text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                        Welcome
+                        Welcome Back
                     </h2>
                     <p className="mt-2 text-sm text-gray-500 dark:text-slate-400 font-medium">
                         Securely access your BNX Mail account.
