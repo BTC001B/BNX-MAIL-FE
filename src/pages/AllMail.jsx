@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { mailAPI } from "../services/api";
+import { useNavigate } from "react-router-dom";
+import { useMail } from "../context/MailContext";
+import { MdMail, MdFilterList, MdForward, MdReply } from "react-icons/md";
 import EmailList from "../components/EmailList";
 import EmailDetails from "../components/EmailDetails";
 import { useTheme } from "../context/ThemeContext";
 
 const AllMail = () => {
+  const navigate = useNavigate();
   const { theme } = useTheme();
-
-  const [emails, setEmails] = useState([]);
+  const { emails, loading, fetchEmails, handleToggleStar, handleMoveToTrash, handleMarkRead } = useMail();
   const [selectedEmail, setSelectedEmail] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   // UI-only filter dropdown states
   const [showTime, setShowTime] = useState(false);
@@ -18,103 +18,32 @@ const AllMail = () => {
   const [showTo, setShowTo] = useState(false);
 
   useEffect(() => {
-    fetchAllMail();
-  }, []);
+    fetchEmails('inbox');
+  }, [fetchEmails]);
 
-  /* ---------------- FETCH ALL MAIL ---------------- */
-  const fetchAllMail = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      // Backend-ready
-      const res = await mailAPI.getInbox(100);
-      if (res.data?.success) {
-        setEmails(res.data.data.emails || []);
-      }
-    } catch (err) {
-      console.error("Failed to fetch all mail:", err);
-      setError("Failed to load mail");
-    } finally {
-      setLoading(false);
+  const handleSelectEmail = (email) => {
+    setSelectedEmail(email);
+    if (!email.isRead) {
+      handleMarkRead(email.uid);
     }
   };
 
-  /* ---------------- ACTIONS ---------------- */
-  const handleDelete = (uid) => {
-    setEmails((prev) => prev.filter((e) => e.uid !== uid));
-    setSelectedEmail(null);
+  const handleReply = (email) => {
+    navigate("/compose", {
+      state: {
+        replyTo: email.senderEmail || email.from,
+        subject: `Re: ${email.subject || ""}`,
+        originalBody: email.body,
+      },
+    });
   };
-
-  const handleStar = (uid) => {
-    setEmails((prev) =>
-      prev.map((e) =>
-        e.uid === uid ? { ...e, starred: !e.starred } : e
-      )
-    );
-  };
-
-  const handleArchive = (uid) => {
-    setEmails((prev) =>
-      prev.map((e) =>
-        e.uid === uid ? { ...e, folder: "archive" } : e
-      )
-    );
-    setSelectedEmail(null);
-  };
-
-  /* ---------------- FILTERED VIEW ---------------- */
-  const visibleEmails = emails.filter(
-    (e) => e.folder !== "trash"
-  );
-
-  /* ---------------- LOADING ---------------- */
-  if (loading) {
-    return (
-      <div
-        className="flex items-center justify-center h-screen"
-        style={{ background: theme.bg }}
-      >
-        <div className="text-center">
-          <div
-            className="animate-spin rounded-full h-10 w-10 border-b-2 mx-auto mb-4"
-            style={{ borderColor: theme.accent }}
-          />
-          <p style={{ color: theme.subText }}>Loading mail…</p>
-        </div>
-      </div>
-    );
-  }
-
-  /* ---------------- ERROR ---------------- */
-  if (error) {
-    return (
-      <div
-        className="flex items-center justify-center h-screen"
-        style={{ background: theme.bg }}
-      >
-        <div className="text-center">
-          <p className="mb-4 text-red-600">{error}</p>
-          <button
-            onClick={fetchAllMail}
-            className="px-4 py-2 rounded text-white"
-            style={{ background: theme.accent }}
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   /* ---------------- MAIN UI ---------------- */
   return (
     <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-transparent">
       {/* LEFT — LIST */}
       <div
-        className={`transition-all duration-300
-          w-full
-          border-r-0 sm:border-r border-gray-200/50 dark:border-gray-800/50 relative z-10`}
+        className={`transition-all duration-300 w-full border-r-0 sm:border-r border-gray-200/50 dark:border-gray-800/50 relative z-10 ${selectedEmail ? 'hidden md:block' : 'block'}`}
       >
         {/* HEADER */}
         <div className="p-4 sm:p-5 border-b border-gray-200/50 dark:border-gray-800/50 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md sticky top-0 z-20">
@@ -123,10 +52,10 @@ const AllMail = () => {
               className="px-4 py-1.5 text-sm font-semibold rounded-full shadow-sm text-white tracking-wide"
               style={{ background: `linear-gradient(135deg, ${theme.accent || '#135bec'} 0%, #3b82f6 100%)` }}
             >
-              All Mail ({visibleEmails.length})
+              All Mail ({emails.length})
             </span>
 
-            {/* UI-only filters */}
+            {/* RESTORED FILTERS */}
             <div className="flex items-center gap-2">
               <FilterButton label="From" open={showFrom} setOpen={setShowFrom} />
               <FilterButton label="To" open={showTo} setOpen={setShowTo} />
@@ -135,21 +64,20 @@ const AllMail = () => {
           </div>
         </div>
 
-        {/* EMAIL LIST */}
+        {/* EMAIL LIST CONTAINER */}
         <div className="h-full overflow-y-auto hidden-scrollbar pb-24">
-          {visibleEmails.length === 0 ? (
+          {emails.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full opacity-80 animate-fade-in">
-              <span className="text-6xl mb-4 drop-shadow-md">📭</span>
+              <MdMail className="text-6xl mb-4 text-gray-300 dark:text-gray-600 drop-shadow-md" />
               <p className="font-medium text-gray-500 dark:text-gray-400">No emails found</p>
             </div>
           ) : (
             <EmailList
-              emails={visibleEmails}
+              emails={emails}
               selectedEmailId={selectedEmail?.uid}
-              onSelectEmail={setSelectedEmail}
-              onDelete={handleDelete}
-              onStar={handleStar}
-              onArchive={handleArchive}
+              onSelectEmail={handleSelectEmail}
+              onDelete={(uid) => handleMoveToTrash(uid, 'inbox')}
+              onStar={(uid) => handleToggleStar(uid, 'inbox')}
             />
           )}
         </div>
@@ -157,15 +85,17 @@ const AllMail = () => {
 
       {/* RIGHT — DETAILS */}
       <div
-        className={`flex-1 transition-all duration-300 relative
-          `}
+        className={`flex-1 transition-all duration-300 relative ${selectedEmail ? 'block' : 'hidden md:block'}`}
       >
         <EmailDetails
           email={selectedEmail}
-          onClose={() => setSelectedEmail(null)}
-          onDelete={handleDelete}
-          onStar={handleStar}
-          onArchive={handleArchive}
+          onBack={() => setSelectedEmail(null)}
+          onDelete={(uid) => {
+            handleMoveToTrash(uid, 'inbox');
+            setSelectedEmail(null);
+          }}
+          onStar={(uid) => handleToggleStar(uid, 'inbox')}
+          onReply={handleReply}
         />
       </div>
     </div>
@@ -177,14 +107,14 @@ const FilterButton = ({ label, open, setOpen }) => (
   <div className="relative">
     <button
       onClick={() => setOpen(!open)}
-      className="px-3 py-1 border rounded-full text-sm bg-white"
+      className="px-3 py-1 border rounded-full text-sm bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
     >
       {label} ▾
     </button>
 
     {open && (
-      <div className="absolute mt-2 w-56 bg-white shadow rounded p-3 z-10 text-sm">
-        <p className="text-gray-500">Filter UI only</p>
+      <div className="absolute mt-2 w-56 bg-white dark:bg-gray-800 shadow-xl rounded-xl p-3 z-30 text-sm border dark:border-gray-700 animate-in fade-in zoom-in duration-200 origin-top-right right-0">
+        <p className="text-gray-500 dark:text-gray-400">Filter options coming soon...</p>
       </div>
     )}
   </div>

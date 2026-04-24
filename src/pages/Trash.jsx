@@ -1,71 +1,53 @@
 import React, { useEffect, useState } from "react";
+import { useMail } from "../context/MailContext";
+import { MdDelete } from "react-icons/md";
 import EmailList from "../components/EmailList";
 import EmailDetails from "../components/EmailDetails";
 import { useTheme } from "../context/ThemeContext";
+import { mailAPI } from "../services/api";
+import toast from "react-hot-toast";
 
 const Trash = () => {
   const { theme } = useTheme();
-
-  const [trashedEmails, setTrashedEmails] = useState([]);
+  const { emails, loading, fetchEmails } = useMail();
   const [selectedEmail, setSelectedEmail] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  /* ---------------- FETCH TRASH ---------------- */
   useEffect(() => {
-    fetchTrash();
-  }, []);
-
-  const fetchTrash = async () => {
-    try {
-      setLoading(true);
-
-      // 🔹 Backend-ready
-      // const res = await mailAPI.getTrash();
-      // if (res.data?.success) setTrashedEmails(res.data.data.emails || []);
-
-      // TEMP fallback
-      setTrashedEmails([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchEmails('trash');
+  }, [fetchEmails]);
 
   const handleSelectEmail = (email) => {
     setSelectedEmail(email);
   };
 
-  const handleEmptyTrash = () => {
-    if (window.confirm("Permanently delete all emails in Trash?")) {
-      // 🔹 Backend-ready
-      // await mailAPI.emptyTrash();
-      setTrashedEmails([]);
+  const handlePermanentDelete = async (uid) => {
+    try {
+      await mailAPI.permanentDelete(uid);
+      toast.success("Permanently deleted");
+      fetchEmails('trash');
       setSelectedEmail(null);
+    } catch (error) {
+      toast.error("Failed to delete permanently");
     }
   };
 
-  /* ---------------- LOADING ---------------- */
-  if (loading) {
-    return (
-      <div
-        className="flex items-center justify-center h-screen"
-        style={{ backgroundColor: theme.bg }}
-      >
-        <div
-          className="animate-spin rounded-full h-10 w-10 border-b-2"
-          style={{ borderColor: theme.accent }}
-        />
-      </div>
-    );
-  }
+  const handleRestore = async (uid) => {
+    try {
+      await mailAPI.restore(uid);
+      toast.success("Email restored");
+      fetchEmails('trash');
+      setSelectedEmail(null);
+    } catch (error) {
+      toast.error("Failed to restore email");
+    }
+  };
 
   /* ---------------- MAIN UI ---------------- */
   return (
     <div className="flex h-[calc(100vh-64px)] overflow-hidden">
       {/* LEFT — LIST */}
       <div
-        className={`transition-all duration-300
-          w-full
-          border-r`}
+        className={`transition-all duration-300 w-full border-r ${selectedEmail ? 'hidden md:block' : 'block'}`}
         style={{
           backgroundColor: theme.bg,
           borderColor: theme.border,
@@ -73,65 +55,72 @@ const Trash = () => {
       >
         {/* HEADER */}
         <div
-          className="p-4 border-b flex items-center justify-between"
+          className="p-4 border-b flex justify-between items-center"
           style={{ borderColor: theme.border }}
         >
           <h2
-            className="text-xl font-semibold"
+            className="text-xl font-semibold flex items-center gap-2"
             style={{ color: theme.text }}
           >
-            🗑️ Trash
+            <MdDelete size={24} className="text-gray-500" /> Trash
             <span
               className="ml-2 text-sm font-normal"
               style={{ color: theme.subText }}
             >
-              ({trashedEmails.length})
+              ({emails.length})
             </span>
           </h2>
-
-          {trashedEmails.length > 0 && (
-            <button
-              onClick={handleEmptyTrash}
-              className="text-sm text-red-600 hover:underline"
-            >
-              Empty Trash
-            </button>
-          )}
         </div>
 
-        {/* EMPTY STATE */}
-        {trashedEmails.length === 0 ? (
+        {emails.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <span className="text-6xl mb-4">🗑️</span>
+            <MdDelete size={64} className="text-gray-300 dark:text-gray-600 mb-4 opacity-50" />
             <p
               className="text-lg font-medium mb-1"
               style={{ color: theme.text }}
             >
               Trash is empty
             </p>
-            <p style={{ color: theme.subText }}>
-              Deleted emails stay here for 30 days
-            </p>
           </div>
         ) : (
           <EmailList
-            emails={trashedEmails}
-            selectedEmail={selectedEmail}
+            emails={emails}
+            selectedEmailId={selectedEmail?.uid}
             onSelectEmail={handleSelectEmail}
+            onDelete={handlePermanentDelete}
           />
         )}
       </div>
 
       {/* RIGHT — DETAILS */}
       <div
-        className={`flex-1 transition-all duration-300
-          `}
+        className={`flex-1 transition-all duration-300 ${selectedEmail ? 'block' : 'hidden md:block'}`}
         style={{ backgroundColor: theme.bg }}
       >
-        <EmailDetails
-          email={selectedEmail}
-          onBack={() => setSelectedEmail(null)}
-        />
+        {selectedEmail && (
+          <div className="h-full flex flex-col">
+             <div className="p-4 border-b flex gap-4" style={{ borderColor: theme.border }}>
+                <button 
+                  onClick={() => handleRestore(selectedEmail.uid)}
+                  className="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition-colors"
+                >
+                  Restore
+                </button>
+                <button 
+                  onClick={() => handlePermanentDelete(selectedEmail.uid)}
+                  className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition-colors"
+                >
+                  Delete Permanently
+                </button>
+             </div>
+             <div className="flex-1 overflow-hidden">
+                <EmailDetails
+                  email={selectedEmail}
+                  onBack={() => setSelectedEmail(null)}
+                />
+             </div>
+          </div>
+        )}
       </div>
     </div>
   );

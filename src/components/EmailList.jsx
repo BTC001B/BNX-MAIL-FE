@@ -1,6 +1,6 @@
 import React from "react";
 import img from "../assets/img1.jpg";
-import { MdArchive, MdDelete, MdStarBorder } from "react-icons/md";
+import { MdArchive, MdDelete, MdStar, MdStarBorder, MdAccessTime } from "react-icons/md";
 
 const EmailList = ({
   emails,
@@ -9,6 +9,7 @@ const EmailList = ({
   onDelete,
   onStar,
   onArchive,
+  onSnooze,
   selectedIds = new Set(),
   onToggleSelect,
 }) => {
@@ -87,7 +88,7 @@ const EmailList = ({
               {/* Star Indicator (Always visible if starred) */}
               {email.starred && (
                 <div className="shrink-0 absolute right-4 top-1/2 -translate-y-1/2 group-hover:opacity-0 transition-opacity">
-                  <MdStarBorder size={20} className="text-yellow-400 fill-current drop-shadow-sm" />
+                  <MdStar size={20} className="text-yellow-400 drop-shadow-sm" />
                 </div>
               )}
 
@@ -123,12 +124,29 @@ const EmailList = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
+                    const wakeUpAt = new Date();
+                    wakeUpAt.setDate(wakeUpAt.getDate() + 1); // Default to tomorrow
+                    onSnooze?.(email.uid, wakeUpAt.toISOString());
+                  }}
+                  className="rounded-lg p-2 hover:bg-blue-50 hover:text-blue-500 dark:hover:bg-blue-900/30 text-gray-600 dark:text-gray-300 transition-colors tooltip-trigger"
+                  title="Snooze"
+                >
+                  <MdAccessTime size={18} />
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
                     onStar?.(email.uid);
                   }}
                   className="rounded-lg p-2 hover:bg-yellow-50 hover:text-yellow-500 dark:hover:bg-yellow-900/30 text-gray-600 dark:text-gray-300 transition-colors tooltip-trigger"
                   title={email.starred ? "Unstar" : "Star"}
                 >
-                  <MdStarBorder size={18} className={email.starred ? "text-yellow-500 fill-current" : ""} />
+                  {email.starred ? (
+                    <MdStar size={18} className="text-yellow-500" />
+                  ) : (
+                    <MdStarBorder size={18} />
+                  )}
                 </button>
               </div>
             </div>

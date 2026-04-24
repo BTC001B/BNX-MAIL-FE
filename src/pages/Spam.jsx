@@ -1,62 +1,41 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useMail } from "../context/MailContext";
+import { MdReport } from "react-icons/md";
 import EmailList from "../components/EmailList";
 import EmailDetails from "../components/EmailDetails";
 import { useTheme } from "../context/ThemeContext";
 
 const Spam = () => {
+  const navigate = useNavigate();
   const { theme } = useTheme();
-
-  const [spamEmails, setSpamEmails] = useState([]);
+  const { emails, loading, fetchEmails, handleToggleStar, handleMoveToTrash } = useMail();
   const [selectedEmail, setSelectedEmail] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  /* ---------------- FETCH SPAM ---------------- */
   useEffect(() => {
-    fetchSpam();
-  }, []);
-
-  const fetchSpam = async () => {
-    try {
-      setLoading(true);
-
-      // 🔹 Backend-ready
-      // const res = await mailAPI.getSpam();
-      // if (res.data?.success) setSpamEmails(res.data.data.emails || []);
-
-      // TEMP fallback
-      setSpamEmails([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchEmails('spam');
+  }, [fetchEmails]);
 
   const handleSelectEmail = (email) => {
     setSelectedEmail(email);
   };
 
-  /* ---------------- LOADING ---------------- */
-  if (loading) {
-    return (
-      <div
-        className="flex items-center justify-center h-screen"
-        style={{ backgroundColor: theme.bg }}
-      >
-        <div
-          className="animate-spin rounded-full h-10 w-10 border-b-2"
-          style={{ borderColor: theme.accent }}
-        />
-      </div>
-    );
-  }
+  const handleReply = (email) => {
+    navigate("/compose", {
+      state: {
+        replyTo: email.senderEmail || email.from,
+        subject: `Re: ${email.subject || ""}`,
+        originalBody: email.body,
+      },
+    });
+  };
 
   /* ---------------- MAIN UI ---------------- */
   return (
     <div className="flex h-[calc(100vh-64px)] overflow-hidden">
       {/* LEFT — LIST */}
       <div
-        className={`transition-all duration-300
-          w-full
-          border-r`}
+        className={`transition-all duration-300 w-full border-r ${selectedEmail ? 'hidden md:block' : 'block'}`}
         style={{
           backgroundColor: theme.bg,
           borderColor: theme.border,
@@ -68,23 +47,23 @@ const Spam = () => {
           style={{ borderColor: theme.border }}
         >
           <h2
-            className="text-xl font-semibold"
+            className="text-xl font-semibold flex items-center gap-2"
             style={{ color: theme.text }}
           >
-            🚫 Spam
+            <MdReport size={24} className="text-red-500" /> Spam
             <span
               className="ml-2 text-sm font-normal"
               style={{ color: theme.subText }}
             >
-              ({spamEmails.length})
+              ({emails.length})
             </span>
           </h2>
         </div>
 
         {/* EMPTY STATE */}
-        {spamEmails.length === 0 ? (
+        {emails.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <span className="text-6xl mb-4">🚫</span>
+            <MdReport size={64} className="text-gray-300 dark:text-gray-600 mb-4 opacity-50" />
             <p
               className="text-lg font-medium mb-1"
               style={{ color: theme.text }}
@@ -97,22 +76,29 @@ const Spam = () => {
           </div>
         ) : (
           <EmailList
-            emails={spamEmails}
-            selectedEmail={selectedEmail}
+            emails={emails}
+            selectedEmailId={selectedEmail?.uid}
             onSelectEmail={handleSelectEmail}
+            onDelete={(uid) => handleMoveToTrash(uid, 'spam')}
+            onStar={(uid) => handleToggleStar(uid, 'spam')}
           />
         )}
       </div>
 
       {/* RIGHT — DETAILS */}
       <div
-        className={`flex-1 transition-all duration-300
-          `}
+        className={`flex-1 transition-all duration-300 ${selectedEmail ? 'block' : 'hidden md:block'}`}
         style={{ backgroundColor: theme.bg }}
       >
         <EmailDetails
           email={selectedEmail}
           onBack={() => setSelectedEmail(null)}
+          onDelete={(uid) => {
+            handleMoveToTrash(uid, 'spam');
+            setSelectedEmail(null);
+          }}
+          onStar={(uid) => handleToggleStar(uid, 'spam')}
+          onReply={handleReply}
         />
       </div>
     </div>

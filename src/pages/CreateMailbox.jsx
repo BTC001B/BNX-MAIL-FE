@@ -85,7 +85,7 @@ const CreateMailbox = () => {
                                 value={emailName}
                                 onChange={(e) => setEmailName(e.target.value)}
                                 required
-                                pattern="[a-z0-9._-]+"
+                                pattern="[a-z0-9._\-]+"
                                 className="flex-1 px-4 py-3 bg-transparent focus:outline-none dark:text-white"
                                 placeholder="e.g. john.doe"
                             />

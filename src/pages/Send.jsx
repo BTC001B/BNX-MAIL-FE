@@ -1,51 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { mailAPI } from "../services/api";
+import { useNavigate } from "react-router-dom";
+import { useMail } from "../context/MailContext";
+import { MdSend } from "react-icons/md";
 import EmailList from "../components/EmailList";
 import EmailDetails from "../components/EmailDetails";
 import { useTheme } from "../context/ThemeContext";
 
 const Send = () => {
+  const navigate = useNavigate();
   const { theme } = useTheme();
-
-  const [sentEmails, setSentEmails] = useState([]);
+  const { emails, loading, fetchEmails, handleToggleStar, handleMoveToTrash } = useMail();
   const [selectedEmail, setSelectedEmail] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchSent();
-  }, []);
-
-  /* ---------------- FETCH SENT ---------------- */
-  const fetchSent = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      // 🔹 Backend-ready (replace when API exists)
-      // const res = await mailAPI.getSent();
-      // if (res.data?.success) setSentEmails(res.data.data.emails || []);
-
-      // TEMP fallback (safe)
-      setSentEmails([]);
-    } catch (err) {
-      setError("Failed to load sent emails");
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchEmails('sent');
+  }, [fetchEmails]);
 
   const handleSelectEmail = (email) => {
     setSelectedEmail(email);
   };
 
   const handleDelete = (uid) => {
-    setSentEmails((prev) => prev.filter((e) => e.uid !== uid));
+    handleMoveToTrash(uid, 'sent');
     setSelectedEmail(null);
   };
 
+  const handleReply = (email) => {
+    navigate("/compose", {
+      state: {
+        replyTo: email.to || email.senderEmail || email.from, // For sent mail, reply to the recipient
+        subject: `Re: ${email.subject || ""}`,
+        originalBody: email.body,
+      },
+    });
+  };
+
   /* ---------------- LOADING ---------------- */
-  if (loading) {
+  if (loading && emails.length === 0) {
     return (
       <div
         className="flex items-center justify-center h-screen"
@@ -62,35 +53,12 @@ const Send = () => {
     );
   }
 
-  /* ---------------- ERROR ---------------- */
-  if (error) {
-    return (
-      <div
-        className="flex items-center justify-center h-screen"
-        style={{ backgroundColor: theme.bg }}
-      >
-        <div className="text-center">
-          <p className="mb-4 text-red-600">{error}</p>
-          <button
-            onClick={fetchSent}
-            className="px-4 py-2 rounded text-white"
-            style={{ backgroundColor: theme.accent }}
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   /* ---------------- MAIN UI ---------------- */
   return (
     <div className="flex h-[calc(100vh-64px)] overflow-hidden">
       {/* LEFT — LIST */}
       <div
-        className={`transition-all duration-300
-          w-full
-          border-r`}
+        className={`transition-all duration-300 w-full border-r ${selectedEmail ? 'hidden md:block' : 'block'}`}
         style={{
           backgroundColor: theme.bg,
           borderColor: theme.border,
@@ -110,36 +78,38 @@ const Send = () => {
               className="ml-2 text-sm font-normal"
               style={{ color: theme.subText }}
             >
-              ({sentEmails.length})
+              ({emails.length})
             </span>
           </h2>
         </div>
 
-        {sentEmails.length === 0 ? (
+        {emails.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
-            <span className="text-5xl mb-3">📭</span>
+            <MdSend className="text-6xl mb-4 text-gray-300 dark:text-gray-600 opacity-50" />
             <p style={{ color: theme.subText }}>No sent emails</p>
           </div>
         ) : (
           <EmailList
-            emails={sentEmails}
-            selectedEmail={selectedEmail}
+            emails={emails}
+            selectedEmailId={selectedEmail?.uid}
             onSelectEmail={handleSelectEmail}
             onDelete={handleDelete}
+            onStar={(uid) => handleToggleStar(uid, 'sent')}
           />
         )}
       </div>
 
       {/* RIGHT — DETAILS */}
       <div
-        className={`flex-1 transition-all duration-300
-          `}
+        className={`flex-1 transition-all duration-300 ${selectedEmail ? 'block' : 'hidden md:block'}`}
         style={{ backgroundColor: theme.bg }}
       >
         <EmailDetails
           email={selectedEmail}
           onBack={() => setSelectedEmail(null)}
           onDelete={handleDelete}
+          onStar={(uid) => handleToggleStar(uid, 'sent')}
+          onReply={handleReply}
         />
       </div>
     </div>

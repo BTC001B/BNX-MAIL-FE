@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { MdArchive, MdDelete, MdStar, MdClose } from "react-icons/md";
+import { MdArchive, MdDelete, MdStar, MdClose, MdAccessTime, MdLabel } from "react-icons/md";
+import { useMail } from "../context/MailContext";
 import { useTheme } from "../context/ThemeContext";
 
 const EmailDetails = ({
@@ -9,9 +10,13 @@ const EmailDetails = ({
   onDelete,
   onStar,
   onArchive,
+  onSnooze,
+  onApplyLabel,
   onClose,
 }) => {
   const { theme } = useTheme();
+  const { labels } = useMail();
+  const [showLabels, setShowLabels] = useState(false);
 
   const handleClose = onBack || onClose;
 
@@ -106,6 +111,45 @@ const EmailDetails = ({
               >
                 <MdArchive size={22} />
               </button>
+
+              <button
+                onClick={() => {
+                  const wakeUpAt = new Date();
+                  wakeUpAt.setDate(wakeUpAt.getDate() + 1);
+                  onSnooze?.(localEmail.uid, wakeUpAt.toISOString());
+                }}
+                className="p-2.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 hover:text-blue-500 tooltip-trigger"
+                title="Snooze"
+              >
+                <MdAccessTime size={22} />
+              </button>
+
+              <div className="relative">
+                <button
+                  onClick={() => setShowLabels(!showLabels)}
+                  className="p-2.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 hover:text-indigo-500 tooltip-trigger"
+                  title="Labels"
+                >
+                  <MdLabel size={22} />
+                </button>
+                {showLabels && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border rounded-xl shadow-xl z-20 overflow-hidden">
+                    {labels.map(l => (
+                      <button
+                        key={l.id}
+                        onClick={() => {
+                          onApplyLabel?.(localEmail.uid, l.id);
+                          setShowLabels(false);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                      >
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: l.colorHex }} />
+                        <span className="text-sm">{l.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               <button
                 onClick={() => {
@@ -206,13 +250,13 @@ const EmailDetails = ({
               className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-white font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all w-32"
               style={{ background: `linear-gradient(135deg, ${theme.accent || '#135bec'} 0%, #3b82f6 100%)` }}
             >
-              <span>↩️</span> Reply
+              <MdReply size={20} /> Reply
             </button>
 
             <button
               className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-sm transition-all text-gray-700 dark:text-gray-200 w-32"
             >
-              <span>↪️</span> Forward
+              <MdForward size={20} /> Forward
             </button>
           </div>
         </div>

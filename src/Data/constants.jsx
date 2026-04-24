@@ -78,21 +78,51 @@ export const EMAIL_CATEGORIES = {
 export const API_ENDPOINTS = {
   AUTH: {
     REGISTER: '/api/auth/register',
-    LOGIN: '/api/auth/login'
+    LOGIN: '/api/auth/login',
+    REFRESH: '/api/auth/refresh',
+    LOGOUT: '/api/auth/logout',
+    SESSIONS: '/api/auth/sessions',
+    CHANGE_PASSWORD: '/api/auth/change-password'
   },
   MAIL: {
-    SEND: '/api/mail/send',
     INBOX: '/api/mail/inbox',
-    EMAIL: '/api/mail/email'
+    SENT: '/api/mail/sent',
+    STARRED: '/api/mail/starred',
+    TRASH: '/api/mail/trash',
+    SPAM: '/api/mail/spam',
+    SNOOZED: '/api/mail/snoozed',
+    SEND: '/api/mail/send',
+    STAR: '/api/mail/star',
+    EMAIL: '/api/mail/email',
+    READ: '/api/mail/read',
+    UNREAD: '/api/mail/unread',
+    MOVE_TRASH: '/api/mail/trash',
+    RESTORE: '/api/mail/restore',
+    PERMANENT: '/api/mail/permanent',
+    SNOOZE: '/api/mail/snooze',
+    LABELS: '/api/mail/labels',
+    APPLY_LABEL: '/api/mail/labels/apply',
+    REMOVE_LABEL: '/api/mail/labels/remove',
+    CATEGORY: '/api/mail/category'
   },
   EMAILS: {
     CREATE: '/api/emails/create',
     LIST: '/api/emails/list',
-    SET_PRIMARY: '/api/emails/:id/set-primary'
+    SET_PRIMARY: '/api/emails/:emailId/set-primary'
+  },
+  USERS: {
+    SETTINGS: '/api/users/settings',
+    ACTIVITY_LOGS: '/api/users/activity-logs'
   },
   BUSINESS: {
     REGISTER: '/api/business/register',
     DOMAINS: '/api/business/domains',
     VERIFY: '/api/business/domain/:id/verify'
+  },
+  GROUPS: {
+    CREATE: '/api/groups/create',
+    LIST: '/api/groups/',
+    MEMBERS: '/api/groups/:id/members',
+    SEND: '/api/groups/:id/send'
   }
 };
