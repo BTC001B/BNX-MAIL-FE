@@ -1,91 +1,131 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { Client } from '@stomp/stompjs';
 import { useAuth } from './AuthContext';
 import { useMail } from './MailContext';
 import toast from 'react-hot-toast';
 
 const SocketContext = createContext();
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'wss://api.bnxmail.com/ws';
+// Detect environment and set URLs
+// Force WSS for api.bnxmail.com to avoid redirects
+const DEFAULT_WS = 'wss://api.bnxmail.com/ws';
+const WS_URL = import.meta.env.VITE_WS_URL || DEFAULT_WS;
 
 export const SocketProvider = ({ children }) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const { fetchEmails } = useMail();
-    const [socket, setSocket] = useState(null);
-    const reconnectTimer = useRef(null);
+    const [stompClient, setStompClient] = useState(null);
+    const [isConnected, setIsConnected] = useState(false);
 
-    const connect = () => {
+    useEffect(() => {
+        if (!isAuthenticated) {
+            if (stompClient) {
+                stompClient.deactivate();
+                setStompClient(null);
+            }
+            setIsConnected(false);
+            return;
+        }
+
         const token = localStorage.getItem('accessToken');
         if (!token) return;
 
-        const ws = new WebSocket(`${WS_URL}?token=${token}`);
+        console.log('🔄 Attempting standard WebSocket connection to:', WS_URL);
 
-        ws.onopen = () => {
-            console.log('🔌 Connected to BNX Mail WebSocket');
-            if (reconnectTimer.current) {
-                clearTimeout(reconnectTimer.current);
-                reconnectTimer.current = null;
-            }
+        const client = new Client({
+            brokerURL: WS_URL,
+            connectHeaders: {
+                Authorization: `Bearer ${token}`
+            },
+            debug: function (str) {
+                console.log('STOMP:', str);
+            },
+            reconnectDelay: 5000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
+            // Disable SockJS for now to see the raw WebSocket error
+            // webSocketFactory: () => new SockJS(WS_URL.replace('wss://', 'https://')),
+        });
+
+        client.onConnect = (frame) => {
+            console.log('🔌 Connected to BNX STOMP Broker');
+            setIsConnected(true);
+
+            // Subscribe to personal notifications
+            client.subscribe('/user/topic/notifications', (message) => {
+                const data = JSON.parse(message.body);
+                handlePersonalNotification(data);
+            });
         };
 
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log('📩 WS Message:', data);
-
-            switch (data.type) {
-                case 'new_email':
-                    toast('New email received!', { icon: '📧' });
-                    fetchEmails(); // Refresh inbox
-                    break;
-                case 'send_progress':
-                    if (data.status === 'completed') {
-                        toast.success('Email sent successfully');
-                        fetchEmails('sent');
-                    } else if (data.status === 'failed') {
-                        toast.error('Failed to send email');
-                    }
-                    break;
-                case 'notification':
-                    toast(data.message);
-                    break;
-                default:
-                    console.log('Unknown WS event type:', data.type);
-            }
+        client.onStompError = (frame) => {
+            console.error('Broker reported error: ' + frame.headers['message']);
+            console.error('Additional details: ' + frame.body);
         };
 
-        ws.onclose = () => {
-            console.log('🔌 WebSocket disconnected. Reconnecting...');
-            reconnectTimer.current = setTimeout(connect, 5000);
+        client.onWebSocketError = (event) => {
+            console.error('WebSocket Error:', event);
         };
 
-        ws.onerror = (err) => {
-            console.error('🔌 WebSocket error:', err);
-            ws.close();
+        client.onDisconnect = () => {
+            console.log('🔌 Disconnected from STOMP');
+            setIsConnected(false);
         };
 
-        setSocket(ws);
-    };
-
-    useEffect(() => {
-        if (isAuthenticated) {
-            connect();
-        } else {
-            if (socket) {
-                socket.close();
-                setSocket(null);
-            }
-            if (reconnectTimer.current) {
-                clearTimeout(reconnectTimer.current);
-                reconnectTimer.current = null;
-            }
-        }
+        client.activate();
+        setStompClient(client);
 
         return () => {
-            if (socket) socket.close();
+            if (client) client.deactivate();
         };
     }, [isAuthenticated]);
 
+    const handlePersonalNotification = (data) => {
+        console.log('📩 Personal Notification:', data);
+        switch (data.type) {
+            case 'new_email':
+                toast('New email received!', { icon: '📧' });
+                fetchEmails();
+                break;
+            case 'send_progress':
+                if (data.status === 'completed') {
+                    toast.success('Email sent successfully');
+                    fetchEmails('sent');
+                } else if (data.status === 'failed') {
+                    toast.error('Failed to send email');
+                }
+                break;
+            default:
+                toast(data.message || 'Notification received');
+        }
+    };
+
+    const subscribeToChat = (chatId, callback) => {
+        if (!stompClient || !isConnected) return null;
+        console.log(`📡 Subscribing to /topic/chat/${chatId}`);
+        return stompClient.subscribe(`/topic/chat/${chatId}`, (message) => {
+            const data = JSON.parse(message.body);
+            callback(data);
+        });
+    };
+
+    const sendMessage = (chatId, messageContent) => {
+        if (!stompClient || !isConnected || !user) return;
+        
+        const payload = {
+            chatId: parseInt(chatId),
+            sender: user.email,
+            message: messageContent
+        };
+
+        stompClient.publish({
+            destination: '/app/chat.send',
+            body: JSON.stringify(payload)
+        });
+    };
+
     return (
-        <SocketContext.Provider value={{ socket }}>
+        <SocketContext.Provider value={{ stompClient, isConnected, subscribeToChat, sendMessage }}>
             {children}
         </SocketContext.Provider>
     );

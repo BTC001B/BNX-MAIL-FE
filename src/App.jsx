@@ -27,6 +27,7 @@ import Archive from "./pages/Archive";
 import ComposePage from "./pages/ComposePage";
 import Settings from "./pages/Settings";
 import Groups from "./pages/Groups";
+import ChatRoom from "./pages/ChatRoom";
 import GroupDetails from "./pages/GroupDetails";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -99,6 +100,8 @@ const AppContent = () => {
             <Route path="/settings" element={<Settings />} />
             <Route path="/groups" element={<Groups />} />
             <Route path="/groups/:id" element={<GroupDetails />} />
+            <Route path="/chat" element={<Groups />} />
+            <Route path="/chat/:chatId" element={<ChatRoom />} />
           </Routes>
         </main>
       </div>

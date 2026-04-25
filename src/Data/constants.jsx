@@ -8,7 +8,8 @@ import {
   MdReport,
   MdDelete,
   MdMail,
-  MdGroup
+  MdGroup,
+  MdChat
 } from 'react-icons/md';
 
 export const SIDEBAR_ITEMS = [
@@ -64,6 +65,12 @@ export const SIDEBAR_ITEMS = [
     name: 'Groups',
     icon: <MdGroup size={22} />,
     path: '/groups',
+    count: 0
+  },
+  {
+    name: 'Messages',
+    icon: <MdChat size={22} />,
+    path: '/chat',
     count: 0
   }
 ];
@@ -124,5 +131,13 @@ export const API_ENDPOINTS = {
     LIST: '/api/groups/',
     MEMBERS: '/api/groups/:id/members',
     SEND: '/api/groups/:id/send'
+  },
+  CHAT: {
+    BASE: '/api/chat',
+    DIRECT: '/api/chat/direct',
+    GROUP: '/api/chat/group',
+    USER_CHATS: '/api/chat/user/:email',
+    MESSAGES: '/api/chat/:chatId/messages',
+    SEND_MESSAGE: '/api/chat/message'
   }
 };

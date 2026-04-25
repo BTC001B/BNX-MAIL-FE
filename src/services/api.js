@@ -132,3 +132,12 @@ export const groupAPI = {
     getMembers: (groupId) => api.get(API_ENDPOINTS.GROUPS.MEMBERS.replace(':id', groupId)),
     sendBroadcast: (groupId, data) => api.post(API_ENDPOINTS.GROUPS.SEND.replace(':id', groupId), data),
 };
+
+// Chat APIs
+export const chatAPI = {
+    createDirectChat: (data) => api.post(API_ENDPOINTS.CHAT.DIRECT, data),
+    createGroupChat: (data) => api.post(API_ENDPOINTS.CHAT.GROUP, data),
+    getUserChats: (email) => api.get(API_ENDPOINTS.CHAT.USER_CHATS.replace(':email', email)),
+    getMessageHistory: (chatId) => api.get(API_ENDPOINTS.CHAT.MESSAGES.replace(':chatId', chatId)),
+    sendMessage: (data) => api.post(API_ENDPOINTS.CHAT.SEND_MESSAGE, data),
+};
