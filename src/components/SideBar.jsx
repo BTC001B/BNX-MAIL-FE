@@ -90,7 +90,7 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile }) => {
       </nav>
 
       {/* STORAGE */}
-      <div className="p-4 mt-auto">
+      {/* <div className="p-4 mt-auto">
         <div className="rounded-xl p-4 glass-input dark:bg-gray-800/50">
           <div className="flex justify-between mb-3 items-center">
             <span className="text-xs font-semibold" style={{ color: theme.subText }}>STORAGE</span>
@@ -102,7 +102,7 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile }) => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </aside>
   );
 };
