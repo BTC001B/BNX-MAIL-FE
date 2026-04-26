@@ -18,6 +18,8 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            export VITE_API_URL=${{ secrets.VITE_API_URL }}
+            export VITE_WS_URL=${{ secrets.VITE_WS_URL }}
             cd /var/www/BNX-MAIL-FE
             git fetch origin
             git reset --hard origin/main
