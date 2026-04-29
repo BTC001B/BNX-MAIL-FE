@@ -14,6 +14,7 @@ import SideBar from "./components/SideBar";
 /* Pages */
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 import CreateMailbox from "./pages/CreateMailbox";
 import Inbox from "./pages/Inbox";
 import Starred from "./pages/Starred";
@@ -121,6 +122,7 @@ const App = () => (
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/create-mailbox" element={<CreateMailbox />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />

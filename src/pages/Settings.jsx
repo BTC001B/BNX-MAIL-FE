@@ -27,6 +27,7 @@ const Settings = () => {
   const [showCreateEmail, setShowCreateEmail] = useState(false);
   const [newEmail, setNewEmail] = useState({ emailName: "", password: "" });
   const [passwords, setPasswords] = useState({ oldPassword: "", newPassword: "" });
+  const [recoveryInfo, setRecoveryInfo] = useState({ recoveryEmail: "", phoneNumber: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -34,6 +35,7 @@ const Settings = () => {
     if (activeTab === "accounts") fetchEmails();
     if (activeTab === "sessions") fetchSessions();
     if (activeTab === "activity") fetchActivityLogs();
+    if (activeTab === "recovery") fetchRecoveryInfo();
   }, [activeTab]);
 
   const fetchEmails = async () => {
@@ -81,6 +83,35 @@ const Settings = () => {
     }
   };
 
+  const fetchRecoveryInfo = async () => {
+    try {
+      setLoading(true);
+      const res = await userAPI.getRecovery();
+      if (res.data?.status === "success") {
+        setRecoveryInfo(res.data.data);
+      }
+    } catch {
+      toast.error("Failed to load recovery information");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateRecovery = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const res = await userAPI.updateRecovery(recoveryInfo);
+      if (res.data?.status === "success") {
+        toast.success("Recovery info updated successfully");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update recovery info");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCreateEmail = async (e) => {
     e.preventDefault();
     if (!newEmail.emailName || newEmail.password.length < 8) {
@@ -122,6 +153,7 @@ const Settings = () => {
         <h2 className="text-xl font-bold mb-4" style={{ color: theme.text }}>Settings</h2>
         <SideTab icon={<MdEmail />} label="Email Accounts" active={activeTab === "accounts"} onClick={() => setActiveTab("accounts")} theme={theme} />
         <SideTab icon={<MdSettings />} label="Account" active={activeTab === "account"} onClick={() => setActiveTab("account")} theme={theme} />
+        <SideTab icon={<MdSecurity />} label="Recovery" active={activeTab === "recovery"} onClick={() => setActiveTab("recovery")} theme={theme} />
         <SideTab icon={<MdColorLens />} label="Appearance" active={activeTab === "appearance"} onClick={() => setActiveTab("appearance")} theme={theme} />
         <SideTab icon={<MdSecurity />} label="Security" active={activeTab === "security"} onClick={() => setActiveTab("security")} theme={theme} />
         <SideTab icon={<MdDevices />} label="Active Sessions" active={activeTab === "sessions"} onClick={() => setActiveTab("sessions")} theme={theme} />
@@ -153,6 +185,39 @@ const Settings = () => {
               <input type="password" placeholder="Old Password" value={passwords.oldPassword} onChange={e => setPasswords({...passwords, oldPassword: e.target.value})} className="w-full mb-3 p-2 border rounded" />
               <input type="password" placeholder="New Password" value={passwords.newPassword} onChange={e => setPasswords({...passwords, newPassword: e.target.value})} className="w-full mb-3 p-2 border rounded" />
               <button type="submit" className="px-4 py-2 rounded text-white" style={{ background: theme.accent }}>Update Password</button>
+            </form>
+          </Section>
+        )}
+
+        {activeTab === "recovery" && (
+          <Section title="Account Recovery" theme={theme}>
+            <p className="mb-4 text-sm opacity-70">Update your recovery email and phone number to ensure you can always access your account.</p>
+            <form onSubmit={handleUpdateRecovery} className="max-w-md">
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Recovery Email</label>
+                <input 
+                  type="email" 
+                  placeholder="backup@example.com" 
+                  value={recoveryInfo.recoveryEmail || ""} 
+                  onChange={e => setRecoveryInfo({...recoveryInfo, recoveryEmail: e.target.value})} 
+                  className="w-full p-2 border rounded"
+                  style={{ background: theme.bg, borderColor: theme.border, color: theme.text }}
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-1">Phone Number</label>
+                <input 
+                  type="text" 
+                  placeholder="+1234567890" 
+                  value={recoveryInfo.phoneNumber || ""} 
+                  onChange={e => setRecoveryInfo({...recoveryInfo, phoneNumber: e.target.value})} 
+                  className="w-full p-2 border rounded"
+                  style={{ background: theme.bg, borderColor: theme.border, color: theme.text }}
+                />
+              </div>
+              <button type="submit" className="px-6 py-2 rounded font-medium text-white transition-opacity hover:opacity-90" style={{ background: theme.accent }}>
+                Save Recovery Info
+              </button>
             </form>
           </Section>
         )}

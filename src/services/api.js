@@ -32,31 +32,33 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
-            originalRequest._retry = true;
-            const refreshToken = localStorage.getItem('refreshToken');
+        if (error.response?.status === 401 || error.response?.status === 403) {
+            const isAuthPage = ['/login', '/register', '/create-mailbox'].includes(window.location.pathname);
 
-            if (refreshToken) {
-                try {
-                    const res = await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`, { refreshToken });
-                    if (res.data?.accessToken) {
-                        localStorage.setItem('accessToken', res.data.accessToken);
-                        localStorage.setItem('refreshToken', res.data.refreshToken);
-                        api.defaults.headers.common['Authorization'] = `Bearer ${res.data.accessToken}`;
-                        return api(originalRequest);
+            if (!originalRequest._retry && !isAuthPage) {
+                originalRequest._retry = true;
+                const refreshToken = localStorage.getItem('refreshToken');
+
+                if (refreshToken) {
+                    try {
+                        const res = await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`, { refreshToken });
+                        if (res.data?.accessToken) {
+                            localStorage.setItem('accessToken', res.data.accessToken);
+                            localStorage.setItem('refreshToken', res.data.refreshToken);
+                            api.defaults.headers.common['Authorization'] = `Bearer ${res.data.accessToken}`;
+                            originalRequest.headers['Authorization'] = `Bearer ${res.data.accessToken}`;
+                            return api(originalRequest);
+                        }
+                    } catch (refreshError) {
+                        console.error('Token refresh failed:', refreshError);
                     }
-                } catch (refreshError) {
-                    console.error('Token refresh failed:', refreshError);
-                    localStorage.clear();
-                    window.location.href = '/login';
                 }
-            } else {
-                // Only redirect if we're not on a public/temp-token page
-                const isAuthPage = ['/login', '/register', '/create-mailbox'].includes(window.location.pathname);
-                if (!isAuthPage) {
-                    localStorage.clear();
-                    window.location.href = '/login';
-                }
+            }
+
+            // If refresh fails or it's a second 401, redirect to login
+            if (!isAuthPage) {
+                localStorage.clear();
+                window.location.href = '/login';
             }
         }
         return Promise.reject(error);
@@ -88,6 +90,10 @@ export const authAPI = {
     logout: (refreshToken) => api.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken }),
     sessions: () => api.get(API_ENDPOINTS.AUTH.SESSIONS),
     changePassword: (data) => api.post(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, data),
+    getForgotPasswordOptions: (identifier) => api.get(`${API_ENDPOINTS.AUTH.FORGOT_PASSWORD_OPTIONS}?identifier=${identifier}`),
+    sendOTP: (data) => api.post(API_ENDPOINTS.AUTH.SEND_OTP, data),
+    verifyOTP: (data) => api.post(API_ENDPOINTS.AUTH.VERIFY_OTP, data),
+    resetPassword: (data) => api.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, data),
 };
 
 // Mail APIs
@@ -130,6 +136,8 @@ export const userAPI = {
     getSettings: () => api.get(API_ENDPOINTS.USERS.SETTINGS),
     updateSettings: (data) => api.patch(API_ENDPOINTS.USERS.SETTINGS, data),
     activityLogs: () => api.get(API_ENDPOINTS.USERS.ACTIVITY_LOGS),
+    getRecovery: () => api.get(API_ENDPOINTS.USERS.RECOVERY),
+    updateRecovery: (data) => api.patch(API_ENDPOINTS.USERS.RECOVERY, data),
 };
 
 // Business APIs

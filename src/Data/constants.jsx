@@ -89,7 +89,11 @@ export const API_ENDPOINTS = {
     REFRESH: '/api/auth/refresh',
     LOGOUT: '/api/auth/logout',
     SESSIONS: '/api/auth/sessions',
-    CHANGE_PASSWORD: '/api/auth/change-password'
+    CHANGE_PASSWORD: '/api/auth/change-password',
+    FORGOT_PASSWORD_OPTIONS: '/api/auth/forgot-password/options',
+    SEND_OTP: '/api/auth/forgot-password/send-otp',
+    VERIFY_OTP: '/api/auth/forgot-password/verify-otp',
+    RESET_PASSWORD: '/api/auth/reset-password'
   },
   MAIL: {
     INBOX: '/api/mail/inbox',
@@ -119,7 +123,8 @@ export const API_ENDPOINTS = {
   },
   USERS: {
     SETTINGS: '/api/users/settings',
-    ACTIVITY_LOGS: '/api/users/activity-logs'
+    ACTIVITY_LOGS: '/api/users/activity-logs',
+    RECOVERY: '/api/users/recovery'
   },
   BUSINESS: {
     REGISTER: '/api/business/register',
