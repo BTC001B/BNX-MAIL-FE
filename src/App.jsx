@@ -98,7 +98,7 @@ const AppContent = () => {
             <Route path="/" element={<Inbox searchQuery={searchQuery} />} />
             <Route path="/inbox" element={<AllMail searchQuery={searchQuery} />} />
             <Route path="/starred" element={<Starred />} />
-            <Route path="/drafts" element={<Draft />} />
+            <Route path="/draft" element={<Draft />} />
             <Route path="/sent" element={<Send />} />
             <Route path="/outbox" element={<Outbox />} />
             <Route path="/spam" element={<Spam />} />

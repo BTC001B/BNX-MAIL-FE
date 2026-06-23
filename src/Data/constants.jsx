@@ -110,6 +110,7 @@ export const API_ENDPOINTS = {
     SPAM: '/api/mail/spam',
     SNOOZED: '/api/mail/snoozed',
     ARCHIVE: '/api/mail/archive',
+    DRAFTS: '/api/mail/draft',
     MOVE_ARCHIVE: '/api/mail/archive',
     UNARCHIVE: '/api/mail/unarchive',
     SEND: '/api/mail/send',

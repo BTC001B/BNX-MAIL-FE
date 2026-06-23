@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMail } from "../context/MailContext";
+import { MdDrafts } from "react-icons/md";
 import EmailList from "../components/EmailList";
 import EmailDetails from "../components/EmailDetails";
 import { useTheme } from "../context/ThemeContext";
@@ -7,36 +9,27 @@ import { useTheme } from "../context/ThemeContext";
 const Draft = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { emails, loading, fetchEmails, handleToggleStar, handleMoveToTrash, handleApplyLabel, handleArchive } = useMail();
+  const [selectedEmailUid, setSelectedEmailUid] = useState(null);
+  const selectedEmail = emails.find((e) => String(e.uid) === String(selectedEmailUid));
 
-  const [drafts, setDrafts] = useState([]);
-  const [selectedDraft, setSelectedDraft] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  /* ---------------- FETCH DRAFTS ---------------- */
   useEffect(() => {
-    fetchDrafts();
-  }, []);
+    fetchEmails('draft');
+  }, [fetchEmails]);
 
-  const fetchDrafts = async () => {
-    try {
-      setLoading(true);
-
-      // 🔹 Backend-ready
-      // const res = await mailAPI.getDrafts();
-      // if (res.data?.success) setDrafts(res.data.data.drafts || []);
-
-      // TEMP fallback
-      setDrafts([]);
-    } finally {
-      setLoading(false);
-    }
+  const handleSelectEmail = (email) => {
+    setSelectedEmailUid(email.uid);
   };
 
-  const handleSelectDraft = (draft) => {
-    setSelectedDraft(draft);
+  const handleReply = (email) => {
+    // Open draft in composer
+    navigate("/compose", {
+      state: {
+        draft: email
+      },
+    });
   };
 
-  /* ---------------- LOADING ---------------- */
   if (loading) {
     return (
       <div
@@ -51,20 +44,24 @@ const Draft = () => {
     );
   }
 
-  /* ---------------- MAIN UI ---------------- */
   return (
     <div className="h-full flex flex-col overflow-hidden bg-transparent">
-      {selectedDraft ? (
+      {selectedEmail ? (
         <EmailDetails
-          email={selectedDraft}
-          onBack={() => setSelectedDraft(null)}
-          onReply={(draft) =>
-            navigate("/compose", {
-              state: {
-                draft,
-              },
-            })
-          }
+          email={selectedEmail}
+          onBack={() => setSelectedEmailUid(null)}
+          onClose={() => setSelectedEmailUid(null)}
+          onDelete={(uid) => {
+            handleMoveToTrash(uid, "draft");
+            setSelectedEmailUid(null);
+          }}
+          onStar={(uid) => handleToggleStar(uid, "draft")}
+          onArchive={(uid) => {
+            handleArchive(uid, "draft");
+            setSelectedEmailUid(null);
+          }}
+          onReply={handleReply}
+          onApplyLabel={handleApplyLabel}
         />
       ) : (
         <>
@@ -77,19 +74,19 @@ const Draft = () => {
               className="text-base font-bold flex items-center gap-2"
               style={{ color: theme.text }}
             >
-              Drafts
+              <MdDrafts className="text-primary" size={20} style={{ color: theme.accent }} /> Drafts
               <span
                 className="ml-2 text-xs font-normal"
                 style={{ color: theme.subText }}
               >
-                ({drafts.length})
+                ({emails.length})
               </span>
             </h2>
           </div>
 
           {/* EMAIL LIST CONTAINER */}
           <div className="flex-1 overflow-y-auto hidden-scrollbar pb-12">
-            {drafts.length === 0 ? (
+            {emails.length === 0 ? (
               <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
                 <span className="text-5xl mb-3">📝</span>
                 <p
@@ -111,9 +108,13 @@ const Draft = () => {
               </div>
             ) : (
               <EmailList
-                emails={drafts}
-                selectedEmailId={selectedDraft?.uid}
-                onSelectEmail={handleSelectDraft}
+                emails={emails}
+                selectedEmailId={selectedEmail?.uid}
+                onSelectEmail={handleSelectEmail}
+                onStar={(uid) => handleToggleStar(uid, "draft")}
+                onArchive={(uid) => handleArchive(uid, "draft")}
+                onDelete={(uid) => handleMoveToTrash(uid, "draft")}
+                showTo={true}
               />
             )}
           </div>

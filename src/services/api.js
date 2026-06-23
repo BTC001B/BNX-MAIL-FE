@@ -117,6 +117,7 @@ export const authAPI = {
 export const mailAPI = {
     getInbox: (limit = 50) => api.get(`${API_ENDPOINTS.MAIL.INBOX}?limit=${limit}`),
     getSent: (limit = 50) => api.get(`${API_ENDPOINTS.MAIL.SENT}?limit=${limit}`),
+    getDrafts: (limit = 50) => api.get(`${API_ENDPOINTS.MAIL.DRAFTS}?limit=${limit}`),
     getStarred: (limit = 50) => api.get(`${API_ENDPOINTS.MAIL.STARRED}?limit=${limit}`),
     getTrash: (limit = 50) => api.get(`${API_ENDPOINTS.MAIL.TRASH}?limit=${limit}`),
     getSpam: (limit = 50) => api.get(`${API_ENDPOINTS.MAIL.SPAM}?limit=${limit}`),

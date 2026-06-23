@@ -57,6 +57,8 @@ export const MailProvider = ({ children }) => {
             switch (folder.toLowerCase()) {
                 case 'inbox': res = await mailAPI.getInbox(); break;
                 case 'sent': res = await mailAPI.getSent(); break;
+                case 'draft':
+                case 'drafts': res = await mailAPI.getDrafts(); break;
                 case 'starred': res = await mailAPI.getStarred(); break;
                 case 'trash': res = await mailAPI.getTrash(); break;
                 case 'spam': res = await mailAPI.getSpam(); break;
@@ -229,7 +231,7 @@ export const MailProvider = ({ children }) => {
         try {
             await mailAPI.unarchive(uid);
             setEmails(prev => prev.filter(m => String(m.uid) !== String(uid)));
-            toast.success('Email restored to Inbox');
+            toast.success('Email restored');
         } catch (error) {
             console.error('Failed to unarchive:', error);
             toast.error('Failed to unarchive email');

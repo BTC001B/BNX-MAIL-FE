@@ -52,6 +52,17 @@ const ComposePage = () => {
             ? `\n\n--- Original Message ---\n${location.state.originalBody}`
             : "",
         }));
+      } else if (location.state.draft) {
+        const d = location.state.draft;
+        setFormData({
+          to: d.to || "",
+          cc: d.cc || "",
+          bcc: d.bcc || "",
+          subject: d.subject || "",
+          body: d.body || "",
+        });
+        if (d.cc) setShowCc(true);
+        if (d.bcc) setShowBcc(true);
       } else {
         setFormData((prev) => ({
           ...prev,
