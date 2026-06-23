@@ -141,6 +141,33 @@ const ComposePage = () => {
     }
   };
 
+  const handleClose = async () => {
+    const hasContent = formData.to.trim() || formData.subject.trim() || formData.body.trim() || formData.cc.trim() || formData.bcc.trim();
+    if (hasContent) {
+      try {
+        setSending(true);
+        setError("");
+        setSuccess("Saving draft...");
+        const payload = {
+          to: formData.to,
+          subject: formData.subject || "(No Subject)",
+          body: formData.body,
+        };
+        if (formData.cc) payload.cc = formData.cc;
+        if (formData.bcc) payload.bcc = formData.bcc;
+
+        await mailAPI.saveDraft(payload);
+        setSuccess("Draft saved successfully");
+        setTimeout(() => navigate("/inbox"), 1000);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to save draft");
+        setSending(false);
+      }
+    } else {
+      navigate("/inbox");
+    }
+  };
+
   const handleDiscard = () => {
     if (window.confirm("Discard this email?")) {
       navigate("/inbox");
@@ -165,7 +192,7 @@ const ComposePage = () => {
               New Message
             </h2>
             <button
-              onClick={() => navigate("/inbox")}
+              onClick={handleClose}
               className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors tooltip-trigger flex items-center justify-center text-gray-500 hover:text-gray-900 dark:hover:text-gray-100"
               title="Close"
             >
