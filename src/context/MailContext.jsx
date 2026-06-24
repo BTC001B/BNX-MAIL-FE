@@ -275,6 +275,16 @@ export const MailProvider = ({ children }) => {
         }
     };
 
+    const handleRemoveLabel = async (uid, labelId, folder = currentFolder) => {
+        try {
+            await mailAPI.removeLabel(uid, labelId, folder);
+            toast.success('Label removed');
+            setEmails(prev => prev.map(m => String(m.uid) === String(uid) ? { ...m, labels: m.labels?.filter(l => l.id !== labelId) } : m));
+        } catch (error) {
+            toast.error('Failed to remove label');
+        }
+    };
+
     const handleArchive = async (uid, folder) => {
         try {
             await mailAPI.archive(uid, folder);
@@ -332,6 +342,7 @@ export const MailProvider = ({ children }) => {
             handleSnooze,
             handleCreateLabel,
             handleApplyLabel,
+            handleRemoveLabel,
             handleArchive,
             handleUnarchive,
             handleDeleteLabel,

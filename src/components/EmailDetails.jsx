@@ -87,7 +87,7 @@ const EmailDetails = ({
   isArchiveFolder = false,
 }) => {
   const { theme } = useTheme();
-  const { labels } = useMail();
+  const { labels, handleRemoveLabel } = useMail();
   const [showLabels, setShowLabels] = useState(false);
   const [imagePreviews, setImagePreviews] = useState({});
 
@@ -348,10 +348,20 @@ const EmailDetails = ({
             {email.labels?.map((label) => (
               <span
                 key={label.id}
-                className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-white shadow-sm border border-black/5 dark:border-white/5"
+                className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-white shadow-sm border border-black/5 dark:border-white/5 flex items-center gap-1.5"
                 style={{ backgroundColor: label.colorHex }}
               >
                 {label.name}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveLabel(email.uid, label.id, getFolder());
+                  }}
+                  className="hover:bg-black/20 rounded-full p-0.5 transition-colors flex items-center justify-center"
+                  title="Remove label"
+                >
+                  <MdClose size={12} />
+                </button>
               </span>
             ))}
           </div>
