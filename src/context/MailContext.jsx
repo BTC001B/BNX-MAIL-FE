@@ -19,9 +19,9 @@ export const MailProvider = ({ children }) => {
         currentFolderRef.current = currentFolder;
     }, [currentFolder]);
 
-    const fetchLabelEmails = useCallback(async (labelId) => {
+    const fetchLabelEmails = useCallback(async (labelId, silent = false) => {
         if (!user) return;
-        setLoading(true);
+        if (!silent) setLoading(true);
         // Only clear if the folder actually changed to avoid flashing on auto-polling/refresh
         setEmails(prev => (currentFolder === `label-${labelId}` ? prev : []));
         setCurrentFolder(`label-${labelId}`);
@@ -41,13 +41,13 @@ export const MailProvider = ({ children }) => {
             console.error('Failed to fetch label emails:', error);
             toast.error('Failed to load labeled emails');
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     }, [user, currentFolder]);
 
-    const fetchEmails = useCallback(async (folder = currentFolder) => {
+    const fetchEmails = useCallback(async (folder = currentFolder, silent = false) => {
         if (!user) return;
-        setLoading(true);
+        if (!silent) setLoading(true);
         // Only clear if the folder actually changed to avoid flashing on auto-polling/refresh
         setEmails(prev => (currentFolder === folder ? prev : []));
         setCurrentFolder(folder);
@@ -129,7 +129,7 @@ export const MailProvider = ({ children }) => {
             console.error(`Failed to fetch ${folder}:`, error);
             toast.error(`Failed to load ${folder}`);
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     }, [user, currentFolder]);
 
@@ -160,9 +160,9 @@ export const MailProvider = ({ children }) => {
                 console.log('⏰ Auto-polling emails for:', currentFolder);
                 if (currentFolder.startsWith('label-')) {
                     const labelId = currentFolder.replace('label-', '');
-                    fetchLabelEmails(labelId);
+                    fetchLabelEmails(labelId, true);
                 } else {
-                    fetchEmails(currentFolder);
+                    fetchEmails(currentFolder, true);
                 }
             }
         }, 30000);
