@@ -173,7 +173,7 @@ export const MailProvider = ({ children }) => {
     const handleToggleStar = async (uid, folder) => {
         // Optimistic update
         setEmails(prev => {
-            if (folder?.toLowerCase() === 'starred') {
+            if (currentFolder?.toLowerCase() === 'starred') {
                 return prev.filter(m => String(m.uid) !== String(uid));
             }
             return prev.map(m => String(m.uid) === String(uid) ? { ...m, starred: !m.starred } : m);
@@ -182,12 +182,22 @@ export const MailProvider = ({ children }) => {
         try {
             const res = await mailAPI.toggleStar(uid, folder);
             if (!res.data?.success) {
-                // Rollback if failed (simplified for this example)
-                fetchEmails(folder);
+                // Rollback if failed
+                if (currentFolder.startsWith('label-')) {
+                    const labelId = currentFolder.replace('label-', '');
+                    fetchLabelEmails(labelId);
+                } else {
+                    fetchEmails(currentFolder);
+                }
                 toast.error('Failed to update star');
             }
         } catch (error) {
-            fetchEmails(folder);
+            if (currentFolder.startsWith('label-')) {
+                const labelId = currentFolder.replace('label-', '');
+                fetchLabelEmails(labelId);
+            } else {
+                fetchEmails(currentFolder);
+            }
             toast.error('Failed to update star');
         }
     };
@@ -269,7 +279,12 @@ export const MailProvider = ({ children }) => {
         try {
             await mailAPI.applyLabel(uid, labelId, folder);
             toast.success('Label applied');
-            fetchEmails(folder);
+            if (currentFolder.startsWith('label-')) {
+                const currentLabelId = currentFolder.replace('label-', '');
+                fetchLabelEmails(currentLabelId);
+            } else {
+                fetchEmails(currentFolder);
+            }
         } catch (error) {
             toast.error('Failed to apply label');
         }
@@ -279,7 +294,11 @@ export const MailProvider = ({ children }) => {
         try {
             await mailAPI.removeLabel(uid, labelId, folder);
             toast.success('Label removed');
-            setEmails(prev => prev.map(m => String(m.uid) === String(uid) ? { ...m, labels: m.labels?.filter(l => l.id !== labelId) } : m));
+            if (currentFolder === `label-${labelId}`) {
+                setEmails(prev => prev.filter(m => String(m.uid) !== String(uid)));
+            } else {
+                setEmails(prev => prev.map(m => String(m.uid) === String(uid) ? { ...m, labels: m.labels?.filter(l => l.id !== labelId) } : m));
+            }
         } catch (error) {
             toast.error('Failed to remove label');
         }
