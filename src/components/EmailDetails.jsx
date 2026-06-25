@@ -10,7 +10,13 @@ import {
   MdForward,
   MdFileDownload,
   MdRemoveRedEye,
-  MdClose
+  MdClose,
+  MdWbSunny, 
+  MdNightsStay, 
+  MdToday, 
+  MdEvent, 
+  MdUpdate, 
+  MdDateRange
 } from "react-icons/md";
 import { useMail } from "../context/MailContext";
 import { useTheme } from "../context/ThemeContext";
@@ -91,7 +97,62 @@ const EmailDetails = ({
   const { labels, handleRemoveLabel } = useMail();
   const isActuallyArchived = isArchiveFolder || email.folderName?.toLowerCase() === "archive";
   const [showLabels, setShowLabels] = useState(false);
+  const [showSnooze, setShowSnooze] = useState(false);
+  const [customSnooze, setCustomSnooze] = useState(false);
+  const [customDateTime, setCustomDateTime] = useState("");
   const [imagePreviews, setImagePreviews] = useState({});
+
+  const getSnoozeOptions = () => {
+    const now = new Date();
+    
+    // Later today: 6 PM today (or +3 hours if past 5 PM)
+    const laterToday = new Date(now);
+    if (now.getHours() >= 17) {
+      laterToday.setHours(now.getHours() + 3);
+    } else {
+      laterToday.setHours(18, 0, 0, 0);
+    }
+
+    // Tomorrow: 8 AM tomorrow
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(8, 0, 0, 0);
+
+    // Later this week: Thursday 8 AM (if today is Mon/Tue/Wed), else +2 days 8 AM
+    const laterThisWeek = new Date(now);
+    if (now.getDay() < 4) {
+      laterThisWeek.setDate(now.getDate() + (4 - now.getDay()));
+    } else {
+      laterThisWeek.setDate(now.getDate() + 2);
+    }
+    laterThisWeek.setHours(8, 0, 0, 0);
+
+    // This weekend: Saturday 8 AM
+    const thisWeekend = new Date(now);
+    const daysToSaturday = 6 - now.getDay();
+    thisWeekend.setDate(now.getDate() + (daysToSaturday === 0 ? 7 : daysToSaturday));
+    thisWeekend.setHours(8, 0, 0, 0);
+
+    // Next week: Monday 8 AM
+    const nextWeek = new Date(now);
+    const daysToMonday = (8 - now.getDay()) % 7 || 7;
+    nextWeek.setDate(now.getDate() + daysToMonday);
+    nextWeek.setHours(8, 0, 0, 0);
+
+    const formatTime = (d) => {
+      const timeStr = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const dateStr = d.toLocaleDateString([], { weekday: 'short' });
+      return `${dateStr}, ${timeStr}`;
+    };
+
+    return [
+      { label: "Later today", time: laterToday, display: formatTime(laterToday), icon: <MdToday size={18} className="text-amber-500" /> },
+      { label: "Tomorrow", time: tomorrow, display: formatTime(tomorrow), icon: <MdWbSunny size={18} className="text-yellow-500" /> },
+      { label: "Later this week", time: laterThisWeek, display: formatTime(laterThisWeek), icon: <MdEvent size={18} className="text-indigo-500" /> },
+      { label: "This weekend", time: thisWeekend, display: formatTime(thisWeekend), icon: <MdNightsStay size={18} className="text-purple-500" /> },
+      { label: "Next week", time: nextWeek, display: formatTime(nextWeek), icon: <MdUpdate size={18} className="text-emerald-500" /> },
+    ];
+  };
 
   const getFolder = () => {
     if (isArchiveFolder) return "Archive";
@@ -262,21 +323,116 @@ const EmailDetails = ({
             {isActuallyArchived ? <MdUnarchive size={20} /> : <MdArchive size={20} />}
           </button>
 
-          <button
-            onClick={() => {
-              const wakeUpAt = new Date();
-              wakeUpAt.setDate(wakeUpAt.getDate() + 1);
-              onSnooze?.(email.uid, wakeUpAt.toISOString());
-            }}
-            className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 hover:text-blue-500 cursor-pointer"
-            title="Snooze"
-          >
-            <MdAccessTime size={20} />
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => {
+                setShowSnooze(!showSnooze);
+                setCustomSnooze(false);
+                setShowLabels(false);
+              }}
+              className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 hover:text-blue-500 cursor-pointer"
+              title="Snooze"
+            >
+              <MdAccessTime size={20} />
+            </button>
+
+            {showSnooze && (
+              <div
+                className="absolute left-0 mt-2 w-64 rounded-xl shadow-2xl z-30 border bg-white dark:bg-neutral-900 border-gray-200 dark:border-neutral-800 overflow-hidden text-sm flex flex-col py-1.5 animate-fadeIn"
+              >
+                <div className="px-4 py-2 font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-neutral-800 flex items-center justify-between">
+                  <span>Snooze until...</span>
+                  <button 
+                    onClick={() => { setShowSnooze(false); setCustomSnooze(false); }}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {customSnooze ? (
+                  <div className="p-4 flex flex-col gap-3">
+                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Select Date & Time
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={customDateTime}
+                      onChange={(e) => setCustomDateTime(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <div className="flex gap-2 justify-end mt-2">
+                      <button
+                        onClick={() => setCustomSnooze(false)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800"
+                      >
+                        Back
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (!customDateTime) {
+                            alert("Please select a valid date and time.");
+                            return;
+                          }
+                          const dateObj = new Date(customDateTime);
+                          if (dateObj <= new Date()) {
+                            alert("Please select a future date and time.");
+                            return;
+                          }
+                          onSnooze?.(email.uid, dateObj.toISOString());
+                          setShowSnooze(false);
+                          setCustomSnooze(false);
+                          if (onBack) onBack();
+                        }}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-500/20"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {getSnoozeOptions().map((opt, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          onSnooze?.(email.uid, opt.time.toISOString());
+                          setShowSnooze(false);
+                          if (onBack) onBack();
+                        }}
+                        className="w-full text-left px-4 py-2.5 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] flex items-center justify-between gap-3 cursor-pointer transition-colors"
+                      >
+                        <div className="flex items-center gap-3 truncate">
+                          {opt.icon}
+                          <span className="text-gray-800 dark:text-gray-200 font-medium truncate">{opt.label}</span>
+                        </div>
+                        <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{opt.display}</span>
+                      </button>
+                    ))}
+
+                    <div className="border-t border-gray-100 dark:border-neutral-800 my-1"></div>
+
+                    <button
+                      onClick={() => {
+                        setCustomSnooze(true);
+                        const defaultCustom = new Date();
+                        defaultCustom.setMinutes(defaultCustom.getMinutes() - defaultCustom.getTimezoneOffset());
+                        setCustomDateTime(defaultCustom.toISOString().slice(0, 16));
+                      }}
+                      className="w-full text-left px-4 py-2.5 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] flex items-center gap-3 cursor-pointer transition-colors text-blue-500 dark:text-blue-400 font-medium"
+                    >
+                      <MdDateRange size={18} />
+                      <span>Select date & time</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
 
           <div className="relative">
             <button
-              onClick={() => setShowLabels(!showLabels)}
+              onClick={() => { setShowLabels(!showLabels); setShowSnooze(false); }}
               className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 hover:text-indigo-500 cursor-pointer"
               title="Labels"
             >
