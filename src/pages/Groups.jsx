@@ -13,7 +13,7 @@ const Groups = () => {
     const { theme } = useTheme();
 
     // Determine if we are in "Groups" mode or "Direct Messages" mode
-    const isGroupsMode = location.pathname.includes('/groups');
+    const isGroupsMode = location.pathname.includes('/colab');
     const modeTitle = isGroupsMode ? "Groups" : "Direct Messages";
     const modeIcon = isGroupsMode ? <MdGroup className="text-primary" /> : <MdChat className="text-primary" />;
 
