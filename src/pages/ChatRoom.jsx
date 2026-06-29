@@ -33,8 +33,8 @@ const ChatRoom = () => {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Split Panel Layout States (Only for type === 'GROUP')
-  const [rightPanelTab, setRightPanelTab] = useState("email"); // "email" | "info"
+  // Layout States (Info Modal & Responsive Composer)
+  const [showInfoModal, setShowInfoModal] = useState(false);
   const [showRightPanelMobile, setShowRightPanelMobile] = useState(false);
 
   // Group Members State
@@ -284,27 +284,41 @@ const ChatRoom = () => {
           >
             <MdArrowBack size={24} />
           </button>
-          <div className="flex items-center gap-3">
+          
+          {/* Clickable Group Name to open Colab Info Modal */}
+          <div 
+            onClick={() => {
+              if (chat?.type === 'GROUP') {
+                setShowInfoModal(true);
+              }
+            }}
+            className={`flex items-center gap-3 ${chat?.type === 'GROUP' ? 'cursor-pointer hover:opacity-80 transition-all' : ''}`}
+            title={chat?.type === 'GROUP' ? "View group details & members" : ""}
+          >
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold shadow-sm ${chat?.type === 'GROUP' ? 'bg-gradient-to-br from-primary to-purple-600' : 'bg-gradient-to-br from-teal-500 to-blue-600'}`}>
               {chatName?.charAt(0)}
             </div>
             <div>
-              <h2 className="font-bold leading-tight" style={{ color: theme.text }}>{chatName}</h2>
+              <div className="flex items-center gap-1">
+                <h2 className="font-bold leading-tight text-sm sm:text-base" style={{ color: theme.text }}>{chatName}</h2>
+                {chat?.type === 'GROUP' && <MdInfoOutline size={14} className="opacity-60 text-gray-500 dark:text-gray-400" />}
+              </div>
               <p className="text-[10px] uppercase tracking-widest font-bold text-primary opacity-80">
                 {chat?.type || 'CONVERSATION'} • {isConnected ? 'Online' : 'Reconnecting...'}
               </p>
             </div>
           </div>
         </div>
+
         <div className="flex items-center gap-2">
           {chat?.type === 'GROUP' && (
             <button 
               onClick={() => setShowRightPanelMobile(!showRightPanelMobile)}
               className="md:hidden p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors" 
               style={{ color: theme.subText }}
-              title="Show Group Control Deck"
+              title="Compose broadcast email"
             >
-              <MdInfoOutline size={22} />
+              <MdEmail size={22} />
             </button>
           )}
           <button className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors" style={{ color: theme.subText }}>
@@ -315,7 +329,7 @@ const ChatRoom = () => {
 
       {/* Main Split Container */}
       <div className="flex-1 flex flex-row overflow-hidden relative">
-        {/* Left Side: Chat Room (Visible always) */}
+        {/* Left Side: Chat Room (WebSocket messaging) */}
         <div className={`flex flex-col h-full overflow-hidden transition-all duration-300 ${chat?.type === 'GROUP' ? 'w-full md:w-1/2' : 'w-full'}`}>
           {/* MESSAGES AREA */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4 hidden-scrollbar bg-white/10 dark:bg-black/10">
@@ -388,41 +402,22 @@ const ChatRoom = () => {
           </div>
         </div>
 
-        {/* Right Side: Split Control Deck (Email sending & Colab Info) */}
+        {/* Right Side: Professional Broadcast composer */}
         {chat?.type === 'GROUP' && (
           <div
             className={`
               flex-col h-full border-l border-gray-200/50 dark:border-gray-800/50 bg-white/30 dark:bg-gray-900/30 backdrop-blur-lg overflow-hidden shrink-0 transition-all duration-300
               md:flex md:w-1/2 w-full
-              ${showRightPanelMobile ? "fixed inset-0 z-40 flex bg-white/95 dark:bg-gray-950/95" : "hidden"}
+              ${showRightPanelMobile ? "fixed inset-0 z-45 flex bg-white/95 dark:bg-gray-950/95" : "hidden"}
             `}
           >
-            {/* Split Panel Header */}
+            {/* Header: Professional Broadcast Title */}
             <div className="p-4 border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between bg-black/[0.02] dark:bg-white/[0.02]">
-              <div className="flex gap-2 p-0.5 bg-black/[0.04] dark:bg-white/[0.04] rounded-xl">
-                <button
-                  onClick={() => setRightPanelTab("email")}
-                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    rightPanelTab === "email"
-                      ? "bg-white dark:bg-gray-800 shadow-sm text-gray-900 dark:text-white"
-                      : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
-                  }`}
-                >
-                  <MdEmail size={16} /> Broadcast Mail
-                </button>
-                <button
-                  onClick={() => setRightPanelTab("info")}
-                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    rightPanelTab === "info"
-                      ? "bg-white dark:bg-gray-800 shadow-sm text-gray-900 dark:text-white"
-                      : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
-                  }`}
-                >
-                  <MdPeople size={16} /> Colab Info ({membersList.length})
-                </button>
-              </div>
-
-              {/* Close Button on Mobile Overlay */}
+              <h3 className="text-sm font-bold flex items-center gap-1.5" style={{ color: theme.text }}>
+                <MdEmail size={18} className="text-primary" style={{ color: theme.accent }} /> Professional Broadcast
+              </h3>
+              
+              {/* Close Button on Mobile Composer Overlay */}
               <button
                 onClick={() => setShowRightPanelMobile(false)}
                 className="md:hidden p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
@@ -432,165 +427,180 @@ const ChatRoom = () => {
               </button>
             </div>
 
-            {/* Split Panel Body Content */}
+            {/* Composer form details */}
             <div className="flex-1 overflow-y-auto p-5 hidden-scrollbar">
-              {rightPanelTab === "email" ? (
-                /* Tab 1: Broadcast Mail sending Form */
-                <form onSubmit={handleSendBroadcast} className="space-y-4 max-w-lg mx-auto">
-                  <div>
-                    <h3 className="text-lg font-bold flex items-center gap-2 mb-1" style={{ color: theme.text }}>
-                      Professional Broadcast
-                    </h3>
-                    <p className="text-xs opacity-60 leading-relaxed" style={{ color: theme.subText }}>
-                      Send an official email notification to all {membersList.length} members. 
-                      BNX-MAIL will send it to you with other members BCC'd.
-                    </p>
-                  </div>
-
-                  {/* Template Selection Dropdown */}
-                  {templates.length > 0 && (
-                    <div className="p-3.5 bg-black/[0.02] dark:bg-white/[0.02] border border-gray-200/50 dark:border-gray-800/50 rounded-xl">
-                      <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 opacity-65 flex items-center gap-1">
-                        <MdAssignment size={14} /> Quick Templates
-                      </label>
-                      <select
-                        value={selectedTemplate}
-                        onChange={(e) => handleSelectTemplate(e.target.value)}
-                        className="w-full p-2 border border-gray-200 dark:border-gray-800 rounded-lg text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-white outline-none"
-                      >
-                        <option value="">-- Choose a template to load --</option>
-                        {templates.map(t => (
-                          <option key={t.id} value={t.id}>{t.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  {/* Subject Input */}
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 opacity-65">
-                      Subject
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Email subject"
-                      value={emailSubject}
-                      onChange={(e) => setEmailSubject(e.target.value)}
-                      className="w-full p-3 border border-gray-200 dark:border-gray-800 rounded-xl text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-1 focus:ring-primary/45 focus:border-transparent transition-all"
-                      required
-                    />
-                  </div>
-
-                  {/* Body Textarea */}
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 opacity-65">
-                      Message Body (HTML support)
-                    </label>
-                    <textarea
-                      placeholder="Write email content here..."
-                      value={emailBody}
-                      onChange={(e) => setEmailBody(e.target.value)}
-                      className="w-full p-3 border border-gray-200 dark:border-gray-800 rounded-xl text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-1 focus:ring-primary/45 focus:border-transparent transition-all"
-                      rows={8}
-                      required
-                    />
-                  </div>
-
-                  {/* Actions */}
-                  <button
-                    disabled={sendingEmail || membersList.length === 0}
-                    type="submit"
-                    className="w-full py-2.5 rounded-xl font-semibold text-sm text-white shadow-md transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
-                    style={{ background: theme.accent || "#135bec" }}
-                  >
-                    {sendingEmail ? "Sending..." : "Send broadcast email"}
-                    <MdSend size={15} />
-                  </button>
-                </form>
-              ) : (
-                /* Tab 2: Colab Info / Members management */
-                <div className="space-y-6 max-w-lg mx-auto">
-                  {/* Group Info Metadata */}
-                  <div>
-                    <h3 className="text-lg font-bold" style={{ color: theme.text }}>
-                      {chat?.name || "Colab Group"}
-                    </h3>
-                    <p className="text-xs opacity-75 mt-1 leading-relaxed" style={{ color: theme.subText }}>
-                      {chat?.description || "A collaboration channel for team messaging and email broadcasting."}
-                    </p>
-                    <div className="mt-3.5 flex flex-wrap gap-2 text-[10px] uppercase font-bold tracking-wider opacity-60">
-                      <span className="bg-black/5 dark:bg-white/5 px-2.5 py-1 rounded-full">
-                        Colab ID: #{chatId}
-                      </span>
-                      {chat?.createdAt && (
-                        <span className="bg-black/5 dark:bg-white/5 px-2.5 py-1 rounded-full">
-                          Created: {new Date(chat.createdAt).toLocaleDateString()}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Add Members Form */}
-                  <form onSubmit={handleAddMembers} className="p-4 bg-black/[0.02] dark:bg-white/[0.02] border border-gray-200/50 dark:border-gray-800/50 rounded-2xl">
-                    <h4 className="text-xs font-bold uppercase tracking-wider mb-1 opacity-75 flex items-center gap-1">
-                      <MdPersonAdd size={16} /> Add Members
-                    </h4>
-                    <p className="text-[10px] opacity-60 mb-3">
-                      Enter email addresses separated by commas or spaces.
-                    </p>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="alice@bnxmail.com, bob@bnxmail.com"
-                        value={emailsInput}
-                        onChange={(e) => setEmailsInput(e.target.value)}
-                        className="flex-grow p-2.5 border border-gray-200 dark:border-gray-800 rounded-xl text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 outline-none"
-                      />
-                      <button
-                        type="submit"
-                        disabled={addingMembers || !emailsInput.trim()}
-                        className="px-4 py-2 bg-primary text-white text-xs font-semibold rounded-xl disabled:opacity-50 cursor-pointer shadow-sm"
-                        style={{ background: theme.accent }}
-                      >
-                        {addingMembers ? "Adding..." : "Add"}
-                      </button>
-                    </div>
-                  </form>
-
-                  {/* Members List */}
-                  <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider opacity-65 flex items-center gap-1.5">
-                      <MdPeople size={16} /> Group Members ({membersList.length})
-                    </h4>
-                    <div className="border border-gray-100 dark:border-gray-800 rounded-2xl divide-y divide-gray-50 dark:divide-gray-800 bg-white/40 dark:bg-gray-900/10 overflow-hidden shadow-inner">
-                      {membersList.map((email, idx) => {
-                        const isMe = email.toLowerCase() === user.email.toLowerCase();
-                        return (
-                          <div key={idx} className="p-3 flex items-center justify-between text-xs transition-colors hover:bg-black/[0.01]">
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary/80 to-purple-500/80 flex items-center justify-center font-bold text-white shrink-0 shadow-inner">
-                                {email.charAt(0).toUpperCase()}
-                              </div>
-                              <span className="font-semibold text-gray-700 dark:text-gray-300 truncate">
-                                {email}
-                              </span>
-                            </div>
-                            {isMe && (
-                              <span className="text-[9px] uppercase tracking-wide font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-sm">
-                                Owner
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+              <form onSubmit={handleSendBroadcast} className="space-y-4 max-w-lg mx-auto">
+                <div className="mb-2">
+                  <p className="text-xs opacity-60 leading-relaxed" style={{ color: theme.subText }}>
+                    Send an official email broadcast to all {membersList.length} members. 
+                    BNX-MAIL sends this directly from your professional inbox.
+                  </p>
                 </div>
-              )}
+
+                {/* Template Selection Dropdown */}
+                {templates.length > 0 && (
+                  <div className="p-3.5 bg-black/[0.02] dark:bg-white/[0.02] border border-gray-200/50 dark:border-gray-800/50 rounded-xl">
+                    <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 opacity-65 flex items-center gap-1">
+                      <MdAssignment size={14} /> Quick Templates
+                    </label>
+                    <select
+                      value={selectedTemplate}
+                      onChange={(e) => handleSelectTemplate(e.target.value)}
+                      className="w-full p-2 border border-gray-200 dark:border-gray-800 rounded-lg text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-white outline-none font-medium"
+                    >
+                      <option value="">-- Choose a template to load --</option>
+                      {templates.map(t => (
+                        <option key={t.id} value={t.id}>{t.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Subject Input */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 opacity-65">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Email subject"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    className="w-full p-3 border border-gray-200 dark:border-gray-800 rounded-xl text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-1 focus:ring-primary/45 focus:border-transparent transition-all"
+                    required
+                  />
+                </div>
+
+                {/* Body Textarea */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 opacity-65">
+                    Message Body (HTML support)
+                  </label>
+                  <textarea
+                    placeholder="Write email content here..."
+                    value={emailBody}
+                    onChange={(e) => setEmailBody(e.target.value)}
+                    className="w-full p-3 border border-gray-200 dark:border-gray-800 rounded-xl text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-1 focus:ring-primary/45 focus:border-transparent transition-all"
+                    rows={8}
+                    required
+                  />
+                </div>
+
+                {/* Actions */}
+                <button
+                  disabled={sendingEmail || membersList.length === 0}
+                  type="submit"
+                  className="w-full py-2.5 rounded-xl font-semibold text-sm text-white shadow-md transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
+                  style={{ background: theme.accent || "#135bec" }}
+                >
+                  {sendingEmail ? "Sending..." : "Send broadcast email"}
+                  <MdSend size={15} />
+                </button>
+              </form>
             </div>
           </div>
         )}
       </div>
+
+      {/* Colab Info Overlay Modal (Displays group metadata, members, and adding controls) */}
+      {showInfoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+          <div 
+            className="w-full max-w-md p-6 rounded-2xl border shadow-xl flex flex-col max-h-[85vh] overflow-hidden"
+            style={{ backgroundColor: theme.cardBg, borderColor: theme.border, color: theme.text }}
+          >
+            {/* Modal Header */}
+            <div className="flex justify-between items-center pb-3 border-b mb-4" style={{ borderColor: theme.border }}>
+              <h3 className="text-lg font-bold flex items-center gap-1.5">
+                <MdPeople size={20} className="text-primary" style={{ color: theme.accent }} /> Colab Channel Info
+              </h3>
+              <button 
+                onClick={() => setShowInfoModal(false)}
+                className="p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <MdClose size={22} style={{ color: theme.text }} />
+              </button>
+            </div>
+
+            {/* Modal Scrollable Body */}
+            <div className="flex-1 overflow-y-auto space-y-5 pr-1 hidden-scrollbar">
+              <div>
+                <h4 className="font-bold text-base">{chat?.name || "Colab Group"}</h4>
+                <p className="text-xs opacity-75 mt-1 leading-relaxed" style={{ color: theme.subText }}>
+                  {chat?.description || "A collaboration channel for team messaging and email broadcasting."}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2 text-[9px] uppercase font-bold tracking-wider opacity-60">
+                  <span className="bg-black/5 dark:bg-white/5 px-2.5 py-1 rounded-full">
+                    Channel ID: #{chatId}
+                  </span>
+                  {chat?.createdAt && (
+                    <span className="bg-black/5 dark:bg-white/5 px-2.5 py-1 rounded-full">
+                      Created: {new Date(chat.createdAt).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Add Members Form */}
+              <form onSubmit={handleAddMembers} className="p-4 bg-black/[0.02] dark:bg-white/[0.02] border border-gray-200/50 dark:border-gray-800/50 rounded-2xl">
+                <h5 className="text-xs font-bold uppercase tracking-wider mb-1 opacity-75 flex items-center gap-1">
+                  <MdPersonAdd size={16} /> Add New Members
+                </h5>
+                <p className="text-[10px] opacity-60 mb-3">
+                  Enter email addresses separated by commas or spaces.
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="alice@bnxmail.com, bob@bnxmail.com"
+                    value={emailsInput}
+                    onChange={(e) => setEmailsInput(e.target.value)}
+                    className="flex-grow p-2.5 border border-gray-200 dark:border-gray-800 rounded-xl text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 outline-none"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    disabled={addingMembers || !emailsInput.trim()}
+                    className="px-4 py-2 bg-primary text-white text-xs font-semibold rounded-xl disabled:opacity-50 cursor-pointer shadow-sm transition-all"
+                    style={{ background: theme.accent }}
+                  >
+                    {addingMembers ? "Adding..." : "Add"}
+                  </button>
+                </div>
+              </form>
+
+              {/* Members List */}
+              <div className="space-y-2">
+                <h5 className="text-xs font-bold uppercase tracking-wider opacity-65 flex items-center gap-1.5">
+                  <MdPeople size={16} /> Group Members ({membersList.length})
+                </h5>
+                <div className="border border-gray-100 dark:border-gray-800 rounded-2xl divide-y divide-gray-50 dark:divide-gray-800 bg-white/40 dark:bg-gray-900/10 overflow-hidden shadow-inner max-h-48 overflow-y-auto">
+                  {membersList.map((email, idx) => {
+                    const isMe = email.toLowerCase() === user.email.toLowerCase();
+                    return (
+                      <div key={idx} className="p-3 flex items-center justify-between text-xs transition-colors hover:bg-black/[0.01]">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary/80 to-purple-500/80 flex items-center justify-center font-bold text-white shrink-0 shadow-inner">
+                            {email.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="font-semibold text-gray-700 dark:text-gray-300 truncate">
+                            {email}
+                          </span>
+                        </div>
+                        {isMe && (
+                          <span className="text-[9px] uppercase tracking-wide font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-sm">
+                            Owner
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
