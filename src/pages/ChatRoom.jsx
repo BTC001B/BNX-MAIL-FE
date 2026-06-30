@@ -375,16 +375,17 @@ const ChatRoom = () => {
                       className="p-4 rounded-2xl border border-gray-200/40 dark:border-gray-800/40 bg-white/50 dark:bg-gray-900/50 hover:bg-white/80 dark:hover:bg-gray-900/80 transition-all shadow-sm flex flex-col gap-1.5"
                     >
                       <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200 leading-tight">
-                          {cleanSub}
-                        </h4>
+                      <div className="flex items-center gap-1.5 text-[10px] opacity-75 text-gray-500 font-semibold uppercase tracking-wider">
+                        <span>From: {b.from?.split("<")[0]?.trim() || b.from}</span>
+                      </div>
+
                         <span className="text-[10px] opacity-60 shrink-0 font-medium ml-2">
                           {b.sentDate ? new Date(b.sentDate).toLocaleString() : ""}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-[10px] opacity-75 text-gray-500 font-semibold uppercase tracking-wider">
-                        <span>From: {b.from?.split("<")[0]?.trim() || b.from}</span>
-                      </div>
+                        <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200 leading-tight">
+                          {cleanSub}
+                        </h4>
                       <div className="mt-1 text-xs leading-relaxed text-gray-600 dark:text-gray-300 break-words whitespace-pre-line border-t border-gray-100 dark:border-gray-800/60 pt-2">
                         {b.body || b.textPlain || "(Empty Content)"}
                       </div>
@@ -409,6 +410,14 @@ const ChatRoom = () => {
 
         {/* Right Side: Chat Room (40% width for GROUP, full width for DIRECT) */}
         <div className={`flex flex-col h-full overflow-hidden transition-all duration-300 ${chat?.type === 'GROUP' ? 'w-full md:w-[40%]' : 'w-full'}`}>
+          {/* Header: Instant Chat Messages Title (Only when split) */}
+          {chat?.type === 'GROUP' && (
+            <div className="p-4 border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between bg-black/[0.02] dark:bg-white/[0.02] shrink-0">
+              <h3 className="text-sm font-bold flex items-center gap-1.5" style={{ color: theme.text }}>
+                <MdChat size={18} className="text-primary" style={{ color: theme.accent }} /> Instant Chat Messages
+              </h3>
+            </div>
+          )}
           {/* MESSAGES AREA */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4 hidden-scrollbar bg-white/10 dark:bg-black/10">
             {loading && messages.length === 0 ? (
