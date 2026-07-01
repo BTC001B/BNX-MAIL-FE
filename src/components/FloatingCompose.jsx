@@ -13,11 +13,13 @@ import {
 import { mailAPI, api } from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 import { useMail } from "../context/MailContext";
+import { useAuth } from "../context/AuthContext";
 import { DEFAULT_TEMPLATES } from "../pages/Templates";
 import toast from "react-hot-toast";
 
 const FloatingCompose = () => {
   const { theme } = useTheme();
+  const { user } = useAuth();
   const { 
     isComposeOpen, 
     closeCompose, 
@@ -164,12 +166,13 @@ const FloatingCompose = () => {
           if (composeData.bcc) setShowBcc(true);
         }
       } else {
+        const savedSig = localStorage.getItem(`bnx_signature_${user?.email}`) || "";
         setFormData({
           to: "",
           cc: "",
           bcc: "",
           subject: "",
-          body: "",
+          body: savedSig ? `\n\n---\n${savedSig}` : "",
         });
         setShowCc(false);
         setShowBcc(false);
@@ -177,7 +180,7 @@ const FloatingCompose = () => {
       setError("");
       setSuccess("");
     }
-  }, [composeData, isComposeOpen]);
+  }, [composeData, isComposeOpen, user]);
 
   if (!isComposeOpen) return null;
 
@@ -297,44 +300,76 @@ const FloatingCompose = () => {
       return;
     }
 
-    try {
-      setSending(true);
+    const savedUndo = localStorage.getItem(`bnx_undo_send_${user?.email}`) || "0";
+    const delaySeconds = Number(savedUndo);
 
-      const payload = {
-        to: formData.to,
-        subject: formData.subject,
-        body: formData.body,
-      };
+    const payload = {
+      to: formData.to,
+      subject: formData.subject,
+      body: formData.body,
+    };
+    if (formData.cc) payload.cc = formData.cc;
+    if (formData.bcc) payload.bcc = formData.bcc;
 
-      if (formData.cc) payload.cc = formData.cc;
-      if (formData.bcc) payload.bcc = formData.bcc;
+    const executeSend = async (tid) => {
+      try {
+        let response;
+        if (draftId) {
+          await mailAPI.createDbDraft({
+            id: draftId,
+            ...payload,
+            isHtml: false
+          });
+          response = await mailAPI.sendDbDraft(draftId);
+        } else {
+          response = await mailAPI.send(payload);
+        }
 
-      let response;
-      if (draftId) {
-        // Update the DB draft content first
-        await mailAPI.createDbDraft({
-          id: draftId,
-          ...payload,
-          isHtml: false
-        });
-        // Send the DB draft
-        response = await mailAPI.sendDbDraft(draftId);
-      } else {
-        // Direct Send if no draft ID/attachments exists
-        response = await mailAPI.send(payload);
-      }
-
-      if (response.data?.success) {
-        setSuccess("Email sent successfully");
-        fetchEmails('inbox');
-        setTimeout(() => {
+        if (response.data?.success) {
+          toast.success("Email sent successfully", { id: tid });
+          fetchEmails('inbox');
           closeCompose();
-        }, 1000);
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to send email");
+        toast.error("Failed to send email", { id: tid });
+      } finally {
+        setSending(false);
       }
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to send email");
-    } finally {
-      setSending(false);
+    };
+
+    setSending(true);
+
+    if (delaySeconds > 0) {
+      let isUndone = false;
+      const toastId = toast((t) => (
+        <div className="flex items-center justify-between gap-4 text-xs font-semibold">
+          <span>Sending email in {delaySeconds}s...</span>
+          <button
+            type="button"
+            onClick={() => {
+              isUndone = true;
+              toast.dismiss(t.id);
+            }}
+            className="px-2.5 py-1 text-[10px] font-bold rounded-lg text-white bg-red-600 hover:bg-red-700 cursor-pointer outline-none"
+            style={{ backgroundColor: "#ef4444" }}
+          >
+            Undo
+          </button>
+        </div>
+      ), { duration: delaySeconds * 1000, position: "bottom-center" });
+
+      setTimeout(() => {
+        if (isUndone) {
+          setSending(false);
+          toast.error("Sending cancelled", { id: toastId });
+          return;
+        }
+        executeSend(toastId);
+      }, delaySeconds * 1000);
+    } else {
+      const toastId = toast.loading("Sending email...", { position: "bottom-center" });
+      executeSend(toastId);
     }
   };
 

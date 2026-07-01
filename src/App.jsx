@@ -101,10 +101,28 @@ const AppContent = () => {
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isBitToolSidebarOpen, setIsBitToolSidebarOpen] = useState(false);
-  const { theme } = useTheme();
+  const { theme, backgroundImage } = useTheme();
+
+  const rootStyle = backgroundImage
+    ? {
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+      }
+    : { backgroundColor: theme.bg };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden" style={{ backgroundColor: theme.bg }}>
+    <div className="flex flex-col h-screen overflow-hidden relative" style={rootStyle}>
+      {/* Semi-transparent overlay when a background image is active */}
+      {backgroundImage && (
+        <div 
+          className="absolute inset-0 pointer-events-none z-0" 
+          style={{ backgroundColor: theme.mode === "dark" ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.35)" }}
+        />
+      )}
+      <div className="relative z-[1] flex flex-col flex-1 overflow-hidden">
       <NavBar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -162,6 +180,7 @@ const AppContent = () => {
         </main>
 
         <BitToolSidebar isOpen={isBitToolSidebarOpen} onClose={() => setIsBitToolSidebarOpen(false)} />
+      </div>
       </div>
       <FloatingCompose />
       <Toaster 

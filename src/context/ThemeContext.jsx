@@ -43,14 +43,31 @@ export const themes = {
   },
 };
 
+/* Curated preset background images (royalty-free from Unsplash) */
+export const PRESET_BACKGROUNDS = [
+  { label: "Mountain Lake", url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80" },
+  { label: "Ocean Sunset", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80" },
+  { label: "Forest Path", url: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80" },
+  { label: "Night Sky", url: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80" },
+  { label: "Cherry Blossom", url: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1920&q=80" },
+  { label: "Desert Dunes", url: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=1920&q=80" },
+  { label: "Aurora Borealis", url: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1920&q=80" },
+  { label: "Autumn Leaves", url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&q=80" },
+];
+
 export const ThemeProvider = ({ children }) => {
   const [currentThemeName, setCurrentThemeName] = useState("Classic");
+  const [backgroundImage, setBackgroundImageState] = useState(null);
 
-  // Load theme on first mount
+  // Load theme + background on first mount
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme && themes[savedTheme]) {
       setCurrentThemeName(savedTheme);
+    }
+    const savedBg = localStorage.getItem("bnx_bg_image");
+    if (savedBg) {
+      setBackgroundImageState(savedBg);
     }
   }, []);
 
@@ -72,6 +89,20 @@ export const ThemeProvider = ({ children }) => {
     }
   };
 
+  const setBackgroundImage = (url) => {
+    setBackgroundImageState(url);
+    if (url) {
+      localStorage.setItem("bnx_bg_image", url);
+    } else {
+      localStorage.removeItem("bnx_bg_image");
+    }
+  };
+
+  const clearBackgroundImage = () => {
+    setBackgroundImageState(null);
+    localStorage.removeItem("bnx_bg_image");
+  };
+
   return (
     <ThemeContext.Provider
       value={{
@@ -79,6 +110,9 @@ export const ThemeProvider = ({ children }) => {
         currentThemeName,
         changeTheme,
         themeNames: Object.keys(themes),
+        backgroundImage,
+        setBackgroundImage,
+        clearBackgroundImage,
       }}
     >
       {children}
@@ -93,3 +127,4 @@ export const useTheme = () => {
   }
   return context;
 };
+
