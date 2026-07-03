@@ -52,7 +52,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
 
   return (
     <nav
-      className="sticky top-0 z-50 px-6 py-2.5 transition-colors duration-300"
+      className="sticky top-0 z-50 px-6 py-2.5 transition-colors duration-300 shrink-0"
       style={{ backgroundColor: backgroundImage ? "transparent" : theme.bg }}
     >
       <div className="flex items-center justify-between">

@@ -53,12 +53,12 @@ export const SIDEBAR_ITEMS = [
     path: '/draft',
     count: 0
   },
-  {
-    name: 'Archive',
-    icon: <MdArchive size={20} />,
-    path: '/archive',
-    count: 0
-  },
+  // {
+  //   name: 'Archive',
+  //   icon: <MdArchive size={20} />,
+  //   path: '/archive',
+  //   count: 0
+  // },
   {
     name: 'Spam',
     icon: <MdReport size={20} />,
