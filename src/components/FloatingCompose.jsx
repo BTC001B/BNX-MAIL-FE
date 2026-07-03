@@ -403,11 +403,13 @@ const FloatingCompose = () => {
         }
 
         if (response.data?.success) {
-          toast.success("Email sent successfully", { id: tid });
-          fetchEmails('inbox');
-          if (delaySeconds === 0) {
+          if (delaySeconds > 0) {
+            toast.dismiss(tid);
+          } else {
+            toast.success("Message sent.", { id: tid, duration: 4000 });
             closeCompose();
           }
+          fetchEmails(undefined, true);
         }
       } catch (err) {
         setError(err.response?.data?.message || "Failed to send email");
