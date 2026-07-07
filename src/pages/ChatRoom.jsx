@@ -36,6 +36,7 @@ const ChatRoom = () => {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
   // Layout States (Info Modal, Compose Modal, Collapsed Chat)
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -136,7 +137,13 @@ const ChatRoom = () => {
   const [selectedTemplate, setSelectedTemplate] = useState("");
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current) {
+      // Use scrollTop to strictly contain scrolling inside this div
+      // avoiding layout shifts that scrollIntoView sometimes triggers
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    } else {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const removeAttachment = (index) => {
@@ -586,7 +593,7 @@ const ChatRoom = () => {
             </div>
           )}
           {/* MESSAGES AREA */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 hidden-scrollbar bg-white/10 dark:bg-black/10">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 hidden-scrollbar bg-white/10 dark:bg-black/10">
             {loading && messages.length === 0 ? (
               <div className="flex justify-center p-10">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
