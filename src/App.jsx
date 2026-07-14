@@ -193,7 +193,7 @@ const AppContent = () => {
               <Route path="/settings" element={<Settings />} />
               <Route path="/colab" element={<Groups />} />
               <Route path="/colab/:id" element={<GroupDetails />} />
-              <Route path="/chat" element={<Groups />} />
+              {/* <Route path="/chat" element={<Groups />} /> */}
               <Route path="/chat/:chatId" element={<ChatRoom />} />
               <Route path="/label/:labelId" element={<AllMail searchQuery={searchQuery} />} />
               <Route path="/subscriptions" element={<Subscriptions searchQuery={searchQuery} />} />
