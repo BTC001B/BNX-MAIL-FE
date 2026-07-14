@@ -126,10 +126,9 @@ const Casbox = () => {
       </div>
 
       {/* RIGHT PANE - CHAT WINDOW */}
-      <div className="flex-1 flex flex-col bg-[#efeae2] dark:bg-[#0b141a] relative overflow-hidden">
-        {/* Chat Background Pattern (Optional subtle WhatsApp-like pattern) */}
-        <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.03] pointer-events-none" 
-             style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cubes.png")' }}>
+      <div className="flex-1 flex flex-col bg-slate-50 dark:bg-gray-900 relative overflow-hidden">
+        {/* Chat Background */}
+        <div className="absolute inset-0 opacity-50 dark:opacity-20 pointer-events-none bg-gradient-to-br from-transparent to-primary/5">
         </div>
 
         {activeContact ? (
@@ -165,12 +164,12 @@ const Casbox = () => {
                   <div 
                     className={`max-w-[85%] sm:max-w-[70%] rounded-2xl p-3 shadow-sm relative group transition-all ${
                       msg.isMe 
-                        ? 'bg-[#d9fdd3] dark:bg-[#005c4b] rounded-tr-sm' 
-                        : 'bg-white dark:bg-[#202c33] rounded-tl-sm'
+                        ? 'bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/50 rounded-tr-sm' 
+                        : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50 rounded-tl-sm'
                     }`}
                   >
                     {/* Mail Subject */}
-                    <div className={`text-xs font-bold mb-1 opacity-75 uppercase tracking-wider ${msg.isMe ? 'text-[#005c4b] dark:text-[#86d7c7]' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <div className={`text-xs font-bold mb-1 opacity-90 uppercase tracking-wider ${msg.isMe ? 'text-blue-700 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
                       Subject: {msg.subject}
                     </div>
                     

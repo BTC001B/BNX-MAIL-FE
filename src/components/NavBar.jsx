@@ -19,7 +19,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
   const { openCompose } = useMail();
   const isPrimary = user?.isPrimary || user?.mailboxes?.find(m => m.email === user.email)?.isPrimary;
   
-  const currentTab = location.pathname.startsWith('/colab') || location.pathname.startsWith('/chat') ? 'chat' 
+  const currentTab = location.pathname.startsWith('/colab') || location.pathname.startsWith('/chat') || location.pathname.startsWith('/casbox') ? 'chat' 
                    : location.pathname.startsWith('/vault') ? 'vault' 
                    : 'mail';
 
@@ -148,7 +148,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
             Vault
           </button>
           <button 
-            onClick={() => navigate('/colab')}
+            onClick={() => navigate('/chat')}
             className={`px-4 sm:px-6 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${currentTab === 'chat' ? 'bg-white text-gray-900 shadow-sm' : 'text-blue-900/60 hover:text-blue-900'}`}
           >
             Chat

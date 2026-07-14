@@ -14,7 +14,7 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile }) => {
   const { unreadCounts, labels, handleCreateLabel, handleUpdateLabel, handleDeleteLabel, openCompose } = useMail();
   const { user } = useAuth();
 
-  const isChatMode = location.pathname.startsWith("/colab") || location.pathname.startsWith("/chat");
+  const isChatMode = location.pathname.startsWith("/colab") || location.pathname.startsWith("/chat") || location.pathname.startsWith("/casbox");
   const isVaultMode = location.pathname.startsWith("/vault");
 
   const [chats, setChats] = useState([]);
@@ -148,31 +148,18 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile }) => {
               })
           ) : (
             <div className="flex flex-col px-2 mt-2">
-              {/* Colab Groups */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between px-3 mb-2 hide-on-collapse">
-                  <h3 className="text-xs font-bold uppercase tracking-widest opacity-50" style={{ color: theme.sidebarText }}>Colab Groups</h3>
-                  <button onClick={() => navigate('/colab')} className="p-1 rounded-md hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors" style={{ color: theme.accent }}><MdAdd size={16} /></button>
-                </div>
-                {chatsLoading ? (
-                   <div className="px-3 text-xs opacity-50 hide-on-collapse">Loading...</div>
-                ) : colabGroups.length === 0 ? (
-                   <div className="px-3 text-xs opacity-50 hide-on-collapse">No groups</div>
-                ) : (
-                   colabGroups.map(chat => (
-                     <button
-                        key={chat.id}
-                        onClick={() => navigate(`/chat/${chat.id}`, { state: { chat } })}
-                        className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-xl transition-all duration-200 group cursor-pointer btn-collapse
-                          ${location.pathname === `/chat/${chat.id}` ? "bg-primary/10 dark:bg-primary/20" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"}
-                        `}
-                        style={{ color: location.pathname === `/chat/${chat.id}` ? (theme.accent || "#135bec") : theme.sidebarText }}
-                     >
-                       <MdGroup size={18} className="shrink-0" />
-                       <span className="text-sm truncate hide-on-collapse text-left flex-1">{chat.name || 'Unnamed Group'}</span>
-                     </button>
-                   ))
-                )}
+              {/* Colab */}
+              <div className="mb-2">
+                 <button
+                    onClick={() => navigate('/colab')}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 group cursor-pointer btn-collapse
+                      ${location.pathname.startsWith('/colab') || location.pathname.startsWith('/chat') ? "bg-primary/10 dark:bg-primary/20" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"}
+                    `}
+                    style={{ color: location.pathname.startsWith('/colab') || location.pathname.startsWith('/chat') ? (theme.accent || "#135bec") : theme.sidebarText }}
+                 >
+                   <MdGroup size={18} className="shrink-0" />
+                   <span className="text-sm font-medium hide-on-collapse text-left flex-1">Colab</span>
+                 </button>
               </div>
 
               {/* Casbox */}
