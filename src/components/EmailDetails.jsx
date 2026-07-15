@@ -365,6 +365,7 @@ const EmailDetails = ({
   }, [email]);
 
   const [previewFile, setPreviewFile] = useState(null);
+  const [bounceDetails, setBounceDetails] = useState("");
 
   React.useEffect(() => {
     return () => {
@@ -373,6 +374,35 @@ const EmailDetails = ({
         return null;
       });
     };
+  }, [email]);
+
+  React.useEffect(() => {
+    if (!email || !email.attachments) {
+      setBounceDetails("");
+      return;
+    }
+    const isBounce = email.from?.toLowerCase().includes('mailer-daemon') || email.from?.toLowerCase().includes('postmaster');
+    if (!isBounce) {
+      setBounceDetails("");
+      return;
+    }
+
+    setBounceDetails("");
+    email.attachments.forEach(async (file) => {
+      const ext = file.split('.').pop().toLowerCase();
+      if (['txt', 'eml', 'rfc822'].includes(ext)) {
+        try {
+          const res = await mailAPI.downloadAttachment(email.uid, file, getFolder());
+          const reader = new FileReader();
+          reader.onload = () => {
+            setBounceDetails(prev => prev + `\n\n--- ${file} ---\n${reader.result}`);
+          };
+          reader.readAsText(new Blob([res.data]));
+        } catch (e) {
+          console.error("Failed to fetch bounce details", e);
+        }
+      }
+    });
   }, [email]);
 
   const closePreview = () => {
@@ -851,6 +881,12 @@ const EmailDetails = ({
             <p className="whitespace-pre-wrap text-gray-800 dark:text-gray-200" style={{ color: theme.text }}>
               {email.body || email.textPlain || "(No content available)"}
             </p>
+          )}
+          {bounceDetails && (
+            <div className="mt-8 p-4 bg-gray-50 dark:bg-black/20 rounded-xl border border-gray-100 dark:border-gray-800 font-mono text-xs whitespace-pre-wrap text-gray-600 dark:text-gray-400 overflow-x-auto">
+              <h4 className="font-bold mb-2 text-gray-700 dark:text-gray-300 font-sans">Diagnostic Information & Original Message</h4>
+              {bounceDetails.trim()}
+            </div>
           )}
         </div>
 
