@@ -986,20 +986,24 @@ const EmailDetails = ({
         style={{ borderColor: theme.border }}
       >
         <div className="flex gap-3">
-          <button
-            onClick={() => onReply?.(email)}
-            className="flex items-center justify-center gap-2 px-5 py-2 rounded-full text-white font-medium shadow-sm hover:shadow hover:-translate-y-0.5 transition-all w-28 text-sm cursor-pointer"
-            style={{ background: theme.accent || "#135bec" }}
-          >
-            <MdReply size={18} /> Reply
-          </button>
+          {currentFolder !== "draft" && (
+            <>
+              <button
+                onClick={() => onReply?.(email)}
+                className="flex items-center justify-center gap-2 px-5 py-2 rounded-full text-white font-medium shadow-sm hover:shadow hover:-translate-y-0.5 transition-all w-28 text-sm cursor-pointer"
+                style={{ background: theme.accent || "#135bec" }}
+              >
+                <MdReply size={18} /> Reply
+              </button>
 
-          <button
-            className="flex items-center justify-center gap-2 px-5 py-2 rounded-full font-medium border hover:bg-black/5 dark:hover:bg-white/5 hover:shadow-sm transition-all text-sm w-28 cursor-pointer text-gray-700 dark:text-gray-200"
-            style={{ borderColor: theme.border }}
-          >
-            <MdForward size={18} /> Forward
-          </button>
+              <button
+                className="flex items-center justify-center gap-2 px-5 py-2 rounded-full font-medium border hover:bg-black/5 dark:hover:bg-white/5 hover:shadow-sm transition-all text-sm w-28 cursor-pointer text-gray-700 dark:text-gray-200"
+                style={{ borderColor: theme.border }}
+              >
+                <MdForward size={18} /> Forward
+              </button>
+            </>
+          )}
         </div>
 
         {emailList && emailList.length > 0 && (
