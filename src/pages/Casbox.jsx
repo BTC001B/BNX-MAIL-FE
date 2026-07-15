@@ -3,10 +3,67 @@ import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
 import { useSocket } from "../context/SocketContext";
 import { useMail } from "../context/MailContext";
-import { casboxAPI } from "../services/api";
-import { MdCheck, MdDoneAll, MdStarBorder, MdStar, MdDeleteOutline, MdRefresh, MdSend, MdClose } from "react-icons/md";
+import { casboxAPI, api } from "../services/api";
+import { MdCheck, MdDoneAll, MdStarBorder, MdStar, MdDeleteOutline, MdRefresh, MdSend, MdClose, MdRemoveRedEye, MdFileDownload, MdReply } from "react-icons/md";
 import toast from "react-hot-toast";
 import ReadingPaneLayout from "../components/ReadingPaneLayout";
+
+const getMimeType = (fileName) => {
+  const ext = fileName?.split('.').pop().toLowerCase() || '';
+  switch (ext) {
+    case 'pdf': return 'application/pdf';
+    case 'png': return 'image/png';
+    case 'jpg':
+    case 'jpeg': return 'image/jpeg';
+    case 'gif': return 'image/gif';
+    case 'webp': return 'image/webp';
+    case 'svg': return 'image/svg+xml';
+    case 'txt': return 'text/plain';
+    case 'html': return 'text/html';
+    default: return 'application/octet-stream';
+  }
+};
+
+const getFileIcon = (fileName) => {
+  const ext = fileName?.split('.').pop().toLowerCase() || '';
+  switch (ext) {
+    case 'pdf':
+      return { icon: '📄', color: '#ea4335', name: 'PDF' };
+    case 'doc':
+    case 'docx':
+      return { icon: '📝', color: '#1a73e8', name: 'Word' };
+    case 'xls':
+    case 'xlsx':
+      return { icon: '📊', color: '#1e8e3e', name: 'Excel' };
+    case 'ppt':
+    case 'pptx':
+      return { icon: '📈', color: '#f86734', name: 'PowerPoint' };
+    case 'png':
+    case 'jpg':
+    case 'jpeg':
+    case 'gif':
+    case 'webp':
+    case 'svg':
+      return { icon: '🖼️', color: '#12a4b4', name: 'Image' };
+    case 'zip':
+    case 'rar':
+    case '7z':
+    case 'tar':
+    case 'gz':
+      return { icon: '📦', color: '#e37400', name: 'Archive' };
+    case 'mp3':
+    case 'wav':
+    case 'ogg':
+      return { icon: '🎵', color: '#aa00ff', name: 'Audio' };
+    case 'mp4':
+    case 'avi':
+    case 'mov':
+    case 'mkv':
+      return { icon: '🎥', color: '#d500f9', name: 'Video' };
+    default:
+      return { icon: '📎', color: '#5f6368', name: 'File' };
+  }
+};
 
 const Casbox = () => {
   const { theme, readingPaneMode } = useTheme();
@@ -18,6 +75,81 @@ const Casbox = () => {
   const [loading, setLoading] = useState(true);
 
   const [selectedMessage, setSelectedMessage] = useState(null);
+
+  const [activeTab, setActiveTab] = useState('received');
+  const [previewFile, setPreviewFile] = useState(null);
+
+  React.useEffect(() => {
+    return () => {
+      setPreviewFile((prev) => {
+        if (prev) URL.revokeObjectURL(prev.blobUrl);
+        return null;
+      });
+    };
+  }, [selectedMessage]);
+
+  const closePreview = () => {
+    setPreviewFile((prev) => {
+      if (prev) URL.revokeObjectURL(prev.blobUrl);
+      return null;
+    });
+  };
+
+  const handleDownloadAttachment = async (fileObj) => {
+    try {
+      const fileName = fileObj.fileName || fileObj.name || (typeof fileObj === 'string' ? fileObj.split('/').pop() : "Attachment");
+      const urlPath = fileObj.url || fileObj.filePath || (typeof fileObj === 'string' ? fileObj : "");
+      if (!urlPath) return;
+
+      toast.loading(`Downloading ${fileName}...`, { id: "download-casbox-attachment" });
+      const res = await api.get(urlPath, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success(`${fileName} downloaded successfully`, { id: "download-casbox-attachment" });
+    } catch (err) {
+      console.error("Failed to download attachment:", err);
+      toast.error("Failed to download attachment", { id: "download-casbox-attachment" });
+    }
+  };
+
+  const handlePreviewAttachment = async (fileObj) => {
+    try {
+      const fileName = fileObj.fileName || fileObj.name || (typeof fileObj === 'string' ? fileObj.split('/').pop() : "Attachment");
+      const urlPath = fileObj.url || fileObj.filePath || (typeof fileObj === 'string' ? fileObj : "");
+      if (!urlPath) return;
+
+      toast.loading(`Loading preview...`, { id: "preview-casbox-attachment" });
+      const res = await api.get(urlPath, { responseType: 'blob' });
+      const mime = getMimeType(fileName);
+      
+      let textContent = "";
+      if (mime === "text/plain") {
+        const reader = new FileReader();
+        textContent = await new Promise((resolve) => {
+          reader.onload = () => resolve(reader.result);
+          reader.readAsText(new Blob([res.data]));
+        });
+      }
+
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: mime }));
+      setPreviewFile({
+        fileName,
+        blobUrl: url,
+        mimeType: mime,
+        textContent,
+        rawFileObj: fileObj
+      });
+      toast.success("Loaded preview", { id: "preview-casbox-attachment" });
+    } catch (err) {
+      console.error("Failed to preview attachment:", err);
+      toast.error("Failed to preview attachment", { id: "preview-casbox-attachment" });
+    }
+  };
 
   useEffect(() => {
     fetchMessages();
@@ -102,28 +234,42 @@ const Casbox = () => {
     return new Date(ts);
   };
 
+  const receivedMessages = messages.filter(msg => msg.receiverEmail === user?.email);
+  const sentMessages = messages.filter(msg => msg.senderEmail === user?.email);
+  const filteredMessages = activeTab === 'received' ? receivedMessages : sentMessages;
+
   const headerComponent = (
     <div className="flex flex-col shrink-0">
-      <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3 shrink-0 bg-transparent">
-        <span
-          className="px-4 py-1.5 text-xs font-bold rounded-full shadow-sm text-white tracking-wide flex items-center gap-1.5 uppercase select-none"
-          style={{ background: `linear-gradient(135deg, ${theme.accent || "#135bec"} 0%, #3b82f6 100%)` }}
-        >
-          Casbox ({messages.length})
-        </span>
+      <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2 shrink-0 bg-transparent">
+        <div className="flex items-center bg-gray-100/80 dark:bg-gray-800/80 p-1 rounded-lg shrink-0">
+          <button 
+            onClick={() => { setActiveTab('received'); setSelectedMessage(null); }}
+            className={`px-3 sm:px-4 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 ${activeTab === 'received' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+          >
+            Received <span className={`font-normal hidden sm:inline ${activeTab === 'received' ? 'opacity-80' : 'opacity-60'}`}>({receivedMessages.length})</span>
+          </button>
+          <button 
+            onClick={() => { setActiveTab('sent'); setSelectedMessage(null); }}
+            className={`px-3 sm:px-4 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 ${activeTab === 'sent' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+          >
+            Sent <span className={`font-normal hidden sm:inline ${activeTab === 'sent' ? 'opacity-80' : 'opacity-60'}`}>({sentMessages.length})</span>
+          </button>
+        </div>
+        
         <div className="flex-1"></div>
+        
         <button
           onClick={() => openCompose({ mode: 'casbox' })}
-          className="px-3 py-1.5 rounded-full text-sm font-bold text-white transition-transform active:scale-95"
+          className="px-4 py-1.5 rounded-full text-sm font-bold text-white transition-transform hover:shadow-md active:scale-95"
           style={{ backgroundColor: theme.accent || "#135bec" }}
         >
           Compose
         </button>
         <button
           onClick={fetchMessages}
-          className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
+          className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 ml-1"
         >
-          <MdRefresh size={18} className={loading ? "animate-spin" : ""} />
+          <MdRefresh size={20} className={loading ? "animate-spin" : ""} />
         </button>
       </div>
     </div>
@@ -131,7 +277,13 @@ const Casbox = () => {
 
   const listComponent = (
     <div className="flex-1 overflow-y-auto hidden-scrollbar relative bg-transparent">
-      {messages.map((msg) => {
+      {filteredMessages.length === 0 && !loading && (
+        <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-600 opacity-80 pb-20">
+          <MdSend className="text-4xl mb-3 opacity-30" />
+          <p className="text-sm font-medium">No {activeTab} messages yet</p>
+        </div>
+      )}
+      {filteredMessages.map((msg) => {
         const isMe = msg.senderEmail === user?.email;
         const isSelected = selectedMessage?.id === msg.id;
         return (
@@ -231,29 +383,82 @@ const Casbox = () => {
 
       {selectedMessage.attachmentsJson && (
         <div className="mt-8 border-t border-gray-100 dark:border-gray-800 pt-6">
-          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+          <p className="text-xs font-bold mb-4 text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             Attachments
-          </h4>
-          <div className="flex flex-wrap gap-3">
-            {JSON.parse(selectedMessage.attachmentsJson).map((file, i) => (
-              <a
-                key={i}
-                href={`${import.meta.env.VITE_API_URL || "https://api.bnxmail.com"}${file.url || file.filePath || file}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors w-64 group"
-              >
-                <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+          </p>
+          <div className="flex flex-wrap gap-4">
+            {JSON.parse(selectedMessage.attachmentsJson).map((fileObj, i) => {
+              const fileName = fileObj.fileName || fileObj.name || (typeof fileObj === 'string' ? fileObj.split('/').pop() : "Attachment");
+              const fileInfo = getFileIcon(fileName);
+              return (
+                <div
+                  key={i}
+                  className="w-[180px] h-[130px] rounded-xl border overflow-hidden flex flex-col hover:shadow-md transition-all relative shadow-sm bg-black/[0.01] dark:bg-white/[0.01] hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+                  style={{ borderColor: theme?.border || '#eee' }}
+                >
+                  <div 
+                    className="h-[85px] w-full flex flex-col items-center justify-center bg-black/[0.03] dark:bg-white/[0.03] border-b relative overflow-hidden"
+                    style={{ borderColor: theme?.border || '#eee' }}
+                  >
+                    <span className="text-3xl filter drop-shadow-sm select-none">{fileInfo.icon}</span>
+                    <span 
+                      className="text-[9px] font-extrabold uppercase tracking-wider mt-1.5 px-2 py-0.5 rounded-full select-none"
+                      style={{ backgroundColor: `${fileInfo.color}15`, color: fileInfo.color }}
+                    >
+                      {fileInfo.name}
+                    </span>
+                  </div>
+
+                  <div className="p-2 flex items-center justify-between gap-1 flex-1 min-w-0">
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span 
+                        className="text-[11px] font-semibold truncate select-all text-left" 
+                        style={{ color: theme?.text || '#333' }}
+                        title={fileName}
+                      >
+                        {fileName}
+                      </span>
+                      <span className="text-[9px] opacity-50 font-medium select-none truncate text-left">
+                        {fileInfo.name} File
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      <button
+                        onClick={() => handlePreviewAttachment(fileObj)}
+                        className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
+                        title="Preview file"
+                      >
+                        <MdRemoveRedEye size={15} />
+                      </button>
+                      <button
+                        onClick={() => handleDownloadAttachment(fileObj)}
+                        className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
+                        title="Download file"
+                      >
+                        <MdFileDownload size={15} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-600 transition-colors">
-                    {file.fileName || file.name || (typeof file === 'string' ? file.split('/').pop() : "Attachment")}
-                  </p>
-                </div>
-              </a>
-            ))}
+              );
+            })}
           </div>
+        </div>
+      )}
+
+      {selectedMessage.receiverEmail === user?.email && (
+        <div
+          className="flex items-center py-4 mt-8 border-t shrink-0"
+          style={{ borderColor: theme?.border || '#eee' }}
+        >
+          <button
+            onClick={() => openCompose({ mode: 'casbox', replyTo: selectedMessage.senderEmail })}
+            className="flex items-center justify-center gap-2 px-6 py-2 rounded-full text-white font-semibold shadow-sm hover:shadow hover:-translate-y-0.5 transition-all text-sm cursor-pointer"
+            style={{ background: theme.accent || "#135bec" }}
+          >
+            <MdReply size={18} /> Reply
+          </button>
         </div>
       )}
     </div>
@@ -273,6 +478,69 @@ const Casbox = () => {
         listComponent={listComponent}
         detailsComponent={detailsComponent}
       />
+
+      {previewFile && (
+        <div className="fixed inset-0 bg-black/90 z-[1000] flex flex-col animate-fade-in">
+          <div className="flex items-center justify-between px-6 py-4 bg-black/30 border-b border-white/5 text-white select-none">
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-semibold truncate max-w-[60vw]">
+                {previewFile.fileName}
+              </span>
+              <span className="text-[10px] opacity-60">
+                {previewFile.mimeType}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleDownloadAttachment(previewFile.rawFileObj)}
+                className="p-2 rounded-full hover:bg-white/10 text-gray-300 hover:text-white transition-colors cursor-pointer"
+                title="Download file"
+              >
+                <MdFileDownload size={20} />
+              </button>
+              <button
+                onClick={closePreview}
+                className="p-2 rounded-full hover:bg-white/10 text-gray-300 hover:text-white transition-colors cursor-pointer"
+                title="Close preview"
+              >
+                <MdClose size={20} />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 flex items-center justify-center p-6 overflow-hidden">
+            {previewFile.mimeType.startsWith("image/") ? (
+              <img
+                src={previewFile.blobUrl}
+                alt={previewFile.fileName}
+                className="max-w-full max-h-[82vh] object-contain rounded shadow-2xl select-none"
+              />
+            ) : previewFile.mimeType === "application/pdf" ? (
+              <iframe
+                src={previewFile.blobUrl}
+                title={previewFile.fileName}
+                className="w-[90vw] h-[80vh] rounded-lg shadow-2xl bg-white border-none"
+              />
+            ) : previewFile.mimeType === "text/plain" ? (
+              <pre className="bg-zinc-950 text-zinc-100 p-6 rounded-xl shadow-2xl overflow-auto max-w-[90vw] max-h-[80vh] text-left font-mono text-xs sm:text-sm leading-relaxed border border-zinc-800 hidden-scrollbar">
+                {previewFile.textContent}
+              </pre>
+            ) : (
+              <div className="flex flex-col items-center justify-center bg-zinc-900/60 text-white p-8 rounded-2xl border border-zinc-800 max-w-sm text-center shadow-xl">
+                <span className="text-5xl mb-4 select-none">📎</span>
+                <p className="font-semibold text-sm mb-1 truncate max-w-[280px]">{previewFile.fileName}</p>
+                <p className="text-[11px] text-gray-400 mb-6">No inline preview available for this file type</p>
+                <button
+                  onClick={() => handleDownloadAttachment(previewFile.rawFileObj)}
+                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-full text-xs font-semibold shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <MdFileDownload size={15} /> Download Attachment
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
