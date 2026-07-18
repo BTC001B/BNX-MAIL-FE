@@ -27,7 +27,7 @@ const SignupPasswordSetup = () => {
         try {
             // 1. Build Register Payload
             let payload = {
-                mode: formData.accountType,
+                mode: formData.accountType === 'CHILD' ? 'PERSONAL' : formData.accountType,
                 username: formData.username,
                 password: formData.password,
             };
