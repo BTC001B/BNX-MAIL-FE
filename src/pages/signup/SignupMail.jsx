@@ -27,10 +27,6 @@ const SignupMail = () => {
                     });
                     if (res.data?.success && res.data.data) {
                         setSuggestions(res.data.data);
-                        // Store the first suggestion as the background account username
-                        if (res.data.data.length > 0 && !formData.username) {
-                            updateFormData({ username: res.data.data[0] });
-                        }
                     }
                 } catch (err) {
                     console.error('Failed to fetch suggestions', err);
@@ -47,7 +43,7 @@ const SignupMail = () => {
         e.preventDefault();
         setError('');
 
-        if (!formData.emailName || formData.emailName.trim() === '') {
+        if (!formData.username || formData.username.trim() === '') {
             setError('Please choose a valid email address');
             return;
         }
@@ -57,7 +53,7 @@ const SignupMail = () => {
     };
 
     const selectSuggestion = (sugg) => {
-        updateFormData({ emailName: sugg });
+        updateFormData({ username: sugg });
     };
 
     const handleBack = () => {
@@ -110,8 +106,8 @@ const SignupMail = () => {
                     <div className="flex items-center bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-all">
                         <input
                             type="text"
-                            value={formData.emailName || ''}
-                            onChange={(e) => updateFormData({ emailName: e.target.value })}
+                            value={formData.username || ''}
+                            onChange={(e) => updateFormData({ username: e.target.value })}
                             placeholder="e.g. johndoe123"
                             required
                             className="flex-1 px-4 py-3 bg-transparent outline-none dark:text-white"
