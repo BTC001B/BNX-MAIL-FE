@@ -60,17 +60,19 @@ const SignupPasswordSetup = () => {
                 throw new Error("Registration failed to return a temporary token");
             }
 
-            // 3. For Personal/Child, we must create the email mailbox with the tempToken
-            if (formData.accountType !== 'BUSINESS') {
-                await emailAPI.createEmail({
-                    emailName: formData.username,
-                    password: formData.password
-                }, tempToken);
-            }
+            // 3. Create the email mailbox with the tempToken for ALL account types
+            await emailAPI.createEmail({
+                emailName: formData.username,
+                password: formData.password
+            }, tempToken);
 
             // 4. Log the user in to get the real access token
+            const fullEmail = formData.accountType === 'BUSINESS' && formData.domain
+                ? `${formData.username}@${formData.domain}`
+                : `${formData.username}@bnxmail.com`;
+
             const loginRes = await authAPI.login({
-                email: formData.accountType === 'BUSINESS' ? formData.username : `${formData.username}@bnxmail.com`,
+                email: fullEmail,
                 password: formData.password
             });
 

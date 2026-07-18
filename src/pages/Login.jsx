@@ -45,8 +45,13 @@ const Login = () => {
         setLoading(true);
 
         try {
+            let loginEmail = formData.email;
+            if (!loginEmail.includes('@')) {
+                loginEmail = `${loginEmail}@bnxmail.com`;
+            }
+
             const response = await authAPI.login({
-                email: formData.email,
+                email: loginEmail,
                 password: formData.password
             });
 
