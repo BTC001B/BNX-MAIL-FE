@@ -24,7 +24,8 @@ import {
   MdPrint,
   MdMoreVert,
   MdMarkEmailUnread,
-  MdBlock
+  MdBlock,
+  MdAdd
 } from "react-icons/md";
 import { useMail } from "../context/MailContext";
 import { useAuth } from "../context/AuthContext";
@@ -108,7 +109,7 @@ const EmailDetails = ({
 }) => {
   const { theme, readingPaneMode } = useTheme();
   const { user } = useAuth();
-  const { labels, handleRemoveLabel, fetchEmails, currentFolder } = useMail();
+  const { labels, handleRemoveLabel, handleCreateLabel, fetchEmails, currentFolder } = useMail();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const cleanSenderEmail = email?.from
@@ -143,7 +144,11 @@ const EmailDetails = ({
     }
   };
   const isActuallyArchived = isArchiveFolder || email.folderName?.toLowerCase() === "archive";
+  const [showReply, setShowReply] = useState(false);
   const [showLabels, setShowLabels] = useState(false);
+  const [isCreatingInlineLabel, setIsCreatingInlineLabel] = useState(false);
+  const [inlineLabelName, setInlineLabelName] = useState("");
+  const [showMove, setShowMove] = useState(false);
   const [showSnooze, setShowSnooze] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [customSnooze, setCustomSnooze] = useState(false);
@@ -670,7 +675,34 @@ const EmailDetails = ({
                       </div>
                     ));
                   };
-                  return renderLabelDropdownTree(null);
+                  const tree = renderLabelDropdownTree(null);
+                  return (
+                    <>
+                      {tree.length === 0 && <div className="p-3 text-xs text-center opacity-60" style={{ color: theme.text }}>No labels found</div>}
+                      {tree.length > 0 && <div className="py-1 max-h-48 overflow-y-auto">{tree}</div>}
+                      
+                      <div className="border-t dark:border-gray-700">
+                        <button
+                          onClick={() => {
+                            setShowLabels(false);
+                            window.dispatchEvent(new CustomEvent('openLabelCreateModal', {
+                              detail: {
+                                onSuccess: (newLabelId) => {
+                                  if (onApplyLabel) {
+                                    onApplyLabel(email.uid, newLabelId);
+                                  }
+                                }
+                              }
+                            }));
+                          }}
+                          className="w-full text-left py-2.5 px-4 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] flex items-center gap-2 cursor-pointer text-sm font-medium text-indigo-500"
+                        >
+                          <MdAdd size={18} />
+                          Create New Label
+                        </button>
+                      </div>
+                    </>
+                  );
                 })()}
               </div>
             )}

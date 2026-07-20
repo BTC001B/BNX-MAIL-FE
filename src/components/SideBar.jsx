@@ -38,11 +38,23 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile }) => {
   const directMessages = chats.filter(c => c.type === 'DIRECT');
 
   const [isCreating, setIsCreating] = useState(false);
+  const [onLabelCreatedCb, setOnLabelCreatedCb] = useState(null);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [activeLabelMenu, setActiveLabelMenu] = useState(null);
   const [newLabel, setNewLabel] = useState({ name: "", color: "#135bec", parentId: "" });
   const [editingLabel, setEditingLabel] = useState(null);
   const labelMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleOpenLabelModal = (e) => {
+      setIsCreating(true);
+      if (e.detail?.onSuccess) {
+        setOnLabelCreatedCb(() => e.detail.onSuccess);
+      }
+    };
+    window.addEventListener('openLabelCreateModal', handleOpenLabelModal);
+    return () => window.removeEventListener('openLabelCreateModal', handleOpenLabelModal);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -63,8 +75,12 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile }) => {
   const handleAddLabel = async () => {
     if (!newLabel.name.trim()) return;
     const parentId = newLabel.parentId ? parseInt(newLabel.parentId) : null;
-    const success = await handleCreateLabel(newLabel.name, newLabel.color, parentId);
-    if (success) {
+    const newLbl = await handleCreateLabel(newLabel.name, newLabel.color, parentId);
+    if (newLbl) {
+      if (onLabelCreatedCb) {
+        onLabelCreatedCb(newLbl.id);
+        setOnLabelCreatedCb(null);
+      }
       setIsCreating(false);
       setNewLabel({ name: "", color: "#135bec", parentId: "" });
     }
