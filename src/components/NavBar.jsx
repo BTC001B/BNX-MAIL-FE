@@ -109,17 +109,17 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
 
   return (
     <nav
-      className="sticky top-0 z-50 px-5 py-2.5 transition-colors duration-300 shrink-0 shadow-md"
+      className="sticky top-0 z-50 px-2 sm:px-5 py-2.5 transition-colors duration-300 shrink-0 shadow-md"
       style={{ backgroundColor: backgroundImage ? "transparent" : "#1e3a8a" }}
     >
       <div className="flex items-center justify-between w-full relative">
         {/* LEFT */}
-        <div className="flex items-center gap-2 sm:gap-12 shrink-0">
-          <div className="flex items-center gap-2 pl-2">
+        <div className="flex items-center gap-2 sm:gap-12 shrink-0 md:flex-1">
+          <div className="flex items-center gap-2 pl-1 sm:pl-2">
             <img
               src={logo}
               alt="BNX Mail"
-              className="h-10 sm:h-11 cursor-pointer drop-shadow-sm transition-transform hover:scale-105 bg-white rounded-lg"
+              className="h-8 sm:h-11 cursor-pointer drop-shadow-sm transition-transform hover:scale-105 bg-white rounded-lg"
               onClick={() => onToggleDesktopSidebar()}
             />
             <span
@@ -143,29 +143,23 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
         </div>
 
         {/* CENTER: SEGMENTED CONTROL */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center bg-white/10 backdrop-blur-sm shadow-sm rounded-full p-1 border border-white/10 shrink-0">
+        <div className="md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center bg-white/10 backdrop-blur-sm shadow-sm rounded-full p-1 border border-white/10 shrink-0 mx-auto">
           <button 
             onClick={() => navigate('/inbox')}
-            className={`px-4 sm:px-6 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${currentTab === 'mail' ? 'bg-white text-[#1e3a8a] shadow-sm' : 'text-white/70 hover:text-white hover:bg-white/10'}`} 
+            className={`px-3 sm:px-6 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${currentTab === 'mail' ? 'bg-white text-[#1e3a8a] shadow-sm' : 'text-white/70 hover:text-white hover:bg-white/10'}`} 
           >
             Mail
           </button>
-          {/* <button 
-            onClick={() => navigate('/vault')}
-            className={`px-4 sm:px-6 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${currentTab === 'vault' ? 'bg-white text-[#1e3a8a] shadow-sm' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
-          >
-            Vault
-          </button> */}
           <button 
             onClick={() => navigate('/casbox')}
-            className={`px-4 sm:px-6 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${currentTab === 'chat' ? 'bg-white text-[#1e3a8a] shadow-sm' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
+            className={`px-3 sm:px-6 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${currentTab === 'chat' ? 'bg-white text-[#1e3a8a] shadow-sm' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
           >
             Chat
           </button>
         </div>
 
         {/* RIGHT */}
-        <div className="flex items-center justify-end gap-2 sm:gap-3 flex-1">
+        <div className="flex items-center justify-end gap-1 sm:gap-3 md:flex-1 shrink-0">
 
           {/* SEARCH */}
           <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-[260px] mr-2">
@@ -229,7 +223,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
 
             {showDropdown && (
               <div
-                className="absolute right-0 mt-3 w-[310px] rounded-2xl shadow-xl dark:shadow-soft-dark border z-50 overflow-hidden animate-fade-in bg-white dark:bg-gray-900"
+                className="absolute -right-12 sm:right-0 mt-3 w-[300px] sm:w-[310px] max-w-[95vw] rounded-2xl shadow-xl dark:shadow-soft-dark border z-50 overflow-hidden animate-fade-in bg-white dark:bg-gray-900"
                 style={{ borderColor: theme.border }}
               >
                 {/* Active User Large Header */}

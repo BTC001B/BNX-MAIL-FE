@@ -93,11 +93,17 @@ const EmailList = ({
   };
 
   const paginationControls = emails.length > 0 && (
-    <div className="flex items-center justify-between pl-6 pr-24 lg:pr-6 py-4 border-t border-gray-100 dark:border-gray-800/60 bg-black/[0.01] dark:bg-white/[0.01] shrink-0">
-      <div className="text-sm text-gray-500 dark:text-gray-400">
-        Showing <span className="font-medium text-gray-700 dark:text-gray-300">{startIndex + 1}</span> to <span className="font-medium text-gray-700 dark:text-gray-300">{Math.min(startIndex + emailsPerPage, emails.length)}</span> of <span className="font-medium text-gray-700 dark:text-gray-300">{emails.length}</span> emails
+    <div className="flex items-center justify-between gap-2 pl-4 pr-20 lg:px-6 py-4 border-t border-gray-100 dark:border-gray-800/60 bg-black/[0.01] dark:bg-white/[0.01] shrink-0">
+      <div className="text-[11px] sm:text-sm text-gray-500 dark:text-gray-400 shrink-0">
+        <span className="hidden sm:inline">Showing </span>
+        <span className="font-medium text-gray-700 dark:text-gray-300">{startIndex + 1}</span>
+        <span className="hidden sm:inline"> to </span>
+        <span className="sm:hidden">-</span>
+        <span className="font-medium text-gray-700 dark:text-gray-300">{Math.min(startIndex + emailsPerPage, emails.length)}</span>
+        {' '}of <span className="font-medium text-gray-700 dark:text-gray-300">{emails.length}</span>
+        <span className="hidden sm:inline"> emails</span>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
         <button
           onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
           disabled={currentPage === 1}
