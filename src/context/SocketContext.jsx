@@ -100,28 +100,37 @@ export const SocketProvider = ({ children }) => {
     };
 
     const subscribeToChat = (chatId, callback) => {
-        if (!stompClient || !isConnected) return null;
-        // console.log(`📡 Subscribing to /topic/chat/${chatId}`);
-        return stompClient.subscribe(`/topic/chat/${chatId}`, (message) => {
-            const data = JSON.parse(message.body);
-            callback(data);
-        });
+        if (!stompClient || !isConnected || !stompClient.connected) return null;
+        try {
+            // console.log(`📡 Subscribing to /topic/chat/${chatId}`);
+            return stompClient.subscribe(`/topic/chat/${chatId}`, (message) => {
+                const data = JSON.parse(message.body);
+                callback(data);
+            });
+        } catch (e) {
+            console.error("Failed to subscribe to chat:", e);
+            return null;
+        }
     };
 
     const sendMessage = (chatId, messageContent, attachmentsJson = null) => {
-        if (!stompClient || !isConnected || !user) return;
+        if (!stompClient || !isConnected || !user || !stompClient.connected) return;
         
-        const payload = {
-            chatId: parseInt(chatId),
-            sender: user.email,
-            message: messageContent,
-            attachmentsJson: attachmentsJson
-        };
+        try {
+            const payload = {
+                chatId: parseInt(chatId),
+                sender: user.email,
+                message: messageContent,
+                attachmentsJson: attachmentsJson
+            };
 
-        stompClient.publish({
-            destination: '/app/chat.send',
-            body: JSON.stringify(payload)
-        });
+            stompClient.publish({
+                destination: '/app/chat.send',
+                body: JSON.stringify(payload)
+            });
+        } catch (e) {
+            console.error("Failed to send message:", e);
+        }
     };
 
     return (

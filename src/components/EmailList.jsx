@@ -306,9 +306,6 @@ const EmailList = ({
                           ? sender.split("<")[0].replace(/^["']/g, "").replace(/["']$/g, "").trim()
                           : (sender?.split("@")[0] || sender)
                       )}
-                      {email.isThread && email.messages && email.messages.length > 1 && (
-                        <span className="ml-1 text-xs text-gray-500 font-normal">({email.messages.length})</span>
-                      )}
                     </span>
                   </div>
 

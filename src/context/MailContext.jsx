@@ -2,7 +2,6 @@ import React, { createContext, useState, useContext, useEffect, useCallback, use
 import { mailAPI, api } from '../services/api';
 import { API_ENDPOINTS } from '../Data/constants';
 import { useAuth } from './AuthContext';
-import { groupEmailsIntoThreads, normalizeSubject } from '../utils/threadUtils';
 import toast from 'react-hot-toast';
 
 const MailContext = createContext();
@@ -56,37 +55,7 @@ export const MailProvider = ({ children }) => {
         try {
             let res;
             switch (folder.toLowerCase()) {
-                case 'inbox': {
-                    const [inboxRes, sentRes] = await Promise.all([
-                        mailAPI.getInbox().catch(() => ({ data: { success: false } })),
-                        mailAPI.getSent().catch(() => ({ data: { success: false } }))
-                    ]);
-                    
-                    let inboxEmails = inboxRes.data?.success && inboxRes.data.data?.emails ? inboxRes.data.data.emails : [];
-                    let sentEmails = sentRes.data?.success && sentRes.data.data?.emails ? sentRes.data.data.emails : [];
-                    
-                    const inboxSubjects = new Set(inboxEmails.map(e => normalizeSubject(e.subject)));
-                    const matchingSentEmails = sentEmails.filter(e => inboxSubjects.has(normalizeSubject(e.subject)));
-                    
-                    let mergedEmails = [...inboxEmails, ...matchingSentEmails];
-                    
-                    mergedEmails.sort((a, b) => {
-                        const dateA = new Date(a.date || a.sentDate || a.receivedDate || 0);
-                        const dateB = new Date(b.date || b.sentDate || b.receivedDate || 0);
-                        return dateB - dateA;
-                    });
-                    
-                    res = {
-                        data: {
-                            success: true,
-                            data: {
-                                emails: mergedEmails,
-                                unreadCount: (inboxRes.data?.success && inboxRes.data.data?.unreadCount) ? inboxRes.data.data.unreadCount : 0
-                            }
-                        }
-                    };
-                    break;
-                }
+                case 'inbox': res = await mailAPI.getInbox(); break;
                 case 'sent': res = await mailAPI.getSent(); break;
                 case 'draft':
                 case 'drafts': res = await mailAPI.getDrafts(); break;
@@ -155,12 +124,6 @@ export const MailProvider = ({ children }) => {
                     if (folder === 'starred') {
                         normalizedEmails = normalizedEmails.filter(m => m.folderName?.toLowerCase() !== 'trash');
                     }
-                    
-                    // Group into threads if we are in inbox
-                    if (folder.toLowerCase() === 'inbox') {
-                        normalizedEmails = groupEmailsIntoThreads(normalizedEmails);
-                    }
-                    
                     setEmails(normalizedEmails);
                     setUnreadCounts(prev => ({ ...prev, [folder]: data.unreadCount || 0 }));
                 }

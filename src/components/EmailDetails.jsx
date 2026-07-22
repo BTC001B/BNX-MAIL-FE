@@ -157,19 +157,6 @@ const EmailDetails = ({
   const [customDateTime, setCustomDateTime] = useState("");
   const [imagePreviews, setImagePreviews] = useState({});
 
-  const messagesToRender = email.isThread && email.messages && email.messages.length > 0 
-    ? email.messages 
-    : [email];
-
-  const [expandedMessages, setExpandedMessages] = useState(new Set());
-
-  React.useEffect(() => {
-    if (messagesToRender.length > 0) {
-      const latestUid = messagesToRender[messagesToRender.length - 1].uid;
-      setExpandedMessages(new Set([latestUid]));
-    }
-  }, [email.uid]);
-
   const handlePrint = () => {
     const iframe = document.createElement('iframe');
     iframe.style.position = 'absolute';
@@ -878,209 +865,153 @@ const EmailDetails = ({
           </div>
         </div>
 
-        {/* MESSAGES LOOP */}
-        <div className="flex flex-col gap-4">
-          {messagesToRender.map((msg, index) => {
-            const isExpanded = expandedMessages.has(msg.uid);
-            const isSentByUser = user?.email && msg.from?.toLowerCase().includes(user.email.toLowerCase());
-            
-            // Clean up sender email
-            const extractEmail = (str) => {
-              if (!str) return "";
-              const match = str.match(/<([^>]+)>/);
-              return match ? match[1] : str;
-            };
-            const msgCleanSenderEmail = extractEmail(msg.from);
-            const msgIsSystemEmail = msgCleanSenderEmail.toLowerCase().includes('noreply') || 
-                                  msgCleanSenderEmail.toLowerCase().includes('no-reply') ||
-                                  msgCleanSenderEmail.toLowerCase().includes('donotreply') ||
-                                  msgCleanSenderEmail.toLowerCase().includes('daemon');
-            const msgBounceDetails = (msgIsSystemEmail && msg.textPlain?.includes('Diagnostic-Code:')) 
-              ? msg.textPlain.substring(msg.textPlain.indexOf('Diagnostic-Code:')) 
-              : null;
-
-            return (
-              <div 
-                key={msg.uid} 
-                className={`flex flex-col transition-all duration-200 ${isExpanded ? 'my-1' : 'hover:bg-black/[0.02] dark:hover:bg-white/[0.02]'}`}
-                style={{ borderBottom: index !== messagesToRender.length - 1 ? `1px solid ${theme.border}` : 'none' }}
-              >
-                {/* SENDER INFO HEADER (Clickable to expand/collapse) */}
-                <div 
-                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 cursor-pointer`}
-                  onClick={() => {
-                    setExpandedMessages(prev => {
-                      const newSet = new Set(prev);
-                      if (newSet.has(msg.uid)) {
-                        if (newSet.size > 1 || messagesToRender.length === 1) newSet.delete(msg.uid); // Don't collapse if it's the only one
-                      } else {
-                        newSet.add(msg.uid);
-                      }
-                      return newSet;
-                    });
-                  }}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold text-base shadow-sm shrink-0"
-                      style={{ backgroundColor: theme.accent || "#135bec" }}
-                    >
-                      {msg.from?.split("@")[0]?.[0]?.toUpperCase() || "U"}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-sm sm:text-base flex flex-wrap items-center gap-x-2 truncate" style={{ color: theme.text }}>
-                        {isSentByUser ? (
-                          <span className="truncate">me</span>
-                        ) : msg.from?.includes("<") ? (
-                          <>
-                            <span className="truncate">{msg.from.split("<")[0].replace(/^["']/g, "").replace(/["']$/g, "").trim()}</span>
-                            {isExpanded && <span className="text-xs font-normal text-gray-500 dark:text-gray-400 truncate">&lt;{msg.from.split("<")[1].split(">")[0]}&gt;</span>}
-                          </>
-                        ) : (
-                          <span className="truncate">{msg.from}</span>
-                        )}
-                        {isExpanded && msgCleanSenderEmail && !msgIsSystemEmail && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleUnsubscribeClick(); }}
-                            className="text-[10px] font-semibold text-red-500 hover:text-red-600 hover:underline cursor-pointer bg-red-500/10 dark:bg-red-500/20 px-1.5 py-0.5 rounded transition-all select-none"
-                            title="Unsubscribe from this sender"
-                          >
-                            Unsub
-                          </button>
-                        )}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        to <span className="font-medium text-gray-700 dark:text-gray-300">
-                          {msg.to?.toLowerCase().includes(user?.email?.toLowerCase()) ? "me" : (msg.to || "me")}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 shrink-0 self-start sm:self-center">
-                    {!isExpanded && (
-                      <span className="text-xs text-gray-400 truncate max-w-[200px] hidden sm:block">
-                        {msg.body ? msg.body.substring(0, 50) + "..." : msg.textPlain ? msg.textPlain.substring(0, 50) + "..." : ""}
-                      </span>
-                    )}
-                    <span className="text-xs font-medium text-gray-400 dark:text-gray-500 bg-black/[0.03] dark:bg-white/[0.04] px-2.5 py-1 rounded-full whitespace-nowrap">
-                      {msg.sentDate ? formatDate(msg.sentDate) : msg.receivedDate ? formatDate(msg.receivedDate) : formatDate(msg.date)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* BODY AND ATTACHMENTS */}
-                {isExpanded && (
-                  <div className="p-6">
-                    <div className="max-w-none prose prose-slate dark:prose-invert prose-p:leading-relaxed text-[15px] leading-relaxed">
-                      {msg.htmlBody ? (
-                        <div dangerouslySetInnerHTML={{ __html: msg.htmlBody }} style={{ color: theme.text }} />
-                      ) : (
-                        <p className="whitespace-pre-wrap text-gray-800 dark:text-gray-200" style={{ color: theme.text }}>
-                          {msg.body || msg.textPlain || "(No content available)"}
-                        </p>
-                      )}
-                      {msgBounceDetails && (
-                        <div className="mt-8 p-4 bg-gray-50 dark:bg-black/20 rounded-xl border border-gray-100 dark:border-gray-800 font-mono text-xs whitespace-pre-wrap text-gray-600 dark:text-gray-400 overflow-x-auto">
-                          <h4 className="font-bold mb-2 text-gray-700 dark:text-gray-300 font-sans">Diagnostic Information & Original Message</h4>
-                          {msgBounceDetails.trim()}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* ATTACHMENTS */}
-                    {(() => {
-                      const msgIsBounce = msg.from?.toLowerCase().includes('mailer-daemon') || msg.from?.toLowerCase().includes('postmaster');
-                      const visibleAttachments = msg.attachments?.filter(file => {
-                        if (!msgIsBounce) return true;
-                        return file !== 'delivery_status.txt' && file !== 'original_message.eml';
-                      }) || [];
-                      
-                      if (visibleAttachments.length === 0) return null;
-                      
-                      return (
-                        <div className="mt-8 pt-6 border-t" style={{ borderColor: theme.border }}>
-                          <p className="text-xs font-bold mb-4 text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Attachments ({visibleAttachments.length})
-                          </p>
-                          <div className="flex flex-wrap gap-4">
-                            {visibleAttachments.map((file, i) => {
-                              const fileInfo = getFileIcon(file);
-                            return (
-                              <div
-                                key={i}
-                                className="w-[180px] h-[130px] rounded-xl border overflow-hidden flex flex-col hover:shadow-md transition-all relative shadow-sm bg-black/[0.01] dark:bg-white/[0.01] hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
-                                style={{ borderColor: theme.border }}
-                              >
-                                {/* Upper preview / icon block */}
-                                <div 
-                                  className="h-[85px] w-full flex flex-col items-center justify-center bg-black/[0.03] dark:bg-white/[0.03] border-b relative overflow-hidden"
-                                  style={{ borderColor: theme.border }}
-                                >
-                                  {imagePreviews[file] ? (
-                                    <img 
-                                      src={imagePreviews[file]} 
-                                      alt={file} 
-                                      className="w-full h-full object-cover select-none" 
-                                    />
-                                  ) : (
-                                    <>
-                                      <span className="text-3xl filter drop-shadow-sm select-none">{fileInfo.icon}</span>
-                                      <span 
-                                        className="text-[9px] font-extrabold uppercase tracking-wider mt-1.5 px-2 py-0.5 rounded-full select-none"
-                                        style={{ backgroundColor: `${fileInfo.color}15`, color: fileInfo.color }}
-                                      >
-                                        {fileInfo.name}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-
-                                {/* Lower details block */}
-                                <div className="p-2 flex items-center justify-between gap-1 flex-1 min-w-0">
-                                  <div className="flex flex-col min-w-0 flex-1">
-                                    <span 
-                                      className="text-[11px] font-semibold truncate select-all text-left" 
-                                      style={{ color: theme.text }}
-                                      title={file}
-                                    >
-                                      {file}
-                                    </span>
-                                    <span className="text-[9px] opacity-50 font-medium select-none truncate text-left">
-                                      {fileInfo.name} File
-                                    </span>
-                                  </div>
-                                  
-                                  <div className="flex items-center gap-0.5 shrink-0">
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); handlePreviewAttachment(file); }}
-                                      className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
-                                      title="Preview file"
-                                    >
-                                      <MdRemoveRedEye size={15} />
-                                    </button>
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); handleDownloadAttachment(file); }}
-                                      className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
-                                      title="Download file"
-                                    >
-                                      <MdFileDownload size={15} />
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })()}
-                  </div>
+        {/* SENDER INFO */}
+        <div
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b"
+          style={{ borderColor: theme.border }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold text-base shadow-sm shrink-0"
+              style={{ backgroundColor: theme.accent || "#135bec" }}
+            >
+              {email.from?.split("@")[0]?.[0]?.toUpperCase() || "U"}
+            </div>
+            <div>
+              <p className="font-semibold text-sm sm:text-base flex flex-wrap items-center gap-x-2" style={{ color: theme.text }}>
+                {email.from?.includes("<") ? (
+                  <>
+                    <span>{email.from.split("<")[0].replace(/^["']/g, "").replace(/["']$/g, "").trim()}</span>
+                    <span className="text-xs font-normal text-gray-500 dark:text-gray-400">&lt;{email.from.split("<")[1].split(">")[0]}&gt;</span>
+                  </>
+                ) : (
+                  <span>{email.from}</span>
                 )}
-              </div>
-            );
-          })}
+                {cleanSenderEmail && !isSystemEmail && (
+                  <button
+                    onClick={handleUnsubscribeClick}
+                    className="text-xs font-semibold text-red-500 hover:text-red-600 hover:underline cursor-pointer bg-red-500/10 dark:bg-red-500/20 px-2 py-0.5 rounded transition-all select-none"
+                    title="Unsubscribe from this sender"
+                  >
+                    Unsubscribe
+                  </button>
+                )}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                to <span className="font-medium text-gray-700 dark:text-gray-300">{email.to || "me"}</span>
+              </p>
+            </div>
+          </div>
+
+          <span className="text-xs font-medium text-gray-400 dark:text-gray-500 self-start sm:self-center bg-black/[0.03] dark:bg-white/[0.04] px-2.5 py-1 rounded-full">
+            {email.sentDate ? formatDate(email.sentDate) : email.receivedDate ? formatDate(email.receivedDate) : ""}
+          </span>
         </div>
+
+        {/* BODY */}
+        <div className="max-w-none prose prose-slate dark:prose-invert prose-p:leading-relaxed text-[15px] leading-relaxed">
+          {email.htmlBody ? (
+            <div dangerouslySetInnerHTML={{ __html: email.htmlBody }} style={{ color: theme.text }} />
+          ) : (
+            <p className="whitespace-pre-wrap text-gray-800 dark:text-gray-200" style={{ color: theme.text }}>
+              {email.body || email.textPlain || "(No content available)"}
+            </p>
+          )}
+          {bounceDetails && (
+            <div className="mt-8 p-4 bg-gray-50 dark:bg-black/20 rounded-xl border border-gray-100 dark:border-gray-800 font-mono text-xs whitespace-pre-wrap text-gray-600 dark:text-gray-400 overflow-x-auto">
+              <h4 className="font-bold mb-2 text-gray-700 dark:text-gray-300 font-sans">Diagnostic Information & Original Message</h4>
+              {bounceDetails.trim()}
+            </div>
+          )}
+        </div>
+
+        {/* ATTACHMENTS */}
+        {(() => {
+          const isBounce = email.from?.toLowerCase().includes('mailer-daemon') || email.from?.toLowerCase().includes('postmaster');
+          const visibleAttachments = email.attachments?.filter(file => {
+            if (!isBounce) return true;
+            return file !== 'delivery_status.txt' && file !== 'original_message.eml';
+          }) || [];
+          
+          if (visibleAttachments.length === 0) return null;
+          
+          return (
+            <div className="mt-8 pt-6 border-t" style={{ borderColor: theme.border }}>
+              <p className="text-xs font-bold mb-4 text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Attachments ({visibleAttachments.length})
+              </p>
+              <div className="flex flex-wrap gap-4">
+                {visibleAttachments.map((file, i) => {
+                  const fileInfo = getFileIcon(file);
+                return (
+                  <div
+                    key={i}
+                    className="w-[180px] h-[130px] rounded-xl border overflow-hidden flex flex-col hover:shadow-md transition-all relative shadow-sm bg-black/[0.01] dark:bg-white/[0.01] hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+                    style={{ borderColor: theme.border }}
+                  >
+                    {/* Upper preview / icon block */}
+                    <div 
+                      className="h-[85px] w-full flex flex-col items-center justify-center bg-black/[0.03] dark:bg-white/[0.03] border-b relative overflow-hidden"
+                      style={{ borderColor: theme.border }}
+                    >
+                      {imagePreviews[file] ? (
+                        <img 
+                          src={imagePreviews[file]} 
+                          alt={file} 
+                          className="w-full h-full object-cover select-none" 
+                        />
+                      ) : (
+                        <>
+                          <span className="text-3xl filter drop-shadow-sm select-none">{fileInfo.icon}</span>
+                          <span 
+                            className="text-[9px] font-extrabold uppercase tracking-wider mt-1.5 px-2 py-0.5 rounded-full select-none"
+                            style={{ backgroundColor: `${fileInfo.color}15`, color: fileInfo.color }}
+                          >
+                            {fileInfo.name}
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Lower details block */}
+                    <div className="p-2 flex items-center justify-between gap-1 flex-1 min-w-0">
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span 
+                          className="text-[11px] font-semibold truncate select-all text-left" 
+                          style={{ color: theme.text }}
+                          title={file}
+                        >
+                          {file}
+                        </span>
+                        <span className="text-[9px] opacity-50 font-medium select-none truncate text-left">
+                          {fileInfo.name} File
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        <button
+                          onClick={() => handlePreviewAttachment(file)}
+                          className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
+                          title="Preview file"
+                        >
+                          <MdRemoveRedEye size={15} />
+                        </button>
+                        <button
+                          onClick={() => handleDownloadAttachment(file)}
+                          className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
+                          title="Download file"
+                        >
+                          <MdFileDownload size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
       </div>
 
       {/* FOOTER ACTIONS */}
