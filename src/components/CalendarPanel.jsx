@@ -280,8 +280,11 @@ export default function CalendarPanel() {
             {selectedItems.dayEvents.map(e => (
               <div key={e._id || Math.random()} className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 rounded-lg flex gap-2">
                 <MdEvent className="text-blue-500 mt-0.5 shrink-0" size={14} />
-                <div className="min-w-0">
-                  <div className="font-semibold text-xs text-blue-900 dark:text-blue-100 truncate">{e.title}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="font-semibold text-xs text-blue-900 dark:text-blue-100 truncate">{e.title}</div>
+                    {e.app && <span className="shrink-0 text-[8px] font-bold bg-blue-100 dark:bg-blue-800/40 text-blue-600 dark:text-blue-300 px-1.5 py-0.5 rounded uppercase">{e.app.replace('_', ' ')}</span>}
+                  </div>
                   <div className="text-[10px] opacity-75 truncate">{new Date(e.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {e.description}</div>
                 </div>
               </div>
@@ -290,8 +293,11 @@ export default function CalendarPanel() {
             {selectedItems.dayNotes.map(n => (
               <div key={n._id || Math.random()} className="p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-900/30 rounded-lg flex gap-2">
                 <MdOutlineNoteAlt className="text-yellow-600 mt-0.5 shrink-0" size={14} />
-                <div className="min-w-0">
-                  <div className="font-semibold text-xs text-yellow-900 dark:text-yellow-100 truncate">{n.title}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="font-semibold text-xs text-yellow-900 dark:text-yellow-100 truncate">{n.title}</div>
+                    {n.app && <span className="shrink-0 text-[8px] font-bold bg-yellow-100 dark:bg-yellow-800/40 text-yellow-700 dark:text-yellow-300 px-1.5 py-0.5 rounded uppercase">{n.app.replace('_', ' ')}</span>}
+                  </div>
                   <div className="text-[10px] opacity-75 truncate">{n.content}</div>
                 </div>
               </div>
@@ -300,8 +306,11 @@ export default function CalendarPanel() {
             {selectedItems.dayReminders.map(r => (
               <div key={r._id || Math.random()} className="p-2 bg-pink-50 dark:bg-pink-900/20 border border-pink-100 dark:border-pink-900/30 rounded-lg flex gap-2">
                 <MdNotificationsActive className="text-pink-500 mt-0.5 shrink-0" size={14} />
-                <div className="min-w-0">
-                  <div className="font-semibold text-xs text-pink-900 dark:text-pink-100 truncate">{r.title}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="font-semibold text-xs text-pink-900 dark:text-pink-100 truncate">{r.title}</div>
+                    {r.app && <span className="shrink-0 text-[8px] font-bold bg-pink-100 dark:bg-pink-800/40 text-pink-600 dark:text-pink-300 px-1.5 py-0.5 rounded uppercase">{r.app.replace('_', ' ')}</span>}
+                  </div>
                   <div className="text-[10px] opacity-75 truncate">{new Date(r.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {r.description}</div>
                 </div>
               </div>
@@ -316,7 +325,15 @@ export default function CalendarPanel() {
 
       {/* ADD FORM OVERLAY */}
       {showAddForm && (
-        <div className="absolute inset-0 bg-white dark:bg-gray-900 flex flex-col z-10 rounded-t-2xl py-2 overflow-y-auto hidden-scrollbar">
+        <div className="absolute inset-0 z-20 flex flex-col justify-end overflow-hidden pointer-events-none rounded-xl">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/20 dark:bg-black/40 pointer-events-auto"
+            onClick={() => setShowAddForm(false)}
+          />
+          
+          {/* Bottom Sheet Modal */}
+          <div className="relative bg-white dark:bg-gray-900 flex flex-col rounded-t-2xl p-4 max-h-[85%] overflow-y-auto hidden-scrollbar shadow-2xl pointer-events-auto border-t border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-sm">Add Item for {selectedDate.getDate()} {monthNames[selectedDate.getMonth()]}</h3>
             <button onClick={() => setShowAddForm(false)} className="p-1 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">
@@ -403,6 +420,7 @@ export default function CalendarPanel() {
               {formLoading ? 'Saving...' : 'Save Item'}
             </button>
           </form>
+          </div>
         </div>
       )}
     </div>
