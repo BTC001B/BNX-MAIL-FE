@@ -8,7 +8,8 @@ const StorageCard = ({
   usedStorage, 
   totalStorage = 1073741824, // 1 GB in bytes
   usagePercentage, 
-  remainingStorage 
+  remainingStorage,
+  onManage
 }) => {
   const { theme } = useTheme();
 
@@ -114,6 +115,7 @@ const StorageCard = ({
       {/* Manage Button (UI Element only) */}
       <button 
         type="button"
+        onClick={onManage}
         className="w-full mt-3 py-2.5 rounded-xl font-bold text-xs border text-center transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
         style={{ 
           borderColor: theme.border, 

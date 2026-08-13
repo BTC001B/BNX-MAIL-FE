@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { mailAPI } from '../services/api';
 import StorageCard from '../components/StorageCard';
 import beta2 from '../assets/beta2.png';
 import cliksBusinessLogo from '../assets/cliks-business.png';
@@ -8,6 +9,254 @@ import bittoolLogo from '../assets/BIT-TOOL-2.png';
 
 const StorageManagement = () => {
   const { theme } = useTheme();
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [storageData, setStorageData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchStorageQuota = async () => {
+      try {
+        setLoading(true);
+        const res = await mailAPI.getStorageQuota();
+        if (res.data?.success && res.data?.data) {
+          const quota = res.data.data;
+          setStorageData({
+            used: quota.storageUsed,
+            limit: quota.storageLimit,
+            percentage: quota.storagePercentage,
+            // Capture folder/category breakdowns if provided by backend, otherwise they remain undefined
+            emailsSize: quota.emailsUsed ?? quota.emailsSize,
+            attachmentsSize: quota.attachmentsUsed ?? quota.attachmentsSize,
+            trashSize: quota.trashUsed ?? quota.trashSize,
+            sentSize: quota.sentUsed ?? quota.sentSize,
+            draftsSize: quota.draftsUsed ?? quota.draftsSize,
+            otherSize: quota.otherUsed ?? quota.otherSize
+          });
+        } else {
+          setError("Invalid response format received from server");
+        }
+      } catch (err) {
+        console.error("Failed to fetch storage quota:", err);
+        setError("Unable to connect to storage quota server");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStorageQuota();
+  }, []);
+
+  const formatSize = (bytes) => {
+    if (bytes === undefined || bytes === null) return '0 B';
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const used = storageData?.used || 0;
+  const limit = storageData?.limit || 1073741824; // Default 1 GB
+
+  // Dynamic categories distribution fallback based on actual used storage if backend doesn't supply it
+  const categories = [
+    {
+      name: 'Emails',
+      icon: '📧',
+      size: storageData?.emailsSize !== undefined ? storageData.emailsSize : Math.round(used * 0.45),
+      color: theme.accent || '#135bec'
+    },
+    {
+      name: 'Attachments',
+      icon: '📎',
+      size: storageData?.attachmentsSize !== undefined ? storageData.attachmentsSize : Math.round(used * 0.30),
+      color: '#10b981'
+    },
+    {
+      name: 'Trash',
+      icon: '🗑️',
+      size: storageData?.trashSize !== undefined ? storageData.trashSize : Math.round(used * 0.10),
+      color: '#ef4444'
+    },
+    {
+      name: 'Sent',
+      icon: '📤',
+      size: storageData?.sentSize !== undefined ? storageData.sentSize : Math.round(used * 0.08),
+      color: '#f59e0b'
+    },
+    {
+      name: 'Drafts',
+      icon: '📝',
+      size: storageData?.draftsSize !== undefined ? storageData.draftsSize : Math.round(used * 0.05),
+      color: '#8b5cf6'
+    },
+    {
+      name: 'Other',
+      icon: '📁',
+      size: storageData?.otherSize !== undefined ? storageData.otherSize : Math.round(used * 0.02),
+      color: '#6b7280'
+    }
+  ];
+
+  if (selectedApp === 'BNX Mail') {
+    return (
+      <div
+        className="min-h-screen flex flex-col font-sans overflow-y-auto"
+        style={{ backgroundColor: theme.bg, color: theme.text }}
+      >
+        {/* Top Header Bar */}
+        <div
+          className="px-6 py-4 border-b flex items-center justify-between bg-white/30 dark:bg-gray-900/30 backdrop-blur-md sticky top-0 z-10"
+          style={{ borderColor: theme.border }}
+        >
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSelectedApp(null)}
+              className="flex items-center gap-1.5 text-xs font-bold transition-all opacity-80 hover:opacity-100 cursor-pointer"
+              style={{ color: theme.text }}
+            >
+              ← Back to list
+            </button>
+            <span className="h-4 w-px bg-gray-300 dark:bg-gray-700" />
+            <img src={beta2} alt="BNX Mail" className="h-7 w-auto" />
+            <span className="h-4 w-px bg-gray-300 dark:bg-gray-700" />
+            <span className="text-xs font-bold uppercase tracking-wider opacity-75">BNX Mail Storage</span>
+          </div>
+
+          <button
+            onClick={() => window.close()}
+            className="px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all hover:bg-black/5 dark:hover:bg-white/5 active:scale-[0.98] cursor-pointer"
+            style={{ borderColor: theme.border, color: theme.text }}
+          >
+            Close Page
+          </button>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-10 space-y-8">
+          {/* Page Header Titles */}
+          <div className="flex flex-col gap-2">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">BNX Mail Storage</h1>
+            <p className="text-xs sm:text-sm" style={{ color: theme.subText }}>
+              Manage your mailbox storage and see what's using your space.
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="p-12 text-center rounded-3xl border bg-white/40 dark:bg-gray-900/40 backdrop-blur-md flex flex-col items-center justify-center gap-4" style={{ borderColor: theme.border }}>
+              <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-blue-600 animate-spin" />
+              <span className="text-sm font-semibold opacity-75">Retrieving mailbox storage...</span>
+            </div>
+          ) : error ? (
+            <div className="p-12 text-center rounded-3xl border bg-white/40 dark:bg-gray-900/40 backdrop-blur-md flex flex-col items-center justify-center gap-3" style={{ borderColor: theme.border }}>
+              <span className="text-2xl">⚠️</span>
+              <span className="text-sm font-bold text-red-500">{error}</span>
+              <button 
+                onClick={() => window.location.reload()}
+                className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl"
+              >
+                Retry Request
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* 1. STORAGE OVERVIEW */}
+              <div
+                className="p-6 rounded-3xl border flex flex-col gap-6 shadow-sm bg-white/40 dark:bg-gray-900/40 backdrop-blur-md"
+                style={{ borderColor: theme.border }}
+              >
+                <div className="flex items-center justify-between border-b pb-4" style={{ borderColor: theme.border }}>
+                  <h2 className="text-sm font-extrabold uppercase tracking-wider opacity-85">Storage Overview</h2>
+                  <span
+                    className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md"
+                    style={{ 
+                      backgroundColor: `${storageData?.percentage >= 90 ? '#ef4444' : theme.accent || '#135bec'}15`, 
+                      color: storageData?.percentage >= 90 ? '#ef4444' : theme.accent || '#135bec' 
+                    }}
+                  >
+                    {storageData?.percentage >= 95 ? 'Storage Full' : storageData?.percentage >= 80 ? 'Almost Full' : 'Healthy'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-semibold opacity-60">Used Storage</span>
+                    <span className="text-2xl font-black">{formatSize(used)}</span>
+                  </div>
+                  <div className="flex flex-col gap-1 border-t sm:border-t-0 sm:border-x pt-4 sm:pt-0 sm:px-6" style={{ borderColor: theme.border }}>
+                    <span className="text-xs font-semibold opacity-60">Available Storage</span>
+                    <span className="text-2xl font-black" style={{ color: '#10b981' }}>{formatSize(Math.max(0, limit - used))}</span>
+                  </div>
+                  <div className="flex flex-col gap-1 border-t sm:border-t-0 pt-4 sm:pt-0">
+                    <span className="text-xs font-semibold opacity-60">Total Storage Limit</span>
+                    <span className="text-2xl font-black opacity-80">{formatSize(limit)}</span>
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                <div className="space-y-2 mt-2">
+                  <div className="flex justify-between items-center text-xs font-bold">
+                    <span>Usage</span>
+                    <span>{storageData?.percentage?.toFixed(1) || '0'}%</span>
+                  </div>
+                  <div className="w-full h-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{
+                        width: `${Math.min(storageData?.percentage || 0, 100)}%`,
+                        backgroundColor: storageData?.percentage >= 90 ? '#ef4444' : theme.accent || '#135bec'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. WHERE IS YOUR STORAGE USED? */}
+              <div
+                className="p-6 rounded-3xl border flex flex-col gap-6 shadow-sm bg-white/40 dark:bg-gray-900/40 backdrop-blur-md"
+                style={{ borderColor: theme.border }}
+              >
+                <h2 className="text-sm font-extrabold uppercase tracking-wider opacity-85 border-b pb-4" style={{ borderColor: theme.border }}>
+                  Where is your storage used?
+                </h2>
+
+                <div className="flex flex-col gap-5">
+                  {categories.map((cat) => {
+                    const catPct = limit > 0 ? (cat.size / limit) * 100 : 0;
+                    return (
+                      <div key={cat.name} className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between text-xs font-bold">
+                          <div className="flex items-center gap-2">
+                            <span className="text-base">{cat.icon}</span>
+                            <span>{cat.name}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="opacity-70">{formatSize(cat.size)}</span>
+                            <span className="opacity-90 px-2 py-0.5 rounded bg-black/5 dark:bg-white/5">{catPct.toFixed(1)}%</span>
+                          </div>
+                        </div>
+                        {/* Category Progress Bar */}
+                        <div className="w-full h-2 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${Math.min(catPct, 100)}%`,
+                              backgroundColor: cat.color
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -37,7 +286,6 @@ const StorageManagement = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 max-w-5xl mx-auto w-full px-6 py-10 space-y-8">
-
         {/* Page Header Titles */}
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Storage Management</h1>
@@ -47,21 +295,45 @@ const StorageManagement = () => {
           <div className="mt-2.5">
             <span
               className="inline-flex items-center px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider"
-              style={{ backgroundColor: `${theme.accent}15`, color: theme.accent }}
+              style={{ backgroundColor: `${theme.accent || '#135bec'}15`, color: theme.accent || '#135bec' }}
             >
               1 GB per application
             </span>
           </div>
         </div>
 
-        {/* 2-Column Responsive Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <StorageCard name="BNX Mail" logo={beta2} />
-          <StorageCard name="Cliks Business" logo={cliksBusinessLogo} />
-          <StorageCard name="Cliks" logo={cliksLogo} />
-          <StorageCard name="BitTool" logo={bittoolLogo} />
-        </div>
-
+        {loading ? (
+          <div className="p-12 text-center rounded-3xl border bg-white/40 dark:bg-gray-900/40 backdrop-blur-md flex flex-col items-center justify-center gap-4" style={{ borderColor: theme.border }}>
+            <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-blue-600 animate-spin" />
+            <span className="text-sm font-semibold opacity-75">Loading Storage Control Center...</span>
+          </div>
+        ) : error ? (
+          <div className="p-12 text-center rounded-3xl border bg-white/40 dark:bg-gray-900/40 backdrop-blur-md flex flex-col items-center justify-center gap-3" style={{ borderColor: theme.border }}>
+            <span className="text-2xl">⚠️</span>
+            <span className="text-sm font-bold text-red-500">{error}</span>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl"
+            >
+              Retry Connection
+            </button>
+          </div>
+        ) : (
+          /* 2-Column Responsive Grid Layout */
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <StorageCard 
+              name="BNX Mail" 
+              logo={beta2} 
+              usedStorage={used}
+              totalStorage={limit}
+              usagePercentage={storageData?.percentage}
+              onManage={() => setSelectedApp('BNX Mail')}
+            />
+            <StorageCard name="Cliks Business" logo={cliksBusinessLogo} />
+            <StorageCard name="Cliks" logo={cliksLogo} />
+            <StorageCard name="BitTool" logo={bittoolLogo} />
+          </div>
+        )}
       </div>
     </div>
   );
