@@ -57,7 +57,8 @@ const StorageManagement = () => {
   };
 
   const used = storageData?.used || 0;
-  const limit = storageData?.limit || 1073741824; // Default 1 GB
+  const limit = 1073741824; // Limit is strictly 1 GB (1073741824 bytes) in frontend
+  const usagePercentage = limit > 0 ? (used / limit) * 100 : 0;
 
   // Dynamic categories distribution fallback based on actual used storage if backend doesn't supply it
   const categories = [
@@ -171,11 +172,11 @@ const StorageManagement = () => {
                   <span
                     className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md"
                     style={{ 
-                      backgroundColor: `${storageData?.percentage >= 90 ? '#ef4444' : theme.accent || '#135bec'}15`, 
-                      color: storageData?.percentage >= 90 ? '#ef4444' : theme.accent || '#135bec' 
+                      backgroundColor: `${usagePercentage >= 90 ? '#ef4444' : theme.accent || '#135bec'}15`, 
+                      color: usagePercentage >= 90 ? '#ef4444' : theme.accent || '#135bec' 
                     }}
                   >
-                    {storageData?.percentage >= 95 ? 'Storage Full' : storageData?.percentage >= 80 ? 'Almost Full' : 'Healthy'}
+                    {usagePercentage >= 95 ? 'Storage Full' : usagePercentage >= 80 ? 'Almost Full' : 'Healthy'}
                   </span>
                 </div>
 
@@ -198,14 +199,14 @@ const StorageManagement = () => {
                 <div className="space-y-2 mt-2">
                   <div className="flex justify-between items-center text-xs font-bold">
                     <span>Usage</span>
-                    <span>{storageData?.percentage?.toFixed(1) || '0'}%</span>
+                    <span>{usagePercentage.toFixed(1)}%</span>
                   </div>
                   <div className="w-full h-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
                     <div
                       className="h-full rounded-full transition-all duration-700"
                       style={{
-                        width: `${Math.min(storageData?.percentage || 0, 100)}%`,
-                        backgroundColor: storageData?.percentage >= 90 ? '#ef4444' : theme.accent || '#135bec'
+                        width: `${Math.min(usagePercentage, 100)}%`,
+                        backgroundColor: usagePercentage >= 90 ? '#ef4444' : theme.accent || '#135bec'
                       }}
                     />
                   </div>
@@ -326,7 +327,7 @@ const StorageManagement = () => {
               logo={beta2} 
               usedStorage={used}
               totalStorage={limit}
-              usagePercentage={storageData?.percentage}
+              usagePercentage={usagePercentage}
               onManage={() => setSelectedApp('BNX Mail')}
             />
             <StorageCard name="Cliks Business" logo={cliksBusinessLogo} />

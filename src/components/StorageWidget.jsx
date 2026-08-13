@@ -17,10 +17,13 @@ const StorageWidget = ({ isDesktopOpen }) => {
       try {
         const res = await mailAPI.getStorageQuota();
         if (res.data?.success && res.data?.data) {
+          const used = res.data.data.storageUsed;
+          const limit = 1073741824; // strictly 1 GB in frontend
+          const percentage = limit > 0 ? (used / limit) * 100 : 0;
           setStorageData({
-            used: res.data.data.storageUsed,
-            limit: res.data.data.storageLimit,
-            percentage: res.data.data.storagePercentage
+            used,
+            limit,
+            percentage
           });
         }
       } catch (err) {
