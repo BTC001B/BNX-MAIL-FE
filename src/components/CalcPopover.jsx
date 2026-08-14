@@ -89,8 +89,9 @@ function CalcInner() {
 
   // Tape Mutations
   const saveTapeMutation = useMutation({
-    mutationFn: async () => {
-      if (tape.length === 0) throw new Error('Tape is empty');
+    mutationFn: async (tapeOverride) => {
+      const activeTape = Array.isArray(tapeOverride) ? tapeOverride : tape;
+      if (activeTape.length === 0) throw new Error('Tape is empty');
       const token = localStorage.getItem('accessToken');
       
       // 1. Create Session
@@ -114,8 +115,8 @@ function CalcInner() {
       console.log('SAVE TAPE - SESSION ID:', sessionId);
 
       // 2. Add Items sequentially
-      for (let i = 0; i < tape.length; i++) {
-        const item = tape[i];
+      for (let i = 0; i < activeTape.length; i++) {
+        const item = activeTape[i];
         const itemRes = await fetch(`${API_BASE}/sessions/${sessionId}/items`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -233,9 +234,12 @@ function CalcInner() {
       label: label
     };
 
-    setTape([...tape, newItem]);
+    const newTape = [...tape, newItem];
+    setTape(newTape);
     setRunningTotal(newTotal);
     setCurrentInput('');
+    
+    return newTape;
   };
 
   const handleKeypad = (val) => {
@@ -262,18 +266,26 @@ function CalcInner() {
       setPendingOperator(val);
       setCurrentInput('');
     } else if (val === '=') {
+      let finalTape = tape;
       if (currentInput) {
         if (tape.length === 0) {
-          appendToTape('=', currentInput);
+          finalTape = appendToTape('=', currentInput);
         } else if (pendingOperator) {
-          appendToTape(pendingOperator, currentInput);
+          finalTape = appendToTape(pendingOperator, currentInput);
         } else {
-          setTape([]);
-          appendToTape('=', currentInput);
+          const baseVal = parseFloat(currentInput) || 0;
+          finalTape = [{ value: baseVal, operator: '=', runningTotal: baseVal, label: 'Base Value' }];
+          setTape(finalTape);
+          setRunningTotal(baseVal);
         }
       }
       setPendingOperator(null);
       setCurrentInput('');
+      
+      // Auto-save the history
+      if (finalTape && finalTape.length > 0) {
+          saveTapeMutation.mutate(finalTape);
+      }
     } else if (val === 'gst') {
       if (currentInput && pendingOperator) {
         appendToTape(pendingOperator, currentInput);
