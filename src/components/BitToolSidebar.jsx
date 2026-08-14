@@ -10,6 +10,7 @@ import { NotesManager } from "./StickyNotes";
 import CalendarPanel from "./CalendarPanel";
 import ContactPanel from "./ContactPanel";
 import NotesPanel from "./NotesPanel";
+import CalcPopover from "./CalcPopover";
 import betalogo from '../assets/beta2.png'
 
 // Tools Definition
@@ -116,31 +117,7 @@ const BitToolSidebar = ({
       case "calendar":
         return <CalendarPanel />;
       case "calculator":
-        return (
-          <div className="flex flex-col h-full text-gray-700 dark:text-gray-200">
-            <div className="bg-black/5 dark:bg-black/20 p-3 rounded-2xl text-right mb-4 border border-gray-200/20 shadow-inner min-h-[72px] flex flex-col justify-end">
-              <div className="text-xs opacity-60 tracking-wider truncate mb-1">{calcInput || "0"}</div>
-              <div className="text-xl font-bold truncate">{calcResult || "0"}</div>
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {["C", "Del", "(", ")"].map(btn => (
-                <button key={btn} onClick={() => handleCalcClick(btn)} className="py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 font-bold hover:scale-[1.03] active:scale-[0.97] transition-all text-xs cursor-pointer">{btn}</button>
-              ))}
-              {["7", "8", "9", "/"].map(btn => (
-                <button key={btn} onClick={() => handleCalcClick(btn)} className="py-2.5 rounded-xl bg-white dark:bg-gray-700 font-semibold border border-gray-100 dark:border-gray-800 hover:scale-[1.03] active:scale-[0.97] transition-all text-xs cursor-pointer">{btn}</button>
-              ))}
-              {["4", "5", "6", "*"].map(btn => (
-                <button key={btn} onClick={() => handleCalcClick(btn)} className="py-2.5 rounded-xl bg-white dark:bg-gray-700 font-semibold border border-gray-100 dark:border-gray-800 hover:scale-[1.03] active:scale-[0.97] transition-all text-xs cursor-pointer">{btn}</button>
-              ))}
-              {["1", "2", "3", "-"].map(btn => (
-                <button key={btn} onClick={() => handleCalcClick(btn)} className="py-2.5 rounded-xl bg-white dark:bg-gray-700 font-semibold border border-gray-100 dark:border-gray-800 hover:scale-[1.03] active:scale-[0.97] transition-all text-xs cursor-pointer">{btn}</button>
-              ))}
-              {["0", ".", "=", "+"].map(btn => (
-                <button key={btn} onClick={() => handleCalcClick(btn)} className={`py-2.5 rounded-xl font-bold hover:scale-[1.03] active:scale-[0.97] transition-all text-xs cursor-pointer ${btn === "=" ? "bg-emerald-500 text-white" : "bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-800"}`}>{btn}</button>
-              ))}
-            </div>
-          </div>
-        );
+        return <CalcPopover />;
       case "contacts":
         return <ContactPanel />;
       case "notes":
