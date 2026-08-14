@@ -61,7 +61,8 @@ function CalcInner() {
       if (!token) return [];
       const res = await fetch(`${API_BASE}/history`, { headers: { 'Authorization': `Bearer ${token}` } });
       if (!res.ok) return [];
-      return res.json();
+      const result = await res.json();
+      return Array.isArray(result?.data) ? result.data : (Array.isArray(result) ? result : []);
     }
   });
 
@@ -72,7 +73,8 @@ function CalcInner() {
       if (!token) return [];
       const res = await fetch(`${API_BASE}/compare/history`, { headers: { 'Authorization': `Bearer ${token}` } });
       if (!res.ok) return [];
-      return res.json();
+      const result = await res.json();
+      return Array.isArray(result?.data) ? result.data : (Array.isArray(result) ? result : []);
     }
   });
 
