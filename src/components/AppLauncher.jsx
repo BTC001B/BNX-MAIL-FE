@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MdClose, MdEdit } from "react-icons/md";
+import { MdClose, MdEdit, MdAutoAwesome, MdRocketLaunch } from "react-icons/md";
 import bnxLogo from "../assets/bnx-remove.png";
 import b2authLogo from "../assets/auth2.png";
 import bitToolLogo from "../assets/BIT-TOOL-2.png";
@@ -146,26 +146,86 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
         </div>
 
         {/* Coming Soon Section */}
-        <div className="mt-8 pt-6 border-t border-gray-100">
-          <h3 className="text-[11px] font-extrabold text-slate-700 tracking-widest mb-4 text-center">COMING SOON</h3>
-          {/* <div className="grid grid-cols-4 gap-x-2 gap-y-4">
-            {[
-              { color: 'bg-purple-50', icon: 'text-purple-400' },
-              { color: 'bg-red-50', icon: 'text-red-400' },
-              { color: 'bg-blue-50', icon: 'text-blue-400' },
-              { color: 'bg-green-50', icon: 'text-green-400' },
-              { color: 'bg-orange-50', icon: 'text-orange-400' },
-              { color: 'bg-pink-50', icon: 'text-pink-400' },
-              { color: 'bg-indigo-50', icon: 'text-indigo-400' },
-              { color: 'bg-teal-50', icon: 'text-teal-400' },
-            ].map((style, idx) => (
-              <div key={idx} className="flex flex-col items-center justify-center cursor-not-allowed">
-                <div className={`w-[50px] h-[50px] rounded-[16px] ${style.color} flex items-center justify-center opacity-70`}>
-                  <div className={`w-6 h-6 rounded-md ${style.icon} opacity-50 bg-current`}></div>
-                </div>
-              </div>
-            ))}
-          </div> */}
+        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+          <h3 className="text-[11px] font-extrabold text-slate-400 dark:text-slate-500 tracking-widest mb-4 text-center">COMING SOON</h3>
+          
+          <style>{`
+            @keyframes float {
+              0% { transform: translateY(0px); }
+              50% { transform: translateY(-4px); }
+              100% { transform: translateY(0px); }
+            }
+            @keyframes rotateGlow {
+              0% { transform: rotate(0deg) scale(1); filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.2)); }
+              50% { transform: rotate(180deg) scale(1.1); filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5)); }
+              100% { transform: rotate(360deg) scale(1); filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.2)); }
+            }
+            @keyframes shimmer {
+              0% { background-position: -200% center; }
+              100% { background-position: 200% center; }
+            }
+            @keyframes rocketSlide {
+              0% { opacity: 0.7; transform: translateX(-2px); }
+              50% { opacity: 1; transform: translateX(2px); }
+              100% { opacity: 0.7; transform: translateX(-2px); }
+            }
+            .coming-soon-card {
+              animation: float 5s ease-in-out infinite;
+            }
+            .sparkle-icon {
+              animation: rotateGlow 6s ease-in-out infinite;
+            }
+            .shimmer-text {
+              background: linear-gradient(90deg, #1e293b 25%, #3b82f6 50%, #1e293b 75%);
+              background-size: 200% auto;
+              color: transparent;
+              -webkit-background-clip: text;
+              background-clip: text;
+              animation: shimmer 4s linear infinite;
+            }
+            .dark .shimmer-text {
+              background: linear-gradient(90deg, #f1f5f9 25%, #60a5fa 50%, #f1f5f9 75%);
+              background-size: 200% auto;
+              color: transparent;
+              -webkit-background-clip: text;
+              background-clip: text;
+            }
+            .rocket-line {
+              animation: rocketSlide 4s ease-in-out infinite;
+            }
+          `}</style>
+
+          {/* Animated Coming Soon Card */}
+          <div className="coming-soon-card flex flex-col items-center text-center p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-900/10 backdrop-blur-sm select-none">
+            {/* Sparkle Icon Container */}
+            <div className="w-11 h-11 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-3 shadow-inner">
+              <MdAutoAwesome size={22} className="sparkle-icon" />
+            </div>
+
+            {/* Badge */}
+            <div className="px-3 py-0.5 rounded-full text-[9px] font-extrabold tracking-widest bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 mb-2.5 uppercase border border-blue-100/30 dark:border-blue-900/25">
+              BETA LABS RELEASE
+            </div>
+
+            {/* COMING SOON Text */}
+            <h4 className="text-base font-black tracking-widest mb-1.5 uppercase shimmer-text">
+              COMING SOON
+            </h4>
+
+            {/* Subtitle */}
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium px-2 leading-relaxed">
+              Building the next generation of Beta applications.
+            </p>
+
+            {/* Divider Line */}
+            <div className="w-full border-t border-gray-100/80 dark:border-gray-800/40 my-3.5" />
+
+            {/* Rocket Line */}
+            <div className="rocket-line flex items-center gap-1.5 text-[10px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest">
+              <MdRocketLaunch size={13} className="shrink-0" />
+              <span>New innovations arriving soon</span>
+            </div>
+          </div>
         </div>
       </div>
 
