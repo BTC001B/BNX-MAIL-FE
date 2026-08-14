@@ -99,10 +99,9 @@ function CalcInner() {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: `Tape - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`,
+          title: `Tape - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} [BNX Mail]`,
           mode: 'business',
-          currency: currency,
-          applicationName: 'BNX Mail'
+          currency: currency
         })
       });
       if (!sessionRes.ok) {
@@ -137,7 +136,7 @@ function CalcInner() {
     },
     onSuccess: () => {
       toast.success('Tape saved successfully');
-      refetchTapeHistory();
+      queryClient.invalidateQueries({ queryKey: ['calc-tape-history'] });
     },
     onError: (err) => {
       toast.error(err.message || 'Failed to save tape');
@@ -155,8 +154,7 @@ function CalcInner() {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: `Comparison - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`,
-          applicationName: 'BNX Mail'
+          title: `Comparison - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} [BNX Mail]`
         })
       });
       if (!sessionRes.ok) {
@@ -190,7 +188,7 @@ function CalcInner() {
     },
     onSuccess: () => {
       toast.success('Comparison saved successfully');
-      refetchCompareHistory();
+      queryClient.invalidateQueries({ queryKey: ['calc-compare-history'] });
     },
     onError: (err) => {
       toast.error(err.message || 'Failed to save comparison');
