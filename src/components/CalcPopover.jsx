@@ -60,7 +60,7 @@ function CalcInner() {
     queryFn: async () => {
       const token = localStorage.getItem('accessToken');
       if (!token) return [];
-      const res = await fetch(`${API_BASE}/history`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(`${API_BASE}/history?allApps=true`, { headers: { 'Authorization': `Bearer ${token}` } });
       if (!res.ok) {
         console.error('TAPE HISTORY FETCH ERROR:', res.status, res.statusText);
         return [];
@@ -100,10 +100,14 @@ function CalcInner() {
         body: JSON.stringify({
           title: `Tape - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`,
           mode: 'business',
-          currency: currency
+          currency: currency,
+          applicationName: 'BNX Mail'
         })
       });
-      if (!sessionRes.ok) throw new Error('Failed to create session');
+      if (!sessionRes.ok) {
+        const err = await sessionRes.text();
+        throw new Error(`Failed to create session: ${err}`);
+      }
       const sessionData = await sessionRes.json();
       console.log('SAVE TAPE - SESSION CREATED:', sessionData);
       const sessionId = sessionData?.data?.id || sessionData?.data?._id || sessionData.id || sessionData._id;
@@ -150,10 +154,14 @@ function CalcInner() {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: `Comparison - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
+          title: `Comparison - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`,
+          applicationName: 'BNX Mail'
         })
       });
-      if (!sessionRes.ok) throw new Error('Failed to create compare session');
+      if (!sessionRes.ok) {
+        const err = await sessionRes.text();
+        throw new Error(`Failed to create compare session: ${err}`);
+      }
       const sessionData = await sessionRes.json();
       console.log('SAVE COMPARE - SESSION CREATED:', sessionData);
       const sessionId = sessionData?.data?.id || sessionData?.data?._id || sessionData.id || sessionData._id;
