@@ -99,7 +99,7 @@ function CalcInner() {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: `Tape - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} [BNX Mail]`,
+          title: `Tape - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`,
           mode: 'business',
           currency: currency
         })
@@ -154,7 +154,7 @@ function CalcInner() {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: `Comparison - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} [BNX Mail]`
+          title: `Comparison - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
         })
       });
       if (!sessionRes.ok) {
