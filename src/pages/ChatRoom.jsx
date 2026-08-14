@@ -800,10 +800,16 @@ const ChatRoom = () => {
                           </div>
                         )}
 
-                        <div className={`text-[9px] mt-1 opacity-60 font-medium ${isMe ? 'text-white/80' : 'text-gray-500'}`}>
-                          {formatMessageTime(msg.timestamp)}
-                          {msg.isOptimistic && " • sending..."}
-                        </div>
+                      </div>
+
+                      {/* Timestamp outside and below the bubble */}
+                      <div 
+                        className={`text-[9px] mt-1 opacity-60 font-medium select-none text-gray-500 dark:text-gray-400 ${
+                          isMe ? 'self-end mr-2 text-right' : 'self-start ml-2 text-left'
+                        }`}
+                      >
+                        {formatMessageTime(msg.timestamp)}
+                        {msg.isOptimistic && " • sending..."}
                       </div>
                     </div>
                   </div>

@@ -855,11 +855,15 @@ const Casbox = () => {
                       >
                         <p className="whitespace-pre-wrap leading-relaxed break-words">{msg.body}</p>
                         {renderBubbleAttachments(msg)}
-                        
-                        {/* Timestamp inside bubble at the bottom right */}
-                        <div className="text-[9px] opacity-70 self-end mt-1 text-right select-none font-normal">
-                          {parseTimestamp(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
+                      </div>
+
+                      {/* Timestamp outside and below the bubble */}
+                      <div 
+                        className={`text-[9px] mt-1 select-none font-normal text-gray-400 dark:text-gray-500 ${
+                          isMe ? 'self-end mr-1 text-right' : 'self-start ml-1 text-left'
+                        }`}
+                      >
+                        {parseTimestamp(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
 
                       {isMe && index === sortedThread.length - 1 && (
