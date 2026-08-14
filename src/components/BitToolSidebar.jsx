@@ -9,6 +9,7 @@ import AppLauncher from "./AppLauncher";
 import { NotesManager } from "./StickyNotes";
 import CalendarPanel from "./CalendarPanel";
 import ContactPanel from "./ContactPanel";
+import NotesPanel from "./NotesPanel";
 import betalogo from '../assets/beta2.png'
 
 // Tools Definition
@@ -142,6 +143,8 @@ const BitToolSidebar = ({
         );
       case "contacts":
         return <ContactPanel />;
+      case "notes":
+        return <NotesPanel />;
       case "security":
         return (
           <div className="flex flex-col h-full items-center text-center text-gray-700 dark:text-gray-200">
@@ -213,15 +216,6 @@ const BitToolSidebar = ({
         {selectedTool && (
           selectedTool === 'apps' ? (
             <AppLauncher onClose={() => setSelectedTool(null)} onToggleBitToolSidebar={() => {}} />
-          ) : selectedTool === 'notes' ? (
-            <NotesManager 
-              notes={notes}
-              openNoteIds={openNoteIds}
-              onOpenNote={onOpenNote}
-              onCreateNote={onCreateNote}
-              onDeleteNote={onDeleteNote}
-              onClose={() => setSelectedTool(null)}
-            />
           ) : (
             <>
               <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01] shrink-0">
