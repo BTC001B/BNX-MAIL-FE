@@ -112,17 +112,21 @@ function CalcInner() {
       // 2. Add Items sequentially
       for (let i = 0; i < tape.length; i++) {
         const item = tape[i];
-        await fetch(`${API_BASE}/sessions/${sessionId}/items`, {
+        const itemRes = await fetch(`${API_BASE}/sessions/${sessionId}/items`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
             sequence: i + 1,
-            value: item.value,
+            value: Number(item.value),
             operator: item.operator,
-            runningTotal: item.runningTotal,
+            runningTotal: Number(item.runningTotal),
             label: item.label || ''
           })
         });
+        if (!itemRes.ok) {
+          const errText = await itemRes.text();
+          throw new Error(`Failed to save item ${i + 1}: ${errText}`);
+        }
       }
       return true;
     },
@@ -158,16 +162,20 @@ function CalcInner() {
       // 2. Add Items sequentially
       for (let i = 0; i < compareItems.length; i++) {
         const item = compareItems[i];
-        await fetch(`${API_BASE}/compare/sessions/${sessionId}/items`, {
+        const cmpRes = await fetch(`${API_BASE}/compare/sessions/${sessionId}/items`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
             sequence: i + 1,
             label: item.label,
-            vendorA_Value: item.vendorA_Value,
-            vendorB_Value: item.vendorB_Value
+            vendorA_Value: Number(item.vendorA_Value),
+            vendorB_Value: Number(item.vendorB_Value)
           })
         });
+        if (!cmpRes.ok) {
+          const errText = await cmpRes.text();
+          throw new Error(`Failed to save compare item ${i + 1}: ${errText}`);
+        }
       }
       return true;
     },
