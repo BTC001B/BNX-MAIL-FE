@@ -80,7 +80,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
           <div className="w-full">
             {activeTopTab === 'FAVORITES' ? (
               <div className="flex justify-center py-2">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-4 gap-4">
                   {publicApps.map((app, idx) => (
                     <div 
                       key={idx} 
