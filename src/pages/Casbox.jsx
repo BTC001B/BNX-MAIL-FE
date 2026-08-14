@@ -859,9 +859,7 @@ const Casbox = () => {
 
                       {/* Timestamp outside and below the bubble */}
                       <div 
-                        className={`text-[9px] mt-1 select-none font-normal text-gray-400 dark:text-gray-500 ${
-                          isMe ? 'self-end mr-1 text-right' : 'self-start ml-1 text-left'
-                        }`}
+                        className="text-[9px] mt-1 select-none font-normal text-gray-400 dark:text-gray-500 self-end mr-1 text-right"
                       >
                         {parseTimestamp(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>

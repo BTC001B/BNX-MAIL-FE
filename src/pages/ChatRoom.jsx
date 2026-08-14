@@ -751,65 +751,65 @@ const ChatRoom = () => {
                       <span className="text-[10px] font-bold mb-1 ml-2 uppercase opacity-60" style={{ color: theme.subText }}>
                         {chatName}
                       </span>
-                      <div 
-                        className={`px-4 py-2.5 rounded-full shadow-sm relative ${
-                          isMe 
-                            ? 'bg-primary text-white' 
-                            : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700'
-                        }`}
-                      >
-                        <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                        
-                        {/* Attachments Rendering */}
-                        {msg.attachmentsJson && (
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            {(() => {
-                              try {
-                                const atts = JSON.parse(msg.attachmentsJson);
-                                return atts.map((att, i) => (
-                                  <div key={i} className="max-w-xs rounded-lg overflow-hidden border border-black/10 dark:border-white/10 shadow-sm bg-black/5 dark:bg-white/5 relative group">
-                                    {att.type.startsWith('image/') ? (
-                                      <a href={att.content} target="_blank" rel="noreferrer" download={att.name}>
-                                        <img src={att.content} alt={att.name} className="max-h-48 w-auto object-contain cursor-pointer hover:opacity-90 transition-opacity" />
-                                      </a>
-                                    ) : (
-                                      <div className="flex items-center gap-3 p-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                                        <div className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg shrink-0">
-                                          <MdPictureAsPdf size={24} />
+                      <div className="flex flex-col w-fit">
+                        <div 
+                          className={`px-4 py-2.5 rounded-full shadow-sm relative ${
+                            isMe 
+                              ? 'bg-primary text-white' 
+                              : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700'
+                          }`}
+                        >
+                          <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                          
+                          {/* Attachments Rendering */}
+                          {msg.attachmentsJson && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {(() => {
+                                try {
+                                  const atts = JSON.parse(msg.attachmentsJson);
+                                  return atts.map((att, i) => (
+                                    <div key={i} className="max-w-xs rounded-lg overflow-hidden border border-black/10 dark:border-white/10 shadow-sm bg-black/5 dark:bg-white/5 relative group">
+                                      {att.type.startsWith('image/') ? (
+                                        <a href={att.content} target="_blank" rel="noreferrer" download={att.name}>
+                                          <img src={att.content} alt={att.name} className="max-h-48 w-auto object-contain cursor-pointer hover:opacity-90 transition-opacity" />
+                                        </a>
+                                      ) : (
+                                        <div className="flex items-center gap-3 p-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                                          <div className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg shrink-0">
+                                            <MdPictureAsPdf size={24} />
+                                          </div>
+                                          <div className="flex flex-col min-w-0 flex-1">
+                                            <span className="text-xs font-semibold truncate max-w-[120px]">{att.name}</span>
+                                            <span className="text-[10px] opacity-70">{(att.size / 1024).toFixed(1)} KB</span>
+                                          </div>
+                                          <div className="flex items-center gap-1 shrink-0">
+                                            <a href={att.content} target="_blank" rel="noreferrer" title="View PDF" className="p-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 transition-colors">
+                                              <MdVisibility size={16} />
+                                            </a>
+                                            <a href={att.content} download={att.name} title="Download PDF" className="p-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 transition-colors">
+                                              <MdFileDownload size={16} />
+                                            </a>
+                                          </div>
                                         </div>
-                                        <div className="flex flex-col min-w-0 flex-1">
-                                          <span className="text-xs font-semibold truncate max-w-[120px]">{att.name}</span>
-                                          <span className="text-[10px] opacity-70">{(att.size / 1024).toFixed(1)} KB</span>
-                                        </div>
-                                        <div className="flex items-center gap-1 shrink-0">
-                                          <a href={att.content} target="_blank" rel="noreferrer" title="View PDF" className="p-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 transition-colors">
-                                            <MdVisibility size={16} />
-                                          </a>
-                                          <a href={att.content} download={att.name} title="Download PDF" className="p-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 transition-colors">
-                                            <MdFileDownload size={16} />
-                                          </a>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                ));
-                              } catch (e) {
-                                return null;
-                              }
-                            })()}
-                          </div>
-                        )}
+                                      )}
+                                    </div>
+                                  ));
+                                } catch (e) {
+                                  return null;
+                                }
+                              })()}
+                            </div>
+                          )}
 
-                      </div>
+                        </div>
 
-                      {/* Timestamp outside and below the bubble */}
-                      <div 
-                        className={`text-[9px] mt-1 opacity-60 font-medium select-none text-gray-500 dark:text-gray-400 ${
-                          isMe ? 'self-end mr-2 text-right' : 'self-start ml-2 text-left'
-                        }`}
-                      >
-                        {formatMessageTime(msg.timestamp)}
-                        {msg.isOptimistic && " • sending..."}
+                        {/* Timestamp outside and below the bubble */}
+                        <div 
+                          className="text-[9px] mt-1 opacity-60 font-medium select-none text-gray-500 dark:text-gray-400 self-end mr-2 text-right"
+                        >
+                          {formatMessageTime(msg.timestamp)}
+                          {msg.isOptimistic && " • sending..."}
+                        </div>
                       </div>
                     </div>
                   </div>
