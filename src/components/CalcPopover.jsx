@@ -18,6 +18,7 @@ function CalcInner() {
   const [tape, setTape] = useState([]);
   const [currentInput, setCurrentInput] = useState('');
   const [runningTotal, setRunningTotal] = useState(0);
+  const [pendingOperator, setPendingOperator] = useState(null);
   
   // Modes: 'tape', 'compare', 'history'
   const [activeView, setActiveView] = useState('tape');
@@ -66,7 +67,7 @@ function CalcInner() {
       }
       const result = await res.json();
       console.log('TAPE HISTORY FETCH RESULT:', result);
-      return Array.isArray(result?.data) ? result.data : (Array.isArray(result) ? result : []);
+      return Array.isArray(result?.data?.rows) ? result.data.rows : (Array.isArray(result?.data) ? result.data : (Array.isArray(result) ? result : []));
     }
   });
 
@@ -82,7 +83,7 @@ function CalcInner() {
       }
       const result = await res.json();
       console.log('COMPARE HISTORY FETCH RESULT:', result);
-      return Array.isArray(result?.data) ? result.data : (Array.isArray(result) ? result : []);
+      return Array.isArray(result?.data?.rows) ? result.data.rows : (Array.isArray(result?.data) ? result.data : (Array.isArray(result) ? result : []));
     }
   });
 
@@ -228,23 +229,51 @@ function CalcInner() {
       setCurrentInput('');
       setTape([]);
       setRunningTotal(0);
+      setPendingOperator(null);
     } else if (val === 'BACK') {
       setCurrentInput(prev => prev.slice(0, -1));
     } else if (['+', '-', '*', '/'].includes(val)) {
-      appendToTape(val, currentInput || runningTotal);
-    } else if (val === '=') {
-      if (tape.length === 0) {
-        appendToTape('=', currentInput);
-      } else {
-        // If there's an input pending, just add it, otherwise do nothing
-        if (currentInput) {
-          appendToTape('+', currentInput, 'Addition');
+      if (currentInput) {
+        if (tape.length === 0) {
+          appendToTape('=', currentInput);
+        } else if (pendingOperator) {
+          appendToTape(pendingOperator, currentInput);
+        } else {
+          setTape([]);
+          appendToTape('=', currentInput);
         }
       }
+      setPendingOperator(val);
+      setCurrentInput('');
+    } else if (val === '=') {
+      if (currentInput) {
+        if (tape.length === 0) {
+          appendToTape('=', currentInput);
+        } else if (pendingOperator) {
+          appendToTape(pendingOperator, currentInput);
+        } else {
+          setTape([]);
+          appendToTape('=', currentInput);
+        }
+      }
+      setPendingOperator(null);
+      setCurrentInput('');
     } else if (val === 'gst') {
-      appendToTape('gst', currentInput || '18'); // default 18%
+      if (currentInput && pendingOperator) {
+        appendToTape(pendingOperator, currentInput);
+        setCurrentInput('');
+      }
+      appendToTape('gst', currentInput || '18');
+      setPendingOperator(null);
+      setCurrentInput('');
     } else if (val === 'discount') {
-      appendToTape('discount', currentInput || '10'); // default 10%
+      if (currentInput && pendingOperator) {
+        appendToTape(pendingOperator, currentInput);
+        setCurrentInput('');
+      }
+      appendToTape('discount', currentInput || '10');
+      setPendingOperator(null);
+      setCurrentInput('');
     } else {
       setCurrentInput(prev => prev + val);
     }
