@@ -96,7 +96,7 @@ function CalcInner() {
       });
       if (!sessionRes.ok) throw new Error('Failed to create session');
       const sessionData = await sessionRes.json();
-      const sessionId = sessionData.id || sessionData._id;
+      const sessionId = sessionData?.data?.id || sessionData?.data?._id || sessionData.id || sessionData._id;
 
       // 2. Add Items sequentially
       for (let i = 0; i < tape.length; i++) {
@@ -140,7 +140,7 @@ function CalcInner() {
       });
       if (!sessionRes.ok) throw new Error('Failed to create compare session');
       const sessionData = await sessionRes.json();
-      const sessionId = sessionData.id || sessionData._id;
+      const sessionId = sessionData?.data?.id || sessionData?.data?._id || sessionData.id || sessionData._id;
 
       // 2. Add Items sequentially
       for (let i = 0; i < compareItems.length; i++) {
