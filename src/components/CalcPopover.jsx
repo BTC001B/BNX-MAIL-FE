@@ -60,8 +60,12 @@ function CalcInner() {
       const token = localStorage.getItem('accessToken');
       if (!token) return [];
       const res = await fetch(`${API_BASE}/history`, { headers: { 'Authorization': `Bearer ${token}` } });
-      if (!res.ok) return [];
+      if (!res.ok) {
+        console.error('TAPE HISTORY FETCH ERROR:', res.status, res.statusText);
+        return [];
+      }
       const result = await res.json();
+      console.log('TAPE HISTORY FETCH RESULT:', result);
       return Array.isArray(result?.data) ? result.data : (Array.isArray(result) ? result : []);
     }
   });
@@ -72,8 +76,12 @@ function CalcInner() {
       const token = localStorage.getItem('accessToken');
       if (!token) return [];
       const res = await fetch(`${API_BASE}/compare/history`, { headers: { 'Authorization': `Bearer ${token}` } });
-      if (!res.ok) return [];
+      if (!res.ok) {
+        console.error('COMPARE HISTORY FETCH ERROR:', res.status, res.statusText);
+        return [];
+      }
       const result = await res.json();
+      console.log('COMPARE HISTORY FETCH RESULT:', result);
       return Array.isArray(result?.data) ? result.data : (Array.isArray(result) ? result : []);
     }
   });
@@ -96,7 +104,9 @@ function CalcInner() {
       });
       if (!sessionRes.ok) throw new Error('Failed to create session');
       const sessionData = await sessionRes.json();
+      console.log('SAVE TAPE - SESSION CREATED:', sessionData);
       const sessionId = sessionData?.data?.id || sessionData?.data?._id || sessionData.id || sessionData._id;
+      console.log('SAVE TAPE - SESSION ID:', sessionId);
 
       // 2. Add Items sequentially
       for (let i = 0; i < tape.length; i++) {
@@ -140,7 +150,9 @@ function CalcInner() {
       });
       if (!sessionRes.ok) throw new Error('Failed to create compare session');
       const sessionData = await sessionRes.json();
+      console.log('SAVE COMPARE - SESSION CREATED:', sessionData);
       const sessionId = sessionData?.data?.id || sessionData?.data?._id || sessionData.id || sessionData._id;
+      console.log('SAVE COMPARE - SESSION ID:', sessionId);
 
       // 2. Add Items sequentially
       for (let i = 0; i < compareItems.length; i++) {
