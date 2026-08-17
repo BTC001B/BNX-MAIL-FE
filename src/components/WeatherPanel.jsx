@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { MapPin, Sun, Moon, Wind, Droplets, Loader2, AlertCircle } from 'lucide-react';
+import { MapPin, Sun, Moon, Wind, Droplets, Loader2, AlertCircle, CloudSun } from 'lucide-react';
 
 const fetchWeather = async (lat, lon) => {
     // using .env for api bases if available
-    const baseUrl = import.meta.env.VITE_OPEN_METEO_API || 'https://api.open-meteo.com/v1/forecast';
+    const baseUrl = import.meta.env.VITE_OPEN_METEO_API;
     const url = `${baseUrl}?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&hourly=temperature_2m&current=temperature_2m,is_day,relative_humidity_2m,wind_speed_10m&timezone=auto`;
     const response = await fetch(url);
     if (!response.ok) {
@@ -14,7 +14,7 @@ const fetchWeather = async (lat, lon) => {
 };
 
 const fetchLocationName = async (lat, lon) => {
-    const baseUrl = import.meta.env.VITE_BIGDATA_CLOUD_API || 'https://api.bigdatacloud.net/data/reverse-geocode-client';
+    const baseUrl = import.meta.env.VITE_BIGDATA_CLOUD_API;
     const url = `${baseUrl}?latitude=${lat}&longitude=${lon}&localityLanguage=en`;
     const response = await fetch(url);
     if (!response.ok) {
@@ -26,9 +26,12 @@ const fetchLocationName = async (lat, lon) => {
 const WeatherPanel = () => {
     const [location, setLocation] = useState(null);
     const [geoError, setGeoError] = useState(null);
-    const [isRequestingLocation, setIsRequestingLocation] = useState(true);
+    const [isRequestingLocation, setIsRequestingLocation] = useState(false);
 
-    useEffect(() => {
+    const requestLocation = () => {
+        setIsRequestingLocation(true);
+        setGeoError(null);
+
         if (!navigator.geolocation) {
             setGeoError("Geolocation is not supported by your browser.");
             setIsRequestingLocation(false);
@@ -50,7 +53,7 @@ const WeatherPanel = () => {
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
-    }, []);
+    };
 
     const { 
         data: weatherData, 
@@ -73,9 +76,26 @@ const WeatherPanel = () => {
         staleTime: 60 * 60 * 1000, // 1 hour
     });
 
+    if (!location && !isRequestingLocation && !geoError) {
+        return (
+            <div className="flex flex-col min-h-[400px] h-full w-full bg-white items-center justify-center p-6 text-center rounded-xl border border-gray-100 shadow-sm">
+                <CloudSun size={48} className="text-cyan-400 mb-4" />
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Local Weather</h3>
+                <p className="text-sm text-gray-500 mb-6">Allow location access to see the current weather in your area.</p>
+                <button 
+                    onClick={requestLocation}
+                    className="flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 text-white px-5 py-2.5 rounded-xl font-medium transition-colors shadow-sm cursor-pointer active:scale-95"
+                >
+                    <MapPin size={18} />
+                    Detect Location
+                </button>
+            </div>
+        );
+    }
+
     if (isRequestingLocation || (location && (isWeatherLoading || isLocationLoading))) {
         return (
-            <div className="flex flex-col h-full w-full bg-white items-center justify-center p-6 text-gray-500">
+            <div className="flex flex-col min-h-[400px] h-full w-full bg-white items-center justify-center p-6 text-gray-500 rounded-xl border border-gray-100 shadow-sm">
                 <Loader2 className="animate-spin text-cyan-500 mb-4" size={32} />
                 <p className="text-sm text-center">
                     {isRequestingLocation ? "Detecting location..." : "Fetching local weather..."}
@@ -86,7 +106,7 @@ const WeatherPanel = () => {
 
     if (geoError) {
         return (
-            <div className="flex flex-col h-full w-full bg-white items-center justify-center p-6 text-red-500 text-center">
+            <div className="flex flex-col min-h-[400px] h-full w-full bg-white items-center justify-center p-6 text-red-500 text-center rounded-xl border border-gray-100 shadow-sm">
                 <AlertCircle size={32} className="mb-4 text-red-400" />
                 <p className="text-sm font-medium mb-2">Location Error</p>
                 <p className="text-xs text-red-400">{geoError}</p>
@@ -96,7 +116,7 @@ const WeatherPanel = () => {
 
     if (isWeatherError) {
         return (
-            <div className="flex flex-col h-full w-full bg-white items-center justify-center p-6 text-red-500 text-center">
+            <div className="flex flex-col min-h-[400px] h-full w-full bg-white items-center justify-center p-6 text-red-500 text-center rounded-xl border border-gray-100 shadow-sm">
                 <AlertCircle size={32} className="mb-4 text-red-400" />
                 <p className="text-sm font-medium mb-2">Weather Error</p>
                 <p className="text-xs text-red-400">Failed to load weather data.</p>
@@ -109,7 +129,7 @@ const WeatherPanel = () => {
     const cityName = locationData?.city || locationData?.locality || "Current Location";
 
     return (
-        <div className="flex flex-col h-full w-full bg-gradient-to-b from-cyan-50 to-white">
+        <div className="flex flex-col min-h-[400px] h-full w-full bg-gradient-to-b from-cyan-50 to-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
             {/* Header / Location */}
             <div className="flex items-center gap-2 p-5 border-b border-cyan-100/50 bg-white/50 backdrop-blur-sm shrink-0">
                 <MapPin size={18} className="text-cyan-500 shrink-0" />

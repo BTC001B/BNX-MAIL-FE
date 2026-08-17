@@ -166,6 +166,8 @@ const BitToolSidebar = ({
           </div>
         );
 
+      case "weather":
+        return <WeatherPanel />;
       default:
         return null;
     }
