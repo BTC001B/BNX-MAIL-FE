@@ -10,6 +10,14 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
   const [activeTab, setActiveTab] = useState('BASE');
   const [activeTopTab, setActiveTopTab] = useState('FAVORITES');
 
+  const [recentNames, setRecentNames] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('beta_launcher_recent_apps') || '[]');
+    } catch (e) {
+      return [];
+    }
+  });
+
   const publicApps = [
     { name: 'Cliks', icon: cliksLogo, href: 'https://cliks.beta-softnet.com' },
     { name: 'BNXmail', icon: bnxLogo, href: 'https://www.bnxmail.com' },
@@ -26,6 +34,25 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
     : activeTab === 'PUBLIC' 
       ? publicApps 
       : businessApps;
+
+  const allApps = [...publicApps, ...businessApps];
+  const resolvedRecentApps = recentNames
+    .map(name => allApps.find(app => app.name === name))
+    .filter(Boolean);
+
+  const handleAppClick = (app) => {
+    const appName = app.name;
+    const updatedNames = [appName, ...recentNames.filter(name => name !== appName)].slice(0, 3);
+    setRecentNames(updatedNames);
+    localStorage.setItem('beta_launcher_recent_apps', JSON.stringify(updatedNames));
+
+    if (app.isButton) {
+      onToggleBitToolSidebar?.();
+      onClose();
+    } else {
+      window.open(app.href, '_blank');
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-white w-full select-none">
@@ -84,7 +111,20 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
                   <div 
                     key={idx} 
                     className="w-[62px] h-[45px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/80 active:bg-slate-50 focus:bg-slate-50 border border-transparent hover:border-gray-100/70 rounded-[12px] p-0.5 outline-none" 
-                    onClick={app.isButton ? () => { onToggleBitToolSidebar?.(); onClose(); } : () => window.open(app.href, '_blank')}
+                    onClick={() => handleAppClick(app)}
+                  >
+                    <img src={app.icon} alt={app.name} className="w-7 h-7 object-contain" />
+                    <span className="text-[9px] font-bold text-slate-700 mt-0.5">{app.name}</span>
+                  </div>
+                ))}
+              </div>
+            ) : resolvedRecentApps.length > 0 ? (
+              <div className="grid grid-cols-3 gap-y-2.5 w-full py-1 justify-items-center">
+                {resolvedRecentApps.map((app, idx) => (
+                  <div 
+                    key={idx} 
+                    className="w-[62px] h-[45px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/80 active:bg-slate-50 focus:bg-slate-50 border border-transparent hover:border-gray-100/70 rounded-[12px] p-0.5 outline-none" 
+                    onClick={() => handleAppClick(app)}
                   >
                     <img src={app.icon} alt={app.name} className="w-7 h-7 object-contain" />
                     <span className="text-[9px] font-bold text-slate-700 mt-0.5">{app.name}</span>
@@ -93,7 +133,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
               </div>
             ) : (
               <div className="w-full h-full border border-dashed border-gray-200 rounded-[14px] flex items-center justify-center bg-transparent">
-                <span className="text-[9px] font-bold text-gray-400">No recents</span>
+                <span className="text-[9px] font-bold text-gray-400">No recent apps</span>
               </div>
             )}
           </div>
@@ -135,7 +175,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
               {displayApps.map((app, idx) => (
                 <div 
                   key={idx}
-                  onClick={app.isButton ? () => { onToggleBitToolSidebar?.(); onClose(); } : () => window.open(app.href, '_blank')}
+                  onClick={() => handleAppClick(app)}
                   className="w-[60px] h-[60px] border border-gray-100 rounded-[14px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-md hover:bg-white bg-white cursor-pointer group transition-all p-1"
                 >
                   <img src={app.icon} alt={app.name} className="w-6 h-6 object-contain mb-0.5" />
