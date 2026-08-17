@@ -21,7 +21,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
   const publicApps = [
     { name: 'Cliks', icon: cliksLogo, href: 'https://cliks.beta-softnet.com' },
     { name: 'BNXmail', icon: bnxLogo, href: 'https://www.bnxmail.com' },
-    { name: 'Bit-Tool', icon: bitToolLogo, isButton: true },
+    { name: 'Bit-Tool', icon: bitToolLogo, href: 'https://bit-tool.com/' },
     { name: 'B2Auth', icon: b2authLogo, href: 'https://www.b2auth.com' }
   ];
 
@@ -29,10 +29,10 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
     { name: 'CliksBusiness', icon: cliksBusinessLogo, href: 'https://www.cliksbusiness.com' }
   ];
 
-  const displayApps = activeTab === 'BASE' 
-    ? [...publicApps, ...businessApps] 
-    : activeTab === 'PUBLIC' 
-      ? publicApps 
+  const displayApps = activeTab === 'BASE'
+    ? [...publicApps, ...businessApps]
+    : activeTab === 'PUBLIC'
+      ? publicApps
       : businessApps;
 
   const allApps = [...publicApps, ...businessApps];
@@ -64,7 +64,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
             fontFamily: "'Saira Stencil One', 'Anton', sans-serif",
           }}
         >
-          BE<span style={{marginLeft:'1px'}}>TA</span>
+          BE<span style={{ marginLeft: '1px' }}>TA</span>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors">
@@ -80,22 +80,20 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
           <div className="flex items-center justify-center gap-4 mb-2 text-[9.5px] font-extrabold tracking-widest text-center">
             <button
               onClick={() => setActiveTopTab('FAVORITES')}
-              className={`pb-0.5 transition-all border-b-2 ${
-                activeTopTab === 'FAVORITES' 
-                  ? 'border-emerald-700 text-emerald-700 font-bold' 
+              className={`pb-0.5 transition-all border-b-2 ${activeTopTab === 'FAVORITES'
+                  ? 'border-emerald-700 text-emerald-700 font-bold'
                   : 'border-transparent text-gray-400 hover:text-gray-600'
-              }`}
+                }`}
             >
               FAVORITES
             </button>
             <span className="text-gray-300 font-normal">|</span>
             <button
               onClick={() => setActiveTopTab('RECENT')}
-              className={`pb-0.5 transition-all border-b-2 ${
-                activeTopTab === 'RECENT' 
-                  ? 'border-emerald-700 text-emerald-700 font-bold' 
+              className={`pb-0.5 transition-all border-b-2 ${activeTopTab === 'RECENT'
+                  ? 'border-emerald-700 text-emerald-700 font-bold'
                   : 'border-transparent text-gray-400 hover:text-gray-600'
-              }`}
+                }`}
             >
               RECENT
             </button>
@@ -108,9 +106,9 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
             {activeTopTab === 'FAVORITES' ? (
               <div className="grid grid-cols-3 gap-y-2.5 w-full py-1 justify-items-center">
                 {publicApps.map((app, idx) => (
-                  <div 
-                    key={idx} 
-                    className="w-[62px] h-[45px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/80 active:bg-slate-50 focus:bg-slate-50 border border-transparent hover:border-gray-100/70 rounded-[12px] p-0.5 outline-none" 
+                  <div
+                    key={idx}
+                    className="w-[62px] h-[45px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/80 active:bg-slate-50 focus:bg-slate-50 border border-transparent hover:border-gray-100/70 rounded-[12px] p-0.5 outline-none"
                     onClick={() => handleAppClick(app)}
                   >
                     <img src={app.icon} alt={app.name} className="w-7 h-7 object-contain" />
@@ -121,9 +119,9 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
             ) : resolvedRecentApps.length > 0 ? (
               <div className="grid grid-cols-3 gap-y-2.5 w-full py-1 justify-items-center">
                 {resolvedRecentApps.map((app, idx) => (
-                  <div 
-                    key={idx} 
-                    className="w-[62px] h-[45px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/80 active:bg-slate-50 focus:bg-slate-50 border border-transparent hover:border-gray-100/70 rounded-[12px] p-0.5 outline-none" 
+                  <div
+                    key={idx}
+                    className="w-[62px] h-[45px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/80 active:bg-slate-50 focus:bg-slate-50 border border-transparent hover:border-gray-100/70 rounded-[12px] p-0.5 outline-none"
                     onClick={() => handleAppClick(app)}
                   >
                     <img src={app.icon} alt={app.name} className="w-7 h-7 object-contain" />
@@ -145,22 +143,22 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
         {/* Base Tab Row */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <button 
+            <button
               onClick={() => setActiveTab('BASE')}
               className={`text-[11.5px] font-extrabold tracking-widest pb-0.5 border-b-2 transition-colors ${activeTab === 'BASE' ? 'text-slate-800 border-blue-900' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
             >
               BASE
             </button>
-            
+
             <div className="flex items-center gap-3 text-[9.5px] font-extrabold tracking-widest">
-              <button 
+              <button
                 onClick={() => setActiveTab('PUBLIC')}
                 className={`pb-0.5 border-b-2 transition-colors ${activeTab === 'PUBLIC' ? 'text-blue-900 border-blue-900' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
               >
                 PUBLIC
               </button>
               <span className="text-gray-300 pb-0.5 font-normal">|</span>
-              <button 
+              <button
                 onClick={() => setActiveTab('BUSINESS')}
                 className={`pb-0.5 border-b-2 transition-colors ${activeTab === 'BUSINESS' ? 'text-blue-900 border-blue-900' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
               >
@@ -173,7 +171,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
           <div className="h-[128px]">
             <div className="grid grid-cols-4 gap-x-2 gap-y-2">
               {displayApps.map((app, idx) => (
-                <div 
+                <div
                   key={idx}
                   onClick={() => handleAppClick(app)}
                   className="w-[60px] h-[60px] border border-gray-100 rounded-[14px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-md hover:bg-white bg-white cursor-pointer group transition-all p-1"
@@ -191,7 +189,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
         {/* Coming Soon Section */}
         <div className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800">
           <h3 className="text-[8.5px] font-extrabold text-slate-400 dark:text-slate-500 tracking-widest mb-1 text-center">COMING SOON</h3>
-          
+
           <style>{`
             @keyframes float {
               0% { transform: scale(1); }
