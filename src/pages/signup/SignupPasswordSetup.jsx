@@ -48,7 +48,6 @@ const SignupPasswordSetup = () => {
                     registrationNumber: formData.registrationNumber,
                     ownerFirstName: formData.ownerFirstName,
                     ownerLastName: formData.ownerLastName,
-                    domain: formData.domain,
                 };
             }
 

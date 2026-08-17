@@ -11,9 +11,7 @@ const SignupMail = () => {
     const [loadingSuggestions, setLoadingSuggestions] = useState(false);
     const [error, setError] = useState('');
 
-    const domainSuffix = formData.accountType === 'BUSINESS' && formData.domain 
-        ? `@${formData.domain}` 
-        : '@bnxmail.com';
+    const domainSuffix = '@bnxmail.com';
 
     useEffect(() => {
         const fetchSuggestions = async () => {

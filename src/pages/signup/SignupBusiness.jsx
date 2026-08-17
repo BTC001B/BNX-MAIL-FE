@@ -15,8 +15,7 @@ const SignupBusiness = () => {
             !formData.ownerFirstName ||
             !formData.ownerLastName ||
             !formData.businessName ||
-            !formData.registrationNumber ||
-            !formData.domain
+            !formData.registrationNumber
         ) {
             setError('All fields are required');
             return;
@@ -97,19 +96,6 @@ const SignupBusiness = () => {
                     />
                 </div>
 
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                        Business Domain
-                    </label>
-                    <input
-                        type="text"
-                        value={formData.domain}
-                        onChange={(e) => updateFormData({ domain: e.target.value })}
-                        placeholder="e.g. mycompany.com"
-                        required
-                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
-                    />
-                </div>
 
                 <div className="pt-4 flex justify-between">
                     <button
