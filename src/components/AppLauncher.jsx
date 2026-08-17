@@ -59,7 +59,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 shrink-0">
         <div
-          className="flex items-center text-xl text-blue-900 tracking-tight font-bold"
+          className="flex items-center text-xl text-blue-900 tracking-tight font-bold relative -top-1"
           style={{
             fontFamily: "'Saira Stencil One', 'Anton', sans-serif",
           }}
