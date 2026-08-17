@@ -59,9 +59,11 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 shrink-0">
         <div
-          className="flex items-center text-xl text-blue-900 tracking-tight font-bold relative -top-3"
+          className="flex items-center text-xl text-blue-900 tracking-tight font-bold"
           style={{
             fontFamily: "'Saira Stencil One', 'Anton', sans-serif",
+            position: 'relative',
+            top: '-20px'
           }}
         >
           BE<span style={{ marginLeft: '1px' }}>TA</span>
