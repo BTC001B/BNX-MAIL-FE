@@ -77,17 +77,17 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
           <div className="border-b border-gray-100 mb-2.5 -mx-3" />
 
           {/* Fixed Height Wrapper to prevent layout shift between FAVORITES & RECENT */}
-          <div className="w-full h-[92px] flex items-center justify-center">
+          <div className="w-full h-[96px] flex items-center justify-center">
             {activeTopTab === 'FAVORITES' ? (
               <div className="grid grid-cols-3 gap-y-2.5 w-full py-1 justify-items-center">
                 {publicApps.map((app, idx) => (
                   <div 
                     key={idx} 
-                    className="flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105" 
+                    className="w-[62px] h-[45px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/80 active:bg-slate-50 focus:bg-slate-50 border border-transparent hover:border-gray-100/70 rounded-[12px] p-0.5 outline-none" 
                     onClick={app.isButton ? () => { onToggleBitToolSidebar?.(); onClose(); } : () => window.open(app.href, '_blank')}
                   >
                     <img src={app.icon} alt={app.name} className="w-7 h-7 object-contain" />
-                    <span className="text-[9px] font-bold text-slate-700 mt-1">{app.name}</span>
+                    <span className="text-[9px] font-bold text-slate-700 mt-0.5">{app.name}</span>
                   </div>
                 ))}
               </div>
