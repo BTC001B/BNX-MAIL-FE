@@ -336,132 +336,129 @@ function CalcInner() {
 
   // UI RENDERERS
   const renderTapeMode = () => (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-900 select-none">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900">
       {/* Header */}
-      <div className="flex items-center justify-between py-2.5 px-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-        <div className="flex items-center gap-2 font-bold text-gray-800 dark:text-gray-100 tracking-wide text-xs">
+      <div className="flex items-center justify-between p-2.5 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center gap-2 font-bold text-gray-800 dark:text-gray-100 tracking-wide">
           <span className="text-emerald-500 font-black">#</span> BETA CALC
         </div>
         <div className="flex items-center gap-1 text-gray-500">
-          <button onClick={() => setActiveView('history')} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors" title="History"><History size={15} /></button>
-          <button onClick={() => saveTapeMutation.mutate()} disabled={tape.length === 0 || saveTapeMutation.isPending} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50" title="Save Tape"><Share2 size={15} /></button>
-          <button onClick={() => handleKeypad('AC')} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded-lg transition-colors" title="Clear All"><Trash2 size={15} /></button>
+          <button onClick={() => setActiveView('history')} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"><History size={16} /></button>
+          <button onClick={() => saveTapeMutation.mutate()} disabled={tape.length === 0 || saveTapeMutation.isPending} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50"><Share2 size={16} /></button>
+          <button onClick={() => handleKeypad('AC')} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded-lg transition-colors"><Trash2 size={16} /></button>
         </div>
       </div>
 
-      {/* Main Scrollable Calculator Body Container */}
-      <div className="flex-1 overflow-y-auto flex flex-col min-h-0 custom-scrollbar">
-        {/* Tape Area */}
-        <div className="flex-1 min-h-[100px] overflow-y-auto p-3 space-y-2 bg-gray-50/50 dark:bg-gray-900/50 hidden-scrollbar">
-          {tape.length === 0 ? (
-            <div className="h-full min-h-[100px] flex flex-col items-center justify-center opacity-40">
-              <RefreshCw size={20} className="mb-1.5" />
-              <p className="text-[11px] font-medium">Start typing to record Tape</p>
-            </div>
-          ) : (
-            tape.map((item, idx) => (
-              <div key={idx} className="flex justify-between items-end border-b border-gray-100 dark:border-gray-800 pb-1.5">
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{item.label}</span>
-                  <span className="text-xs font-semibold opacity-70">
-                    {item.operator !== '=' ? item.operator : ''} {new Intl.NumberFormat('en-IN').format(item.value)}
-                  </span>
-                </div>
-                <div className="font-bold text-base">{formatMoney(item.runningTotal)}</div>
+      {/* Tape Area */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-2.5 bg-gray-50/50 dark:bg-gray-900/50 hidden-scrollbar">
+        {tape.length === 0 ? (
+          <div className="h-full flex flex-col items-center justify-center opacity-40">
+            <RefreshCw size={24} className="mb-2" />
+            <p className="text-xs">Start typing to record Tape</p>
+          </div>
+        ) : (
+          tape.map((item, idx) => (
+            <div key={idx} className="flex justify-between items-end border-b border-gray-100 dark:border-gray-800 pb-2">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{item.label}</span>
+                <span className="text-sm font-semibold opacity-70">
+                  {item.operator !== '=' ? item.operator : ''} {new Intl.NumberFormat('en-IN').format(item.value)}
+                </span>
               </div>
-            ))
-          )}
-          <div ref={tapeEndRef} />
-        </div>
-
-        {/* Input Display Area */}
-        <div className="bg-gray-100/50 dark:bg-gray-800 py-2 px-3 border-t border-gray-200 dark:border-gray-700 shrink-0">
-          <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">
-            {tape.length === 0 ? 'SET BASE' : 'CURRENT INPUT'}
-          </div>
-          <div className="text-2xl font-black text-right h-8 truncate overflow-hidden leading-none flex items-center justify-end">
-            {currentInput || '0'}
-          </div>
-        </div>
-
-        {/* Action Bar */}
-        <div className="grid grid-cols-4 gap-1.5 p-1.5 border-t border-gray-100 dark:border-gray-800 shrink-0">
-          <button onClick={() => handleKeypad('gst')} className="flex items-center justify-center gap-1 py-1.5 px-0.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800 hover:scale-[1.02] active:scale-[0.98] transition-transform">
-            <Percent size={10} /> GST
-          </button>
-          <button onClick={() => handleKeypad('discount')} className="flex items-center justify-center gap-1 py-1.5 px-0.5 text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-100 dark:border-amber-800 hover:scale-[1.02] active:scale-[0.98] transition-transform">
-            <Tag size={10} /> Discount
-          </button>
-          <button onClick={toggleCurrency} className="flex items-center justify-center gap-1 py-1.5 px-0.5 text-[10px] font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-100 dark:border-indigo-800 hover:scale-[1.02] active:scale-[0.98] transition-transform">
-            <Globe size={10} /> {currency}
-          </button>
-          <button onClick={() => setActiveView('compare')} className="flex items-center justify-center gap-1 py-1.5 px-0.5 text-[10px] font-bold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-sm">
-            <ArrowUpDown size={10} /> Compare
-          </button>
-        </div>
-
-        {/* Keypad */}
-        <div className="p-2 pt-0.5 shrink-0">
-          <div className="grid grid-cols-4 gap-1.5 h-[176px]">
-            {/* Row 1 */}
-            <button onClick={() => handleKeypad('C')} className="bg-red-50 dark:bg-red-900/20 text-red-500 font-bold rounded-xl flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
-              <RefreshCw size={15} />
-            </button>
-            <button onClick={() => handleKeypad('BACK')} className="bg-gray-100 dark:bg-gray-800 font-bold rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-              <ArrowLeft size={15} />
-            </button>
-            <button onClick={() => handleKeypad('/')} className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-black text-lg rounded-xl flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors">/</button>
-            <button onClick={() => handleKeypad('*')} className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-black text-lg rounded-xl flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors">x</button>
-            
-            {/* Numbers Area */}
-            <div className="col-span-3 grid grid-cols-3 gap-1.5">
-              {[7, 8, 9, 4, 5, 6, 1, 2, 3, 'SCI', 0, '.'].map(btn => (
-                <button 
-                  key={btn} 
-                  onClick={() => {
-                    if (btn !== 'SCI') handleKeypad(btn.toString());
-                  }}
-                  className="bg-gray-50 dark:bg-gray-800 font-bold text-sm text-gray-800 dark:text-gray-100 rounded-xl flex items-center justify-center shadow-sm border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.95] transition-all"
-                >
-                  {btn}
-                </button>
-              ))}
+              <div className="font-bold text-lg">{formatMoney(item.runningTotal)}</div>
             </div>
+          ))
+        )}
+        <div ref={tapeEndRef} />
+      </div>
 
-            {/* Right Operators Area */}
-            <div className="col-span-1 grid grid-rows-4 gap-1.5">
-              <button onClick={() => handleKeypad('-')} className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-black text-lg rounded-xl flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors">-</button>
-              <button onClick={() => handleKeypad('+')} className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-black text-lg rounded-xl flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors">+</button>
-              <button onClick={() => handleKeypad('=')} className="row-span-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-2xl rounded-xl flex items-center justify-center shadow-md active:scale-[0.95] transition-all">=</button>
-            </div>
+      {/* Input Display Area */}
+      <div className="bg-gray-100/50 dark:bg-gray-800 py-2 px-3 border-t border-gray-200 dark:border-gray-700">
+        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">
+          {tape.length === 0 ? 'SET BASE' : 'CURRENT INPUT'}
+        </div>
+        <div className="text-2xl font-black text-right h-8 truncate overflow-hidden">
+          {currentInput || '0'}
+        </div>
+      </div>
+
+      {/* Action Bar */}
+      <div className="grid grid-cols-4 gap-1.5 p-1.5 border-t border-gray-100 dark:border-gray-800">
+        <button onClick={() => handleKeypad('gst')} className="flex items-center justify-center gap-1.5 py-1.5 px-1 text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800 hover:scale-[1.02] active:scale-[0.98] transition-transform">
+          <Percent size={12} /> GST
+        </button>
+        <button onClick={() => handleKeypad('discount')} className="flex items-center justify-center gap-1.5 py-1.5 px-1 text-xs font-bold text-amber-600 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800 hover:scale-[1.02] active:scale-[0.98] transition-transform">
+          <Tag size={12} /> Discount
+        </button>
+        <button onClick={toggleCurrency} className="flex items-center justify-center gap-1.5 py-1.5 px-1 text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800 hover:scale-[1.02] active:scale-[0.98] transition-transform">
+          <Globe size={12} /> {currency}
+        </button>
+        <button onClick={() => setActiveView('compare')} className="flex items-center justify-center gap-1.5 py-1.5 px-1 text-xs font-bold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-sm">
+          <ArrowUpDown size={12} /> Compare
+        </button>
+      </div>
+
+      {/* Keypad */}
+      <div className="p-2.5 pt-0.5">
+        <div className="grid grid-cols-4 gap-1.5 h-44">
+          {/* Row 1 */}
+          <button onClick={() => handleKeypad('C')} className="bg-red-50 dark:bg-red-900/20 text-red-500 font-bold rounded-xl flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
+            <RefreshCw size={16} />
+          </button>
+          <button onClick={() => handleKeypad('BACK')} className="bg-gray-100 dark:bg-gray-800 font-bold rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+            <ArrowLeft size={16} />
+          </button>
+          <button onClick={() => handleKeypad('/')} className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-black text-lg rounded-xl flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors">/</button>
+          <button onClick={() => handleKeypad('*')} className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-black text-lg rounded-xl flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors">x</button>
+          
+          {/* Numbers Area */}
+          <div className="col-span-3 grid grid-cols-3 gap-1.5">
+            {[7, 8, 9, 4, 5, 6, 1, 2, 3, 'SCI', 0, '.'].map(btn => (
+              <button 
+                key={btn} 
+                onClick={() => {
+                  if (btn !== 'SCI') handleKeypad(btn.toString());
+                }}
+                className="bg-gray-50 dark:bg-gray-800 font-bold text-gray-800 dark:text-gray-100 rounded-xl flex items-center justify-center shadow-sm border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.95] transition-all"
+              >
+                {btn}
+              </button>
+            ))}
+          </div>
+
+          {/* Right Operators Area */}
+          <div className="col-span-1 grid grid-rows-4 gap-1.5">
+            <button onClick={() => handleKeypad('-')} className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-black text-lg rounded-xl flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors">-</button>
+            <button onClick={() => handleKeypad('+')} className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-black text-lg rounded-xl flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors">+</button>
+            <button onClick={() => handleKeypad('=')} className="row-span-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-2xl rounded-xl flex items-center justify-center shadow-md active:scale-[0.95] transition-all">=</button>
           </div>
         </div>
+      </div>
 
-        {/* Footer Total */}
-        <div className="bg-gray-900 dark:bg-black text-white py-2 px-3 flex flex-col items-start mt-auto z-10 shrink-0">
-          <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Tape Running Total</span>
-          <span className="text-xl font-black text-emerald-400 leading-none">{formatMoney(runningTotal)}</span>
-        </div>
+      {/* Footer Total */}
+      <div className="bg-gray-900 dark:bg-black text-white py-2 px-3 flex flex-col items-start mt-auto z-10">
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Tape Running Total</span>
+        <span className="text-2xl font-black text-emerald-400">{formatMoney(runningTotal)}</span>
       </div>
     </div>
   );
 
   const renderCompareMode = () => (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-900 select-none">
-      <div className="flex items-center justify-between py-2.5 px-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-        <div className="flex items-center gap-2 font-bold text-gray-800 dark:text-gray-100 tracking-wide text-xs">
-          <ArrowUpDown size={15} className="text-indigo-500" /> Compare Mode
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900">
+      <div className="flex items-center justify-between p-2.5 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center gap-2 font-bold text-gray-800 dark:text-gray-100 tracking-wide">
+          <ArrowUpDown size={16} className="text-indigo-500" /> Compare Mode
         </div>
         <div className="flex items-center gap-1 text-gray-500">
-          <button onClick={() => saveCompareMutation.mutate()} disabled={compareItems.length === 0 || saveCompareMutation.isPending} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50" title="Save Comparison"><Share2 size={15} /></button>
-          <button onClick={clearCompare} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded-lg transition-colors" title="Clear Compare"><Trash2 size={15} /></button>
-          <button onClick={() => setActiveView('tape')} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"><X size={15} /></button>
+          <button onClick={() => saveCompareMutation.mutate()} disabled={compareItems.length === 0 || saveCompareMutation.isPending} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"><Share2 size={16} /></button>
+          <button onClick={clearCompare} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded-lg transition-colors"><Trash2 size={16} /></button>
+          <button onClick={() => setActiveView('tape')} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"><X size={16} /></button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto flex flex-col min-h-0 custom-scrollbar p-2 bg-gray-50/50 dark:bg-gray-900/50 gap-2.5">
+      <div className="flex-1 overflow-y-auto p-2 bg-gray-50/50 dark:bg-gray-900/50 hidden-scrollbar flex flex-col gap-3">
         {/* Vendor Headers */}
-        <div className="grid grid-cols-[1fr_80px_80px] gap-2 px-2 pt-1 text-[9px] font-bold text-gray-400 uppercase shrink-0">
+        <div className="grid grid-cols-[1fr_80px_80px] gap-2 px-2 pt-2 text-[10px] font-bold text-gray-400 uppercase">
           <div>Item / Label</div>
           <div className="text-right truncate">{vendorA.name}</div>
           <div className="text-right truncate">{vendorB.name}</div>
@@ -469,27 +466,27 @@ function CalcInner() {
 
         {/* Compare Items */}
         {compareItems.length === 0 ? (
-          <div className="flex-1 min-h-[80px] flex items-center justify-center opacity-40 text-[11px] font-medium">No items added yet</div>
+          <div className="flex-1 flex items-center justify-center opacity-40 text-xs">No items added yet</div>
         ) : (
-          <div className="space-y-2 flex-1 overflow-y-auto hidden-scrollbar">
+          <div className="space-y-2">
             {compareItems.map((item, idx) => (
-              <div key={idx} className="grid grid-cols-[1fr_80px_80px] gap-2 px-2 py-1.5 bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm items-center shrink-0">
-                <div className="text-[11px] font-semibold truncate">{item.label}</div>
-                <div className="text-right text-[11px]">{new Intl.NumberFormat('en-IN').format(item.vendorA_Value)}</div>
-                <div className="text-right text-[11px]">{new Intl.NumberFormat('en-IN').format(item.vendorB_Value)}</div>
+              <div key={idx} className="grid grid-cols-[1fr_80px_80px] gap-2 px-2 py-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm items-center">
+                <div className="text-xs font-semibold truncate">{item.label}</div>
+                <div className="text-right text-xs">{new Intl.NumberFormat('en-IN').format(item.vendorA_Value)}</div>
+                <div className="text-right text-xs">{new Intl.NumberFormat('en-IN').format(item.vendorB_Value)}</div>
               </div>
             ))}
           </div>
         )}
 
         {/* Input Form */}
-        <div className="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow border border-gray-100 dark:border-gray-700 flex flex-col gap-1.5 shrink-0">
+        <div className="mt-auto bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow border border-gray-100 dark:border-gray-700 flex flex-col gap-2">
           <input 
             type="text" 
             placeholder="Item Label (e.g. Server Cost)"
             value={compareInput.label}
             onChange={e => setCompareInput({...compareInput, label: e.target.value})}
-            className="w-full text-xs px-2 py-1 border border-gray-200 dark:border-gray-600 rounded outline-none bg-gray-50 dark:bg-gray-900 focus:border-indigo-500"
+            className="w-full text-xs px-2 py-1.5 border border-gray-200 dark:border-gray-600 rounded outline-none bg-gray-50 dark:bg-gray-900 focus:border-indigo-500"
           />
           <div className="grid grid-cols-2 gap-2">
             <input 
@@ -497,17 +494,17 @@ function CalcInner() {
               placeholder={`${vendorA.name} Value`}
               value={compareInput.vendorA_Value}
               onChange={e => setCompareInput({...compareInput, vendorA_Value: e.target.value})}
-              className="w-full text-xs px-2 py-1 border border-gray-200 dark:border-gray-600 rounded outline-none bg-gray-50 dark:bg-gray-900 focus:border-indigo-500"
+              className="w-full text-xs px-2 py-1.5 border border-gray-200 dark:border-gray-600 rounded outline-none bg-gray-50 dark:bg-gray-900 focus:border-indigo-500"
             />
             <input 
               type="number" 
               placeholder={`${vendorB.name} Value`}
               value={compareInput.vendorB_Value}
               onChange={e => setCompareInput({...compareInput, vendorB_Value: e.target.value})}
-              className="w-full text-xs px-2 py-1 border border-gray-200 dark:border-gray-600 rounded outline-none bg-gray-50 dark:bg-gray-900 focus:border-indigo-500"
+              className="w-full text-xs px-2 py-1.5 border border-gray-200 dark:border-gray-600 rounded outline-none bg-gray-50 dark:bg-gray-900 focus:border-indigo-500"
             />
           </div>
-          <button onClick={addCompareItem} className="w-full py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer">
+          <button onClick={addCompareItem} className="w-full py-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-lg text-xs transition-colors">
             Add to Compare
           </button>
         </div>
@@ -517,16 +514,16 @@ function CalcInner() {
       <div className="bg-gray-900 dark:bg-black p-3 shrink-0">
         <div className="grid grid-cols-[1fr_1fr] gap-2 items-end">
           <div className="flex flex-col">
-            <span className="text-[9px] text-gray-400 font-bold uppercase truncate">{vendorA.name} Total</span>
-            <span className={`text-lg font-black truncate leading-none mt-0.5 ${vendorA.total < vendorB.total && vendorA.total > 0 ? 'text-emerald-400' : 'text-white'}`}>{formatMoney(vendorA.total)}</span>
+            <span className="text-[10px] text-gray-400 font-bold uppercase truncate">{vendorA.name} Total</span>
+            <span className={`text-lg font-black truncate ${vendorA.total < vendorB.total && vendorA.total > 0 ? 'text-emerald-400' : 'text-white'}`}>{formatMoney(vendorA.total)}</span>
           </div>
           <div className="flex flex-col text-right">
-            <span className="text-[9px] text-gray-400 font-bold uppercase truncate">{vendorB.name} Total</span>
-            <span className={`text-lg font-black truncate leading-none mt-0.5 ${vendorB.total < vendorA.total && vendorB.total > 0 ? 'text-emerald-400' : 'text-white'}`}>{formatMoney(vendorB.total)}</span>
+            <span className="text-[10px] text-gray-400 font-bold uppercase truncate">{vendorB.name} Total</span>
+            <span className={`text-lg font-black truncate ${vendorB.total < vendorA.total && vendorB.total > 0 ? 'text-emerald-400' : 'text-white'}`}>{formatMoney(vendorB.total)}</span>
           </div>
         </div>
         {(vendorA.total > 0 || vendorB.total > 0) && (
-          <div className="mt-1.5 text-center text-[9px] font-bold text-emerald-400 uppercase tracking-widest p-1 bg-emerald-500/10 rounded">
+          <div className="mt-2 text-center text-[10px] font-bold text-emerald-400 uppercase tracking-widest p-1 bg-emerald-500/10 rounded">
             {vendorA.total < vendorB.total ? `${vendorA.name} is cheaper` : vendorB.total < vendorA.total ? `${vendorB.name} is cheaper` : 'Equal value'}
           </div>
         )}
@@ -535,16 +532,16 @@ function CalcInner() {
   );
 
   const renderHistoryMode = () => (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-900 select-none">
-      <div className="flex items-center justify-between py-2.5 px-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-        <div className="flex items-center gap-2 font-bold text-gray-800 dark:text-gray-100 tracking-wide text-xs">
-          <History size={15} className="text-gray-500" /> History
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900">
+      <div className="flex items-center justify-between p-2.5 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center gap-2 font-bold text-gray-800 dark:text-gray-100 tracking-wide">
+          <History size={16} className="text-gray-500" /> History
         </div>
-        <button onClick={() => setActiveView('tape')} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"><X size={15} /></button>
+        <button onClick={() => setActiveView('tape')} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"><X size={16} /></button>
       </div>
       <div className="flex-1 overflow-y-auto p-3 hidden-scrollbar space-y-4">
         <div>
-          <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Tape Sessions</h3>
+          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tape Sessions</h3>
           {tapeHistory.length === 0 ? <p className="text-xs opacity-50">No saved tapes.</p> : (
             tapeHistory.map(session => (
               <div key={session.id || session._id} className="p-2 mb-2 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg shadow-sm">
@@ -555,7 +552,7 @@ function CalcInner() {
           )}
         </div>
         <div>
-          <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Compare Sessions</h3>
+          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Compare Sessions</h3>
           {compareHistory.length === 0 ? <p className="text-xs opacity-50">No saved comparisons.</p> : (
             compareHistory.map(session => (
               <div key={session.id || session._id} className="p-2 mb-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-lg shadow-sm">
@@ -570,7 +567,7 @@ function CalcInner() {
   );
 
   return (
-    <div className="h-full w-full overflow-hidden flex flex-col relative">
+    <div className="h-full w-full overflow-hidden flex flex-col relative min-h-[480px]">
       {activeView === 'tape' && renderTapeMode()}
       {activeView === 'compare' && renderCompareMode()}
       {activeView === 'history' && renderHistoryMode()}
