@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MapPin, Sun, Moon, Wind, Droplets, Loader2, AlertCircle, CloudSun } from 'lucide-react';
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,
+            retry: 1
+        }
+    }
+});
 
 const fetchWeather = async (lat, lon) => {
     // using .env for api bases if available
@@ -23,7 +32,7 @@ const fetchLocationName = async (lat, lon) => {
     return response.json();
 };
 
-const WeatherPanel = () => {
+const WeatherPanelInner = () => {
     const [location, setLocation] = useState(null);
     const [geoError, setGeoError] = useState(null);
     const [isRequestingLocation, setIsRequestingLocation] = useState(false);
@@ -181,4 +190,10 @@ const WeatherPanel = () => {
     );
 };
 
-export default WeatherPanel;
+export default function WeatherPanel() {
+    return (
+        <QueryClientProvider client={queryClient}>
+            <WeatherPanelInner />
+        </QueryClientProvider>
+    );
+}
