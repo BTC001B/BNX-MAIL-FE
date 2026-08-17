@@ -69,23 +69,23 @@ const SignupBusinessOnboarding = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-4">
-            <div className="max-w-2xl w-full bg-gray-800 p-8 rounded-2xl shadow-2xl border border-gray-700">
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold">Welcome to BNX Mail for Business</h2>
-                    <p className="text-gray-400 mt-2">Let's get your organization set up.</p>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-12 px-4 sm:px-6 lg:px-8 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+            <div className="max-w-2xl w-full bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 transition-all duration-500">
+                <div className="mb-8 text-center">
+                    <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Welcome to BNX Mail for Business</h2>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-slate-400 font-medium">Let's get your organization set up.</p>
                 </div>
 
                 {/* Progress Bar */}
-                <div className="w-full bg-gray-700 h-2 rounded-full mb-8">
+                <div className="w-full bg-gray-200 dark:bg-slate-700 h-2 rounded-full mb-8 overflow-hidden">
                     <div 
-                        className="bg-indigo-500 h-2 rounded-full transition-all duration-300"
+                        className="bg-gradient-to-r from-indigo-600 to-blue-600 h-2 rounded-full transition-all duration-300"
                         style={{ width: step === 1 ? '50%' : '100%' }}
                     />
                 </div>
 
                 {error && (
-                    <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-6">
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl animate-shake text-sm font-medium mb-6">
                         {error}
                     </div>
                 )}
@@ -93,15 +93,15 @@ const SignupBusinessOnboarding = () => {
                 <form onSubmit={handleNext}>
                     {step === 1 ? (
                         <div className="space-y-4 animate-fade-in">
-                            <h3 className="text-xl font-semibold mb-4 text-indigo-300">Step 1: Business Profile</h3>
+                            <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Step 1: Business Profile</h3>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Business Type *</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">Business Type *</label>
                                     <select
                                         value={formData.businessType}
                                         onChange={e => updateFormData({ businessType: e.target.value })}
-                                        className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-indigo-500 outline-none"
+                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white transition-all"
                                         required
                                     >
                                         <option value="">Select type</option>
@@ -112,22 +112,22 @@ const SignupBusinessOnboarding = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Industry *</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">Industry *</label>
                                     <input
                                         type="text"
                                         value={formData.industry}
                                         onChange={e => updateFormData({ industry: e.target.value })}
                                         placeholder="e.g. Technology, Retail"
-                                        className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-indigo-500 outline-none"
+                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white transition-all"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Company Size *</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">Company Size *</label>
                                     <select
                                         value={formData.companySize}
                                         onChange={e => updateFormData({ companySize: e.target.value })}
-                                        className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-indigo-500 outline-none"
+                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white transition-all"
                                         required
                                     >
                                         <option value="">Select size</option>
@@ -138,21 +138,21 @@ const SignupBusinessOnboarding = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Website URL</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">Website URL</label>
                                     <input
                                         type="url"
                                         value={formData.businessWebsite}
                                         onChange={e => updateFormData({ businessWebsite: e.target.value })}
                                         placeholder="https://"
-                                        className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-indigo-500 outline-none"
+                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white transition-all"
                                     />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium mb-1">Business Address</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">Business Address</label>
                                     <textarea
                                         value={formData.businessAddress}
                                         onChange={e => updateFormData({ businessAddress: e.target.value })}
-                                        className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-indigo-500 outline-none"
+                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white transition-all"
                                         rows="2"
                                     />
                                 </div>
@@ -160,34 +160,34 @@ const SignupBusinessOnboarding = () => {
                         </div>
                     ) : (
                         <div className="space-y-4 animate-fade-in">
-                            <h3 className="text-xl font-semibold mb-4 text-indigo-300">Step 2: Branding & Preferences</h3>
+                            <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Step 2: Branding & Preferences</h3>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Profile Picture (Owner)</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">Profile Picture (Owner)</label>
                                     <input
                                         type="file"
                                         accept="image/*"
                                         onChange={e => handleFileUpload(e, 'profilePhoto')}
-                                        className="w-full p-2 text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-900 file:text-indigo-300 hover:file:bg-indigo-800"
+                                        className="w-full p-2 text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50 cursor-pointer"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Company Logo</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">Company Logo</label>
                                     <input
                                         type="file"
                                         accept="image/*"
                                         onChange={e => handleFileUpload(e, 'companyLogo')}
-                                        className="w-full p-2 text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-900 file:text-indigo-300 hover:file:bg-indigo-800"
+                                        className="w-full p-2 text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50 cursor-pointer"
                                     />
                                 </div>
                                 
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Time Zone</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">Time Zone</label>
                                     <select
                                         value={formData.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone}
                                         onChange={e => updateFormData({ timeZone: e.target.value })}
-                                        className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-indigo-500 outline-none"
+                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white transition-all"
                                     >
                                         <option value="UTC">UTC</option>
                                         <option value="America/New_York">America/New_York (EST)</option>
@@ -197,11 +197,11 @@ const SignupBusinessOnboarding = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Language</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">Language</label>
                                     <select
                                         value={formData.language || 'en'}
                                         onChange={e => updateFormData({ language: e.target.value })}
-                                        className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-indigo-500 outline-none"
+                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white transition-all"
                                     >
                                         <option value="en">English</option>
                                         <option value="es">Spanish</option>
@@ -211,39 +211,44 @@ const SignupBusinessOnboarding = () => {
                                 </div>
                             </div>
                             
-                            <div className="mt-6">
+                            <div className="mt-6 border-t border-gray-100 dark:border-slate-700 pt-6">
                                 <label className="flex items-center space-x-3 cursor-pointer">
                                     <input 
                                         type="checkbox" 
                                         checked={formData.acceptTerms}
                                         onChange={e => updateFormData({ acceptTerms: e.target.checked })}
-                                        className="w-5 h-5 text-indigo-500 rounded bg-gray-700 border-gray-600 focus:ring-indigo-500" 
+                                        className="w-5 h-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer" 
                                     />
-                                    <span className="text-sm text-gray-300">
-                                        I accept the <a href="/terms" className="text-indigo-400 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-indigo-400 hover:underline">Privacy Policy</a>.
+                                    <span className="text-sm text-gray-600 dark:text-slate-400">
+                                        I accept the <a href="/terms" className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Terms of Service</a> and <a href="/privacy" className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Privacy Policy</a>.
                                     </span>
                                 </label>
                             </div>
                         </div>
                     )}
 
-                    <div className="mt-8 flex justify-between">
+                    <div className="mt-8 flex justify-between items-center">
                         {step === 2 && (
                             <button
                                 type="button"
                                 onClick={() => setStep(1)}
-                                className="px-6 py-3 text-gray-400 hover:text-white transition-colors"
+                                className="px-6 py-3 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white font-semibold transition-colors"
                             >
-                                Back
+                                ← Back
                             </button>
                         )}
                         <div className={step === 1 ? "ml-auto" : ""}>
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition-all disabled:opacity-50"
+                                className="py-4 px-8 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50"
                             >
-                                {step === 1 ? 'Next' : (loading ? 'Finishing setup...' : 'Complete Onboarding')}
+                                {step === 1 ? 'Continue →' : (loading ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        <span>Finishing setup...</span>
+                                    </div>
+                                ) : 'Complete Onboarding →')}
                             </button>
                         </div>
                     </div>
