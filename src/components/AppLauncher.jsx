@@ -133,15 +133,15 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
           </div>
 
           {/* Fixed Height Wrapper to prevent layout shift for different grid row counts */}
-          <div className="h-[144px]">
+          <div className="h-[152px]">
             <div className="grid grid-cols-4 gap-x-2 gap-y-2.5">
               {displayApps.map((app, idx) => (
                 <div 
                   key={idx}
                   onClick={app.isButton ? () => { onToggleBitToolSidebar?.(); onClose(); } : () => window.open(app.href, '_blank')}
-                  className="w-[68px] h-[68px] border border-gray-100 rounded-[18px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-md hover:bg-white bg-[#fafafa]/45 cursor-pointer group transition-all p-1"
+                  className="w-[72px] h-[72px] border border-gray-100 rounded-[20px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-md hover:bg-white bg-white cursor-pointer group transition-all p-1"
                 >
-                  <img src={app.icon} alt={app.name} className="w-7 h-7 object-contain mb-1" />
+                  <img src={app.icon} alt={app.name} className="w-8 h-8 object-contain mb-1" />
                   <span className="text-[9.5px] font-bold text-slate-700 text-center leading-tight truncate w-full px-0.5">
                     {app.name}
                   </span>
