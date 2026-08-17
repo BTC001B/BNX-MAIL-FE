@@ -40,9 +40,6 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
           BE<span style={{marginLeft:'1px'}}>TA</span>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-1.5 px-3 py-1 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-            <MdEdit size={14} /> Edit
-          </button>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors">
             <MdClose size={18} />
           </button>
