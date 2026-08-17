@@ -763,27 +763,6 @@ const Settings = () => {
                     </select>
                     <span className="text-xs text-gray-500">Sets the grace window to cancel/undo emails after pressing send.</span>
                   </div>
-
-                  {/* Smart Filters */}
-                  <div className="flex flex-col gap-4 border-t pt-6" style={{ borderColor: theme.border }}>
-                    <h4 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Smart Filters</h4>
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between py-2.5">
-                        <div className="flex flex-col gap-1 pr-4">
-                          <span className="text-sm font-medium" style={{ color: theme.text }}>Bulk Mail</span>
-                          <span className="text-xs text-gray-500">Automatically organize bulk and mass-mail emails into the Bulk Mail folder.</span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setBulkMailEnabled(!bulkMailEnabled)}
-                          className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 outline-none cursor-pointer flex items-center shrink-0 ${bulkMailEnabled ? 'justify-end' : 'justify-start'}`}
-                          style={{ backgroundColor: bulkMailEnabled ? theme.accent : 'rgba(156,163,175,0.4)' }}
-                        >
-                          <span className="w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-300" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 <button
