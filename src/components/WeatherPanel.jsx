@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MapPin, Sun, Moon, Wind, Droplets, Loader2, AlertCircle, CloudSun } from 'lucide-react';
+import { MapPin, Sun, Moon, Wind, Droplets, Loader2, AlertCircle, CloudSun, Sunrise, Sunset, Thermometer } from 'lucide-react';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -134,8 +134,14 @@ const WeatherPanelInner = () => {
     }
 
     const current = weatherData?.current;
+    const daily = weatherData?.daily;
     const isDay = current?.is_day === 1;
     const cityName = locationData?.city || locationData?.locality || "Current Location";
+
+    const maxTemp = daily?.temperature_2m_max?.[0];
+    const minTemp = daily?.temperature_2m_min?.[0];
+    const sunriseTime = daily?.sunrise?.[0] ? new Date(daily.sunrise[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null;
+    const sunsetTime = daily?.sunset?.[0] ? new Date(daily.sunset[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null;
 
     return (
         <div className="flex flex-col min-h-[400px] h-full w-full bg-gradient-to-b from-cyan-50 to-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
@@ -170,19 +176,33 @@ const WeatherPanelInner = () => {
             </div>
 
             {/* Details Grid */}
-            <div className="p-5 grid grid-cols-2 gap-4 bg-white/60 border-t border-cyan-100/50 shrink-0">
+            <div className="p-5 grid grid-cols-2 gap-3 bg-white/60 border-t border-cyan-100/50 shrink-0">
                 <div className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-gray-100">
-                    <Wind size={20} className="text-cyan-400 mb-2" />
+                    <Wind size={20} className="text-cyan-400 mb-1" />
                     <span className="text-xs text-gray-400 font-medium mb-1">Wind</span>
                     <span className="text-sm font-bold text-gray-700">
                         {current?.wind_speed_10m} <span className="text-xs font-normal">km/h</span>
                     </span>
                 </div>
                 <div className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-gray-100">
-                    <Droplets size={20} className="text-cyan-400 mb-2" />
+                    <Droplets size={20} className="text-cyan-400 mb-1" />
                     <span className="text-xs text-gray-400 font-medium mb-1">Humidity</span>
                     <span className="text-sm font-bold text-gray-700">
                         {current?.relative_humidity_2m}%
+                    </span>
+                </div>
+                <div className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-gray-100">
+                    <Thermometer size={20} className="text-cyan-400 mb-1" />
+                    <span className="text-xs text-gray-400 font-medium mb-1">High / Low</span>
+                    <span className="text-sm font-bold text-gray-700">
+                        {Math.round(maxTemp)}° / {Math.round(minTemp)}°
+                    </span>
+                </div>
+                <div className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-gray-100">
+                    {isDay ? <Sunset size={20} className="text-cyan-400 mb-1" /> : <Sunrise size={20} className="text-cyan-400 mb-1" />}
+                    <span className="text-xs text-gray-400 font-medium mb-1">{isDay ? "Sunset" : "Sunrise"}</span>
+                    <span className="text-sm font-bold text-gray-700">
+                        {isDay ? sunsetTime : sunriseTime}
                     </span>
                 </div>
             </div>
