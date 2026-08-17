@@ -57,18 +57,16 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
   return (
     <div className="flex flex-col h-full bg-white w-full select-none">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 shrink-0">
+      <div className="flex items-start justify-between px-5 pt-1.5 pb-3 border-b border-gray-100 shrink-0">
         <div
           className="flex items-center text-xl text-blue-900 tracking-tight font-bold"
           style={{
             fontFamily: "'Saira Stencil One', 'Anton', sans-serif",
-            position: 'relative',
-            top: '-20px'
           }}
         >
           BE<span style={{ marginLeft: '1px' }}>TA</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 self-center">
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors">
             <MdClose size={18} />
           </button>
