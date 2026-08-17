@@ -30,9 +30,9 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
   return (
     <div className="flex flex-col h-full bg-white w-full select-none">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 shrink-0">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 shrink-0">
         <div
-          className="flex items-center text-xl text-blue-900 tracking-tight font-bold"
+          className="flex items-center text-lg text-blue-900 tracking-tight font-bold"
           style={{
             fontFamily: "'Saira Stencil One', 'Anton', sans-serif",
           }}
@@ -40,86 +40,86 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
           BE<span style={{marginLeft:'1px'}}>TA</span>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors">
-            <MdClose size={18} />
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors">
+            <MdClose size={16} />
           </button>
         </div>
       </div>
 
       {/* Main Content Area (Fixed Height/Viewport fitting, No Scroll) */}
-      <div className="flex-1 overflow-hidden p-4 flex flex-col justify-between">
+      <div className="flex-1 overflow-hidden p-3.5 flex flex-col justify-between">
         {/* Favorites & Recent Tabs */}
         <div>
-          <div className="flex items-center w-full mb-3">
+          <div className="flex items-center w-full mb-2">
             <button
               onClick={() => setActiveTopTab('FAVORITES')}
-              className={`flex-1 pb-1.5 border-b-2 transition-all ${
+              className={`flex-1 pb-1 border-b-2 transition-all ${
                 activeTopTab === 'FAVORITES' 
                   ? 'border-slate-700 text-slate-700' 
                   : 'border-transparent text-gray-400 hover:text-gray-600'
               }`}
             >
-              <h3 className="text-[10px] font-extrabold tracking-widest text-center">FAVORITES</h3>
+              <h3 className="text-[9.5px] font-extrabold tracking-widest text-center">FAVORITES</h3>
             </button>
             <button
               onClick={() => setActiveTopTab('RECENT')}
-              className={`flex-1 pb-1.5 border-b-2 transition-all ${
+              className={`flex-1 pb-1 border-b-2 transition-all ${
                 activeTopTab === 'RECENT' 
                   ? 'border-slate-700 text-slate-700' 
                   : 'border-transparent text-gray-400 hover:text-gray-600'
               }`}
             >
-              <h3 className="text-[10px] font-extrabold tracking-widest text-center">RECENT VIEW</h3>
+              <h3 className="text-[9.5px] font-extrabold tracking-widest text-center">RECENT VIEW</h3>
             </button>
           </div>
 
           {/* Fixed Height Wrapper to prevent layout shift between FAVORITES & RECENT */}
-          <div className="w-full h-[72px] flex items-center justify-center">
+          <div className="w-full h-[64px] flex items-center justify-center">
             {activeTopTab === 'FAVORITES' ? (
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-4 gap-2.5">
                 {publicApps.map((app, idx) => (
                   <div 
                     key={idx} 
-                    className="w-[62px] h-[62px] border border-gray-100 rounded-[16px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-md cursor-pointer transition-all" 
+                    className="w-[54px] h-[54px] border border-gray-100 rounded-[14px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-md cursor-pointer transition-all" 
                     onClick={app.isButton ? () => { onToggleBitToolSidebar?.(); onClose(); } : () => window.open(app.href, '_blank')}
                   >
-                    <img src={app.icon} alt={app.name} className="w-8 h-8 object-contain mb-1" />
+                    <img src={app.icon} alt={app.name} className="w-6.5 h-6.5 object-contain mb-0.5" />
                     <span className="text-[9px] font-bold text-slate-700">{app.name}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="w-full h-full border border-dashed border-gray-200 rounded-2xl flex items-center justify-center bg-transparent">
-                <span className="text-[10px] font-bold text-gray-400">No recents</span>
+              <div className="w-full h-full border border-dashed border-gray-200 rounded-[14px] flex items-center justify-center bg-transparent">
+                <span className="text-[9.5px] font-bold text-gray-400">No recents</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Separator / Gap */}
-        <div className="h-4 shrink-0" />
+        <div className="h-3 shrink-0" />
 
         {/* Base Tab Row */}
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-2.5">
             <button 
               onClick={() => setActiveTab('BASE')}
-              className={`text-[11px] font-extrabold tracking-widest pb-1 border-b-2 transition-colors ${activeTab === 'BASE' ? 'text-slate-700 border-slate-700' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
+              className={`text-[10px] font-extrabold tracking-widest pb-0.5 border-b-2 transition-colors ${activeTab === 'BASE' ? 'text-slate-700 border-slate-700' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
             >
               BASE
             </button>
             
-            <div className="flex items-center gap-3 text-[10px] font-extrabold tracking-widest">
+            <div className="flex items-center gap-2.5 text-[9.5px] font-extrabold tracking-widest">
               <button 
                 onClick={() => setActiveTab('PUBLIC')}
-                className={`pb-1 border-b-2 transition-colors ${activeTab === 'PUBLIC' ? 'text-blue-600 border-blue-600' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
+                className={`pb-0.5 border-b-2 transition-colors ${activeTab === 'PUBLIC' ? 'text-blue-600 border-blue-600' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
               >
                 PUBLIC
               </button>
-              <span className="text-gray-300 pb-1 font-normal">|</span>
+              <span className="text-gray-300 pb-0.5 font-normal">|</span>
               <button 
                 onClick={() => setActiveTab('BUSINESS')}
-                className={`pb-1 border-b-2 transition-colors ${activeTab === 'BUSINESS' ? 'text-blue-600 border-blue-600' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
+                className={`pb-0.5 border-b-2 transition-colors ${activeTab === 'BUSINESS' ? 'text-blue-600 border-blue-600' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
               >
                 BUSINESS
               </button>
@@ -127,16 +127,16 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
           </div>
 
           {/* Fixed Height Wrapper to prevent layout shift for different grid row counts */}
-          <div className="h-[142px]">
-            <div className="grid grid-cols-4 gap-x-2 gap-y-3">
+          <div className="h-[118px]">
+            <div className="grid grid-cols-4 gap-x-2 gap-y-2.5">
               {displayApps.map((app, idx) => (
                 <div 
                   key={idx}
                   onClick={app.isButton ? () => { onToggleBitToolSidebar?.(); onClose(); } : () => window.open(app.href, '_blank')}
-                  className="flex flex-col items-center gap-1.5 cursor-pointer group"
+                  className="flex flex-col items-center gap-1 cursor-pointer group"
                 >
-                  <div className="w-[45px] h-[45px] rounded-[14px] bg-[#fafafa] border border-gray-100 flex items-center justify-center group-hover:shadow-md group-hover:border-gray-200 group-hover:bg-white transition-all">
-                    <img src={app.icon} alt={app.name} className="w-7 h-7 object-contain" />
+                  <div className="w-[40px] h-[40px] rounded-[12px] bg-[#fafafa] border border-gray-100 flex items-center justify-center group-hover:shadow-md group-hover:border-gray-200 group-hover:bg-white transition-all">
+                    <img src={app.icon} alt={app.name} className="w-6 h-6 object-contain" />
                   </div>
                   <span className="text-[9px] font-bold text-slate-700 text-center leading-tight">
                     {app.name}
@@ -148,8 +148,8 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
         </div>
 
         {/* Coming Soon Section */}
-        <div className="mt-3 pt-3.5 border-t border-gray-100 dark:border-gray-800">
-          <h3 className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 tracking-widest mb-2 text-center">COMING SOON</h3>
+        <div className="mt-2.5 pt-2.5 border-t border-gray-100 dark:border-gray-800">
+          <h3 className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-widest mb-1.5 text-center">COMING SOON</h3>
           
           <style>{`
             @keyframes float {
@@ -198,33 +198,33 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
           `}</style>
 
           {/* Animated Coming Soon Card */}
-          <div className="coming-soon-card flex flex-col items-center text-center p-3 rounded-2xl border border-gray-100 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-900/10 backdrop-blur-sm select-none">
+          <div className="coming-soon-card flex flex-col items-center text-center p-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-900/10 backdrop-blur-sm select-none">
             {/* Sparkle Icon Container */}
-            <div className="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-1.5 shadow-inner">
-              <MdAutoAwesome size={18} className="sparkle-icon" />
+            <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-1 shadow-inner">
+              <MdAutoAwesome size={16} className="sparkle-icon" />
             </div>
 
             {/* Badge */}
-            <div className="px-2.5 py-0.5 rounded-full text-[8px] font-extrabold tracking-widest bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 mb-1.5 uppercase border border-blue-100/30 dark:border-blue-900/25">
+            <div className="px-2 py-0.5 rounded-full text-[8px] font-extrabold tracking-widest bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 mb-1 uppercase border border-blue-100/30 dark:border-blue-900/25">
               BETA LABS RELEASE
             </div>
 
             {/* COMING SOON Text */}
-            <h4 className="text-sm font-black tracking-widest mb-1 uppercase shimmer-text">
+            <h4 className="text-xs font-black tracking-widest mb-0.5 uppercase shimmer-text">
               COMING SOON
             </h4>
 
             {/* Subtitle */}
-            <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium px-1 leading-normal">
+            <p className="text-[9px] text-gray-500 dark:text-gray-400 font-medium px-1 leading-normal mb-1">
               Building the next generation of Beta applications.
             </p>
 
             {/* Divider Line */}
-            <div className="w-full border-t border-gray-100/80 dark:border-gray-800/40 my-2" />
+            <div className="w-full border-t border-gray-100/80 dark:border-gray-800/40 my-1.5" />
 
             {/* Rocket Line */}
-            <div className="rocket-line flex items-center gap-1.5 text-[9px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest">
-              <MdRocketLaunch size={11} className="shrink-0" />
+            <div className="rocket-line flex items-center gap-1 text-[8.5px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest">
+              <MdRocketLaunch size={10} className="shrink-0" />
               <span>New innovations arriving soon</span>
             </div>
           </div>
@@ -232,7 +232,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
       </div>
 
       {/* Footer */}
-      <div className="bg-gray-50/50 py-3 text-center border-t border-gray-100 shrink-0 rounded-b-[24px]">
+      <div className="bg-gray-50/50 py-2.5 text-center border-t border-gray-100 shrink-0 rounded-b-[24px]">
         <span className="text-[8px] font-extrabold text-gray-400 tracking-[0.2em]">BETA ECO-SYSTEM • FUTURE READY</span>
       </div>
     </div>
