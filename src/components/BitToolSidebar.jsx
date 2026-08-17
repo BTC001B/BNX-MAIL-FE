@@ -11,6 +11,7 @@ import CalendarPanel from "./CalendarPanel";
 import ContactPanel from "./ContactPanel";
 import NotesPanel from "./NotesPanel";
 import CalcPopover from "./CalcPopover";
+import WeatherPanel from "./WeatherPanel";
 import betalogo from '../assets/beta2.png'
 
 // Tools Definition
