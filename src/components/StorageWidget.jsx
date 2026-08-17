@@ -7,7 +7,7 @@ const StorageWidget = ({ isDesktopOpen }) => {
   const { theme } = useTheme();
   const [storageData, setStorageData] = useState({
     used: 0,
-    limit: 1073741824, // default 1 GB
+    limit: 5368709120, // default 5 GB
     percentage: 0
   });
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ const StorageWidget = ({ isDesktopOpen }) => {
         const res = await mailAPI.getStorageQuota();
         if (res.data?.success && res.data?.data) {
           const used = res.data.data.storageUsed;
-          const limit = 1073741824; // strictly 1 GB in frontend
+          const limit = 5368709120; // strictly 5 GB in frontend
           const percentage = limit > 0 ? (used / limit) * 100 : 0;
           setStorageData({
             used,
