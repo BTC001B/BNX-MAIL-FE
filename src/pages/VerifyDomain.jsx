@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { businessAPI } from "../services/api";
-import logo from "../assets/bluechat_logo.webp";
+import logo from "../assets/bnx-remove.png";
 import { CheckCircle, Copy, RefreshCw, ShieldCheck, Globe } from "lucide-react";
 import toast from "react-hot-toast";
 
