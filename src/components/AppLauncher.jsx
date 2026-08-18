@@ -59,12 +59,13 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
       {/* Header */}
       <div className="flex items-center justify-between pt-4 pb-2 px-6 border-b border-gray-100 shrink-0 relative">
         <div
-          className="flex items-center text-[24px] text-[#0f53c9] font-black tracking-tighter"
+          className="text-[24px] text-[#0f53c9] font-black tracking-tighter"
           style={{
             fontFamily: "'Saira Stencil One', 'Anton', sans-serif",
             position: 'absolute',
-            top: '5px',
-            left: '16px'
+            top: '2px',
+            left: '16px',
+            lineHeight: '1'
           }}
         >
           BE<span style={{ marginLeft: '0.5px' }}>TA</span>
