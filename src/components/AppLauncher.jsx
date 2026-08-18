@@ -96,7 +96,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
       <div className="flex-1 overflow-y-auto hidden-scrollbar px-3 py-2 flex flex-col justify-between" style={{ maxHeight: 'calc(100vh - 100px)' }}>
         {/* Favorites & Recent Tabs Inside Card Container */}
         <div className="border border-gray-200/90 rounded-[20px] px-6 py-4 mt-2 mb-0.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.01)]">
-          <div className="flex items-center justify-center gap-16 mb-2 text-[10px] font-[900] tracking-widest text-center">
+          <div className="flex items-center justify-center gap-16 mb-2 text-[11.5px] font-[900] tracking-widest text-center">
             <button
               onClick={() => setActiveTopTab('FAVORITES')}
               className={`pb-1 transition-all border-b-2 ${activeTopTab === 'FAVORITES'
@@ -164,12 +164,12 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
           <div className="flex items-center justify-between mb-2.5 px-0.5">
             <button
               onClick={() => setActiveTab('BASE')}
-              className={`text-[12px] font-[900] tracking-widest pb-0.5 border-b-[3px] transition-colors ${activeTab === 'BASE' ? 'text-slate-800 border-[#0f53c9]' : 'text-slate-400 border-transparent hover:text-slate-650'}`}
+              className={`text-[14px] font-[900] tracking-widest pb-0.5 border-b-[3px] transition-colors ${activeTab === 'BASE' ? 'text-slate-800 border-[#0f53c9]' : 'text-slate-400 border-transparent hover:text-slate-650'}`}
             >
               BASE
             </button>
 
-            <div className="flex items-center gap-3 text-[9px] font-extrabold tracking-widest">
+            <div className="flex items-center gap-3 text-[10.5px] font-extrabold tracking-widest">
               <button
                 onClick={() => setActiveTab('PUBLIC')}
                 className={`transition-colors ${activeTab === 'PUBLIC' ? 'text-[#0f53c9]' : 'text-slate-400 hover:text-slate-650'}`}
