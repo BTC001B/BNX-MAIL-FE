@@ -77,7 +77,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
           className="flex items-center gap-2"
           style={{
             position: 'absolute',
-            top: '-22px',
+            top: '-24px',
             right: '22px',
             zIndex: 50
           }}
