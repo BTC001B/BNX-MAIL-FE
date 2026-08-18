@@ -204,28 +204,40 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
         {/* Coming Soon Section */}
         <div className="mt-6 relative">
           <style>{`
-            @keyframes float {
+            @keyframes floatCard {
               0% { transform: scale(1); }
-              50% { transform: scale(1.015); }
+              50% { transform: scale(1.01); }
               100% { transform: scale(1); }
             }
-            @keyframes rotateGlow {
-              0% { transform: rotate(0deg) scale(1); filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.2)); }
-              50% { transform: rotate(180deg) scale(1.05); filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.4)); }
-              100% { transform: rotate(360deg) scale(1); filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.2)); }
+            @keyframes floatLogo {
+              0% { transform: translateY(0px) scale(1); }
+              50% { transform: translateY(-3px) scale(1.08); }
+              100% { transform: translateY(0px) scale(1); }
+            }
+            @keyframes pulseGlow {
+              0% { box-shadow: 0 0 4px rgba(59, 130, 246, 0.15); }
+              50% { box-shadow: 0 0 12px rgba(59, 130, 246, 0.45); }
+              100% { box-shadow: 0 0 4px rgba(59, 130, 246, 0.15); }
             }
             .coming-soon-card {
-              animation: float 4s ease-in-out infinite;
+              animation: floatCard 4s ease-in-out infinite;
             }
-            .sparkle-icon {
-              animation: rotateGlow 6s ease-in-out infinite;
+            .bnx-logo-anim {
+              animation: floatLogo 3s ease-in-out infinite;
+            }
+            .glow-circle {
+              animation: pulseGlow 3s ease-in-out infinite;
             }
           `}</style>
 
-          {/* Overlapping Sparkle Icon Circle */}
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white border border-gray-200/90 flex items-center justify-center shadow-sm z-10">
-            <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-              <MdAutoAwesome size={13} className="sparkle-icon" />
+          {/* Overlapping BNX Logo Animation Circle */}
+          <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white border border-gray-200/90 flex items-center justify-center shadow-sm z-10 glow-circle">
+            <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden">
+              <img 
+                src={bnxLogo} 
+                alt="BNX Logo Animation" 
+                className="w-5.5 h-5.5 object-contain bnx-logo-anim" 
+              />
             </div>
           </div>
 
