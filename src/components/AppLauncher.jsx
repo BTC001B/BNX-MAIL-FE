@@ -130,7 +130,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
                     className="w-[64px] h-[48px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/60 hover:border-gray-100/60 border border-transparent rounded-[10px] p-0.5 outline-none"
                     onClick={() => handleAppClick(app)}
                   >
-                    <img src={app.icon} alt={app.name} className="w-[24px] h-[24px] object-contain" />
+                    <img src={app.icon} alt={app.name} className="w-[28px] h-[28px] object-contain" />
                     <span className="text-[9px] font-extrabold text-slate-800 mt-0.5 tracking-wide">{app.name}</span>
                   </div>
                 ))}
@@ -143,7 +143,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
                     className="w-[64px] h-[48px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/60 hover:border-gray-100/60 border border-transparent rounded-[10px] p-0.5 outline-none"
                     onClick={() => handleAppClick(app)}
                   >
-                    <img src={app.icon} alt={app.name} className="w-[24px] h-[24px] object-contain" />
+                    <img src={app.icon} alt={app.name} className="w-[28px] h-[28px] object-contain" />
                     <span className="text-[9px] font-extrabold text-slate-800 mt-0.5 tracking-wide">{app.name}</span>
                   </div>
                 ))}
@@ -195,7 +195,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
                   onClick={() => handleAppClick(app)}
                   className="w-[62px] h-[60px] border border-gray-100/90 rounded-[12px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-sm hover:bg-white bg-white cursor-pointer group transition-all p-1 shadow-[0_1px_2px_rgba(0,0,0,0.015)]"
                 >
-                  <img src={app.icon} alt={app.name} className="w-[24px] h-[24px] object-contain mb-0.5" />
+                  <img src={app.icon} alt={app.name} className="w-[28px] h-[28px] object-contain mb-0.5" />
                   <span className="text-[9px] font-extrabold text-slate-800 text-center leading-tight truncate w-full px-0.5">
                     {app.name}
                   </span>
