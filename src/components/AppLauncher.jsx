@@ -57,39 +57,24 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
   return (
     <div className="flex flex-col h-full bg-white w-full select-none">
       {/* Header */}
-      <div className="flex items-center justify-between pt-0.5 pb-1.5 px-6 border-b border-gray-200 shrink-0 relative">
+      <div className="flex items-center justify-between h-14 px-6 border-b border-gray-200 shrink-0">
         <div
           className="text-[24px] text-[#0f53c9] font-black tracking-tighter"
           style={{
             fontFamily: "'Saira Stencil One', 'Anton', sans-serif",
-            position: 'absolute',
-            top: '-22px',
-            left: '22px',
             lineHeight: '1',
-            zIndex: 50
           }}
         >
           BE<span style={{ marginLeft: '0.5px' }}>TA</span>
         </div>
         
-        {/* Spacer to push flex items to the right */}
-        <div
-          className="flex items-center gap-2"
-          style={{
-            position: 'absolute',
-            top: '-24px',
-            right: '22px',
-            zIndex: 50
-          }}
+        {/* Close button */}
+        <button 
+          onClick={onClose} 
+          className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-400 transition-colors border border-gray-150 cursor-pointer"
         >
-          {/* Close button */}
-          <button 
-            onClick={onClose} 
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-400 transition-colors border border-gray-150 cursor-pointer"
-          >
-            <MdClose size={18} />
-          </button>
-        </div>
+          <MdClose size={18} />
+        </button>
       </div>
 
       {/* Main Content Area — height: auto, max-height: calc(100vh - 100px) */}
