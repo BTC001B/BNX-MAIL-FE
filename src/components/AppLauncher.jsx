@@ -73,9 +73,15 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
         </div>
         
         {/* Spacer to push flex items to the right */}
-        <div className="w-16 h-1 shrink-0" />
-
-        <div className="flex items-center gap-2 ml-auto">
+        <div
+          className="flex items-center gap-2"
+          style={{
+            position: 'absolute',
+            top: '-22px',
+            right: '22px',
+            zIndex: 50
+          }}
+        >
           {/* Close button */}
           <button 
             onClick={onClose} 
