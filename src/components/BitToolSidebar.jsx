@@ -201,7 +201,7 @@ const BitToolSidebar = ({
             <AppLauncher onClose={() => setSelectedTool(null)} onToggleBitToolSidebar={() => {}} onEdit={() => setIsEditing(true)} />
           ) : (
             <>
-              <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01] shrink-0">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01] shrink-0">
                 <h4 className="font-bold text-sm" style={{ color: theme.text }}>
                   {ALL_TOOLS.find(t => t.id === selectedTool)?.name}
                 </h4>
