@@ -180,7 +180,7 @@ const BitToolSidebar = ({
         width: !isOpen ? "0px" : (selectedTool ? "432px" : "72px"),
         borderLeftWidth: isOpen ? "1px" : "0px",
         borderLeftColor: theme.border,
-        overflow: "hidden"
+        overflow: "visible"
       }}
     >
       {/* Mini-App Slide Panel (Shown to the left of the sidebar) */}
@@ -193,7 +193,7 @@ const BitToolSidebar = ({
           alignSelf: "flex-end",
           borderRightWidth: selectedTool ? "1px" : "0px",
           borderRightColor: theme.border,
-          overflow: "hidden"
+          overflow: "visible"
         }}
       >
         {selectedTool && (
