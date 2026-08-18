@@ -64,12 +64,12 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
             fontFamily: "'Saira Stencil One', 'Anton', sans-serif",
             position: 'absolute',
             top: '6px',
-            left: '12px'
+            left: '16px'
           }}
         >
           BE<span style={{ marginLeft: '0.5px' }}>TA</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto">
           {/* Edit button */}
           <button 
             onClick={onEdit}
