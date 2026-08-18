@@ -76,15 +76,6 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
         <div className="w-16 h-1 shrink-0" />
 
         <div className="flex items-center gap-2 ml-auto">
-          {/* Edit button */}
-          <button 
-            onClick={onEdit}
-            className="flex items-center gap-1.5 px-3 py-1 border border-gray-250 rounded-[10px] text-[11px] font-extrabold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm bg-white cursor-pointer"
-          >
-            <MdEdit size={13} className="text-gray-500" />
-            <span>Edit</span>
-          </button>
-          
           {/* Close button */}
           <button 
             onClick={onClose} 
