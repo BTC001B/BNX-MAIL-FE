@@ -95,7 +95,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
       {/* Main Content Area (Fixed Height/Viewport fitting, No Scroll) */}
       <div className="flex-1 overflow-hidden px-6 py-2 flex flex-col justify-between">
         {/* Favorites & Recent Tabs Inside Card Container */}
-        <div className="border border-gray-200/90 rounded-[18px] p-3 mt-2 mb-0.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.01)]">
+        <div className="border border-gray-200/90 rounded-[20px] p-4 mt-2 mb-0.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.01)]">
           <div className="flex items-center justify-center gap-7 mb-2 text-[10px] font-[900] tracking-widest text-center">
             <button
               onClick={() => setActiveTopTab('FAVORITES')}
@@ -118,39 +118,39 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
             </button>
           </div>
 
-          <div className="border-b border-gray-100 mb-3 -mx-3" />
+          <div className="border-b border-gray-100 mb-3 -mx-4" />
 
           {/* Fixed Height Wrapper to prevent layout shift between FAVORITES & RECENT */}
-          <div className="w-full h-[104px] flex items-center justify-center">
+          <div className="w-full h-[116px] flex items-center justify-center">
             {activeTopTab === 'FAVORITES' ? (
-              <div className="grid grid-cols-3 gap-x-4 gap-y-2 w-full py-0.5 justify-items-center">
+              <div className="grid grid-cols-3 gap-x-5 gap-y-3 w-full py-0.5 justify-items-center">
                 {publicApps.map((app, idx) => (
                   <div
                     key={idx}
-                    className="w-[64px] h-[48px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/60 hover:border-gray-100/60 border border-transparent rounded-[10px] p-0.5 outline-none"
+                    className="w-[84px] h-[54px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/60 hover:border-gray-100/60 border border-transparent rounded-[12px] p-0.5 outline-none"
                     onClick={() => handleAppClick(app)}
                   >
-                    <img src={app.icon} alt={app.name} className="w-[30px] h-[30px] object-contain" />
-                    <span className="text-[9px] font-extrabold text-slate-800 mt-0.5 tracking-wide">{app.name}</span>
+                    <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain" />
+                    <span className="text-[10px] font-extrabold text-slate-800 mt-0.5 tracking-wide">{app.name}</span>
                   </div>
                 ))}
               </div>
             ) : resolvedRecentApps.length > 0 ? (
-              <div className="grid grid-cols-3 gap-x-4 gap-y-2 w-full py-0.5 justify-items-center">
+              <div className="grid grid-cols-3 gap-x-5 gap-y-3 w-full py-0.5 justify-items-center">
                 {resolvedRecentApps.map((app, idx) => (
                   <div
                     key={idx}
-                    className="w-[64px] h-[48px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/60 hover:border-gray-100/60 border border-transparent rounded-[10px] p-0.5 outline-none"
+                    className="w-[84px] h-[54px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/60 hover:border-gray-100/60 border border-transparent rounded-[12px] p-0.5 outline-none"
                     onClick={() => handleAppClick(app)}
                   >
-                    <img src={app.icon} alt={app.name} className="w-[30px] h-[30px] object-contain" />
-                    <span className="text-[9px] font-extrabold text-slate-800 mt-0.5 tracking-wide">{app.name}</span>
+                    <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain" />
+                    <span className="text-[10px] font-extrabold text-slate-800 mt-0.5 tracking-wide">{app.name}</span>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="w-full h-full border border-dashed border-gray-200 rounded-[12px] flex items-center justify-center bg-transparent">
-                <span className="text-[9px] font-bold text-gray-400">No recent apps</span>
+                <span className="text-[10px] font-bold text-gray-400">No recent apps</span>
               </div>
             )}
           </div>
@@ -187,16 +187,16 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
           </div>
 
           {/* Fixed Height Wrapper to prevent layout shift for different grid row counts */}
-          <div className="h-[128px]">
-            <div className="grid grid-cols-4 gap-2">
+          <div className="h-[144px]">
+            <div className="grid grid-cols-4 gap-3.5">
               {displayApps.map((app, idx) => (
                 <div
                   key={idx}
                   onClick={() => handleAppClick(app)}
-                  className="w-[62px] h-[60px] border border-gray-100/90 rounded-[12px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-sm hover:bg-white bg-white cursor-pointer group transition-all p-1 shadow-[0_1px_2px_rgba(0,0,0,0.015)]"
+                  className="w-[74px] h-[68px] border border-gray-100/90 rounded-[14px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-sm hover:bg-white bg-white cursor-pointer group transition-all p-1 shadow-[0_1px_2px_rgba(0,0,0,0.015)]"
                 >
-                  <img src={app.icon} alt={app.name} className="w-[28px] h-[28px] object-contain mb-0.5" />
-                  <span className="text-[9px] font-extrabold text-slate-800 text-center leading-tight truncate w-full px-0.5">
+                  <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain mb-0.5" />
+                  <span className="text-[10px] font-extrabold text-slate-800 text-center leading-tight truncate w-full px-0.5">
                     {app.name}
                   </span>
                 </div>
@@ -235,31 +235,31 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
           `}</style>
 
           {/* Animated Coming Soon Card */}
-          <div className="coming-soon-card flex flex-col items-center text-center pt-5 pb-3 px-3 rounded-[18px] border border-gray-150 bg-slate-50/25 select-none relative shadow-[0_1px_6px_rgba(0,0,0,0.01)]">
+          <div className="coming-soon-card flex flex-col items-center text-center pt-6 pb-4 px-4 rounded-[20px] border border-gray-150 bg-slate-50/25 select-none relative shadow-[0_1px_6px_rgba(0,0,0,0.01)]">
             
             {/* Overlapping BNX Logo Animation Circle (Placed inside the card for proper relative stacking) */}
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white border border-gray-200/90 flex items-center justify-center shadow-sm z-10 glow-circle">
-              <div className="w-6.5 h-6.5 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden">
+            <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-white border border-gray-200/90 flex items-center justify-center shadow-sm z-10 glow-circle">
+              <div className="w-7.5 h-7.5 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden">
                 <img 
                   src={bnxLogo} 
                   alt="BNX Logo Animation" 
-                  className="w-[18px] h-[18px] object-contain bnx-logo-anim" 
+                  className="w-5 h-5 object-contain bnx-logo-anim" 
                 />
               </div>
             </div>
 
             {/* Badge */}
-            <div className="px-2 py-0.5 rounded-full text-[7px] font-[900] tracking-widest bg-indigo-50 text-indigo-600 uppercase border border-indigo-100/50 mb-0.5 mt-0.5">
+            <div className="px-2 py-0.5 rounded-full text-[7.5px] font-[900] tracking-widest bg-indigo-50 text-indigo-600 uppercase border border-indigo-100/50 mb-0.5 mt-0.5">
               BETA LABS RELEASE
             </div>
 
             {/* COMING SOON Text */}
-            <h4 className="text-[10px] font-[950] tracking-widest text-[#9333ea] mb-0.5 uppercase">
+            <h4 className="text-[11px] font-[950] tracking-widest text-[#9333ea] mb-0.5 uppercase">
               COMING SOON
             </h4>
 
             {/* Subtitle */}
-            <p className="text-[8.5px] text-slate-500 font-extrabold px-4 leading-normal">
+            <p className="text-[9px] text-slate-500 font-extrabold px-4 leading-normal">
               Building the next generation of Beta applications.
             </p>
           </div>
@@ -267,8 +267,8 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
       </div>
 
       {/* Footer */}
-      <div className="bg-white py-2.5 text-center border-t border-gray-100 shrink-0 rounded-b-[24px]">
-        <span className="text-[8px] font-[900] text-slate-400 tracking-[0.18em]">BETA ECOSYSTEM · FUTURE READY</span>
+      <div className="bg-white py-3 text-center border-t border-gray-100 shrink-0 rounded-b-[24px]">
+        <span className="text-[8.5px] font-[900] text-slate-400 tracking-[0.18em]">BETA ECOSYSTEM · FUTURE READY</span>
       </div>
     </div>
   );
