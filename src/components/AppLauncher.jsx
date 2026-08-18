@@ -95,7 +95,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
       {/* Main Content Area — height: auto, max-height: calc(100vh - 100px) */}
       <div className="flex-1 overflow-y-auto hidden-scrollbar px-6 py-2 flex flex-col justify-between" style={{ maxHeight: 'calc(100vh - 100px)' }}>
         {/* Favorites & Recent Tabs Inside Card Container */}
-        <div className="border border-gray-200/90 rounded-[20px] p-5 mt-2 mb-0.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.01)]">
+        <div className="border border-gray-200/90 rounded-[20px] p-6 mt-2 mb-0.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.01)]">
           <div className="flex items-center justify-center gap-7 mb-2 text-[10px] font-[900] tracking-widest text-center">
             <button
               onClick={() => setActiveTopTab('FAVORITES')}
@@ -118,10 +118,10 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
             </button>
           </div>
 
-          <div className="border-b border-gray-100 mb-3 -mx-5" />
+          <div className="border-b border-gray-100 mb-4 -mx-6" />
 
           {/* Fixed Height Wrapper to prevent layout shift between FAVORITES & RECENT */}
-          <div className="w-full h-[134px] flex items-center justify-center">
+          <div className="w-full h-[160px] flex items-center justify-center">
             {activeTopTab === 'FAVORITES' ? (
               <div className="grid grid-cols-3 gap-x-5 gap-y-3 w-full py-0.5 justify-items-center">
                 {publicApps.map((app, idx) => (
