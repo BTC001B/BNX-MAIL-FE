@@ -93,10 +93,10 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
         </div>
       </div>
 
-      {/* Main Content Area (Fixed Height/Viewport fitting, No Scroll) */}
-      <div className="flex-1 overflow-hidden px-6 py-4 flex flex-col justify-between">
+      {/* Main Content Area (Fixed Height/Viewport fitting, Scrollable if needed) */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-3 flex flex-col justify-between">
         {/* Favorites & Recent Tabs Inside Card Container */}
-        <div className="border border-gray-200/90 rounded-[20px] p-4 mt-4 mb-0.5 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.015)]">
+        <div className="border border-gray-200/90 rounded-[20px] p-4 mt-3 mb-0.5 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.015)]">
           <div className="flex items-center justify-center gap-7 mb-2.5 text-[11px] font-[900] tracking-widest text-center">
             <button
               onClick={() => setActiveTopTab('FAVORITES')}
@@ -158,7 +158,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
         </div>
 
         {/* Separator / Gap */}
-        <div className="h-5 shrink-0" />
+        <div className="h-4 shrink-0" />
 
         {/* Base Tab Row */}
         <div>
@@ -188,7 +188,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
           </div>
 
           {/* Fixed Height Wrapper to prevent layout shift for different grid row counts */}
-          <div className="h-[152px]">
+          <div className="h-[148px]">
             <div className="grid grid-cols-4 gap-3">
               {displayApps.map((app, idx) => (
                 <div
@@ -207,7 +207,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
         </div>
 
         {/* Coming Soon Section */}
-        <div className="mt-6 relative">
+        <div className="mt-4 relative">
           <style>{`
             @keyframes floatCard {
               0% { transform: scale(1); }
