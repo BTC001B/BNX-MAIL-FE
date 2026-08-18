@@ -247,7 +247,7 @@ const AppContent = () => {
           />
 
           <main
-            className="flex-1 overflow-hidden mr-3 mb-3 mt-1 rounded-2xl border flex flex-col shadow-sm transition-all duration-300"
+            className="flex-1 overflow-hidden mr-0 mb-0 mt-0 border-l flex flex-col transition-all duration-300"
             style={{
               backgroundColor: backgroundImage
                 ? (theme.mode === "dark" ? "rgba(31, 41, 55, 0.45)" : "rgba(255, 255, 255, 0.45)")
