@@ -177,7 +177,7 @@ const BitToolSidebar = ({
     <div 
       className={`h-full flex shrink-0 select-none transition-all duration-300 ease-in-out ${backgroundImage ? "bg-transparent" : "bg-white dark:bg-gray-900"} rounded-t-2xl animate-fade-in`}
       style={{ 
-        width: !isOpen ? "0px" : (selectedTool ? "462px" : "72px"),
+        width: !isOpen ? "0px" : (selectedTool ? "450px" : "60px"),
         borderLeftWidth: isOpen ? "1px" : "0px",
         borderLeftColor: theme.border,
         overflow: "visible"
@@ -222,7 +222,7 @@ const BitToolSidebar = ({
 
       {/* Right Sidebar Strip */}
       <div 
-        className="w-[72px] flex flex-col items-center py-4 pt-2 h-full justify-between select-none shrink-0 rounded-t-2xl"
+        className="w-[60px] flex flex-col items-center py-4 pt-2 h-full justify-between select-none shrink-0 rounded-t-2xl"
       >
         <div className="flex flex-col items-center w-full">
           {/* HEADER / EDIT MODE LABEL */}

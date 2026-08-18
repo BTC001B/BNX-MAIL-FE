@@ -156,7 +156,7 @@
 
 /* Sidebar Collapsed Mode (Desktop Toggle) */
 aside.sidebar-collapsed {
-  width: 72px !important;
+  width: 60px !important;
   overflow-x: hidden !important;
   align-items: center !important;
 }
@@ -189,7 +189,7 @@ aside.sidebar-collapsed hr {
 /* Force Collapsed Mode on Mobile */
 @media (max-width: 767px) {
   aside.sidebar-wrapper {
-    width: 72px !important;
+    width: 60px !important;
     overflow-x: hidden !important;
     align-items: center !important;
   }
