@@ -96,7 +96,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
       <div className="flex-1 overflow-y-auto hidden-scrollbar px-3 py-2 flex flex-col justify-between" style={{ maxHeight: 'calc(100vh - 100px)' }}>
         {/* Favorites & Recent Tabs Inside Card Container */}
         <div className="border border-gray-200/90 rounded-[20px] px-6 py-4 mt-2 mb-0.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.01)]">
-          <div className="flex items-center justify-center gap-7 mb-2 text-[10px] font-[900] tracking-widest text-center">
+          <div className="flex items-center justify-center gap-16 mb-2 text-[10px] font-[900] tracking-widest text-center">
             <button
               onClick={() => setActiveTopTab('FAVORITES')}
               className={`pb-1 transition-all border-b-2 ${activeTopTab === 'FAVORITES'
