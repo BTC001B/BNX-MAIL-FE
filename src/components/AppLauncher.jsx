@@ -6,7 +6,7 @@ import bitToolLogo from "../assets/BIT-TOOL-2.png";
 import cliksLogo from "../assets/cliks.png";
 import cliksBusinessLogo from "../assets/cliks-business.png";
 
-const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
+const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
   const [activeTab, setActiveTab] = useState('BASE');
   const [activeTopTab, setActiveTopTab] = useState('FAVORITES');
 
@@ -57,112 +57,125 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
   return (
     <div className="flex flex-col h-full bg-white w-full select-none">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 shrink-0">
+      <div className="flex items-center justify-between pt-5 pb-3.5 px-6 border-b border-gray-100 shrink-0">
         <div
-          className="flex items-center text-xl text-blue-900 tracking-tight font-bold"
+          className="flex items-center text-[25px] text-[#0f53c9] font-black tracking-tighter"
           style={{
             fontFamily: "'Saira Stencil One', 'Anton', sans-serif",
             position: 'relative',
-            top: '-6px'
+            top: '-5px'
           }}
         >
-          BE<span style={{ marginLeft: '1px' }}>TA</span>
+          BE<span style={{ marginLeft: '0.5px' }}>TA</span>
         </div>
-        <div className="flex items-center gap-3">
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors">
+        <div className="flex items-center gap-2">
+          {/* Edit button */}
+          <button 
+            onClick={onEdit}
+            className="flex items-center gap-1.5 px-3 py-1 border border-gray-250 rounded-[10px] text-[11px] font-extrabold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm bg-white cursor-pointer"
+          >
+            <MdEdit size={13} className="text-gray-500" />
+            <span>Edit</span>
+          </button>
+          
+          {/* Close button */}
+          <button 
+            onClick={onClose} 
+            className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-400 transition-colors border border-gray-150 cursor-pointer"
+          >
             <MdClose size={18} />
           </button>
         </div>
       </div>
 
       {/* Main Content Area (Fixed Height/Viewport fitting, No Scroll) */}
-      <div className="flex-1 overflow-hidden p-3 flex flex-col justify-between">
+      <div className="flex-1 overflow-hidden px-6 py-4 flex flex-col justify-between">
         {/* Favorites & Recent Tabs Inside Card Container */}
-        <div className="border border-gray-200 rounded-[20px] p-3 mb-0.5">
-          <div className="flex items-center justify-center gap-4 mb-2 text-[9.5px] font-extrabold tracking-widest text-center">
+        <div className="border border-gray-200/90 rounded-[20px] p-4 mt-4 mb-0.5 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.015)]">
+          <div className="flex items-center justify-center gap-7 mb-2.5 text-[11px] font-[900] tracking-widest text-center">
             <button
               onClick={() => setActiveTopTab('FAVORITES')}
-              className={`pb-0.5 transition-all border-b-2 ${activeTopTab === 'FAVORITES'
-                  ? 'border-emerald-700 text-emerald-700 font-bold'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
+              className={`pb-1 transition-all border-b-2 ${activeTopTab === 'FAVORITES'
+                  ? 'border-emerald-700 text-emerald-700'
+                  : 'border-transparent text-slate-400 hover:text-slate-650'
                 }`}
             >
               FAVORITES
             </button>
-            <span className="text-gray-300 font-normal">|</span>
+            <span className="text-gray-300 font-normal pb-1">|</span>
             <button
               onClick={() => setActiveTopTab('RECENT')}
-              className={`pb-0.5 transition-all border-b-2 ${activeTopTab === 'RECENT'
-                  ? 'border-emerald-700 text-emerald-700 font-bold'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
+              className={`pb-1 transition-all border-b-2 ${activeTopTab === 'RECENT'
+                  ? 'border-emerald-700 text-emerald-700'
+                  : 'border-transparent text-slate-400 hover:text-slate-650'
                 }`}
             >
               RECENT
             </button>
           </div>
 
-          <div className="border-b border-gray-100 mb-2.5 -mx-3" />
+          <div className="border-b border-gray-100 mb-3.5 -mx-4" />
 
           {/* Fixed Height Wrapper to prevent layout shift between FAVORITES & RECENT */}
-          <div className="w-full h-[96px] flex items-center justify-center">
+          <div className="w-full h-[142px] flex items-center justify-center">
             {activeTopTab === 'FAVORITES' ? (
-              <div className="grid grid-cols-3 gap-y-2.5 w-full py-1 justify-items-center">
+              <div className="grid grid-cols-3 gap-x-4 gap-y-4 w-full py-1 justify-items-center">
                 {publicApps.map((app, idx) => (
                   <div
                     key={idx}
-                    className="w-[62px] h-[45px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/80 active:bg-slate-50 focus:bg-slate-50 border border-transparent hover:border-gray-100/70 rounded-[12px] p-0.5 outline-none"
+                    className="w-[72px] h-[62px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/60 hover:border-gray-100/60 border border-transparent rounded-[12px] p-1 outline-none"
                     onClick={() => handleAppClick(app)}
                   >
-                    <img src={app.icon} alt={app.name} className="w-7 h-7 object-contain" />
-                    <span className="text-[9px] font-bold text-slate-700 mt-0.5">{app.name}</span>
+                    <img src={app.icon} alt={app.name} className="w-[30px] h-[30px] object-contain" />
+                    <span className="text-[10px] font-extrabold text-slate-800 mt-1 tracking-wide">{app.name}</span>
                   </div>
                 ))}
               </div>
             ) : resolvedRecentApps.length > 0 ? (
-              <div className="grid grid-cols-3 gap-y-2.5 w-full py-1 justify-items-center">
+              <div className="grid grid-cols-3 gap-x-4 gap-y-4 w-full py-1 justify-items-center">
                 {resolvedRecentApps.map((app, idx) => (
                   <div
                     key={idx}
-                    className="w-[62px] h-[45px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/80 active:bg-slate-50 focus:bg-slate-50 border border-transparent hover:border-gray-100/70 rounded-[12px] p-0.5 outline-none"
+                    className="w-[72px] h-[62px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/60 hover:border-gray-100/60 border border-transparent rounded-[12px] p-1 outline-none"
                     onClick={() => handleAppClick(app)}
                   >
-                    <img src={app.icon} alt={app.name} className="w-7 h-7 object-contain" />
-                    <span className="text-[9px] font-bold text-slate-700 mt-0.5">{app.name}</span>
+                    <img src={app.icon} alt={app.name} className="w-[30px] h-[30px] object-contain" />
+                    <span className="text-[10px] font-extrabold text-slate-800 mt-1 tracking-wide">{app.name}</span>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="w-full h-full border border-dashed border-gray-200 rounded-[14px] flex items-center justify-center bg-transparent">
-                <span className="text-[9px] font-bold text-gray-400">No recent apps</span>
+                <span className="text-[10px] font-bold text-gray-400">No recent apps</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Separator / Gap */}
-        <div className="h-1.5 shrink-0" />
+        <div className="h-5 shrink-0" />
 
         {/* Base Tab Row */}
         <div>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3.5 px-0.5">
             <button
               onClick={() => setActiveTab('BASE')}
-              className={`text-[11.5px] font-extrabold tracking-widest pb-0.5 border-b-2 transition-colors ${activeTab === 'BASE' ? 'text-slate-800 border-blue-900' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
+              className={`text-[13px] font-[900] tracking-widest pb-0.5 border-b-[3px] transition-colors ${activeTab === 'BASE' ? 'text-slate-800 border-[#0f53c9]' : 'text-slate-400 border-transparent hover:text-slate-650'}`}
             >
               BASE
             </button>
 
-            <div className="flex items-center gap-3 text-[9.5px] font-extrabold tracking-widest">
+            <div className="flex items-center gap-3 text-[10px] font-extrabold tracking-widest">
               <button
                 onClick={() => setActiveTab('PUBLIC')}
-                className={`pb-0.5 border-b-2 transition-colors ${activeTab === 'PUBLIC' ? 'text-blue-900 border-blue-900' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
+                className={`transition-colors ${activeTab === 'PUBLIC' ? 'text-[#0f53c9]' : 'text-slate-400 hover:text-slate-650'}`}
               >
                 PUBLIC
               </button>
-              <span className="text-gray-300 pb-0.5 font-normal">|</span>
+              <span className="text-gray-300 font-normal">|</span>
               <button
                 onClick={() => setActiveTab('BUSINESS')}
-                className={`pb-0.5 border-b-2 transition-colors ${activeTab === 'BUSINESS' ? 'text-blue-900 border-blue-900' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
+                className={`transition-colors ${activeTab === 'BUSINESS' ? 'text-[#0f53c9]' : 'text-slate-400 hover:text-slate-650'}`}
               >
                 BUSINESS
               </button>
@@ -170,16 +183,16 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
           </div>
 
           {/* Fixed Height Wrapper to prevent layout shift for different grid row counts */}
-          <div className="h-[128px]">
-            <div className="grid grid-cols-4 gap-x-2 gap-y-2">
+          <div className="h-[152px]">
+            <div className="grid grid-cols-4 gap-3">
               {displayApps.map((app, idx) => (
                 <div
                   key={idx}
                   onClick={() => handleAppClick(app)}
-                  className="w-[60px] h-[60px] border border-gray-100 rounded-[14px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-md hover:bg-white bg-white cursor-pointer group transition-all p-1"
+                  className="w-[70px] h-[70px] border border-gray-100/90 rounded-[16px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-md hover:bg-white bg-white cursor-pointer group transition-all p-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
                 >
-                  <img src={app.icon} alt={app.name} className="w-6 h-6 object-contain mb-0.5" />
-                  <span className="text-[9px] font-bold text-slate-700 text-center leading-tight truncate w-full px-0.5">
+                  <img src={app.icon} alt={app.name} className="w-[28px] h-[28px] object-contain mb-1" />
+                  <span className="text-[9.5px] font-extrabold text-slate-800 text-center leading-tight truncate w-full px-0.5">
                     {app.name}
                   </span>
                 </div>
@@ -189,23 +202,17 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
         </div>
 
         {/* Coming Soon Section */}
-        <div className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800">
-          <h3 className="text-[8.5px] font-extrabold text-slate-400 dark:text-slate-500 tracking-widest mb-1 text-center">COMING SOON</h3>
-
+        <div className="mt-6 relative">
           <style>{`
             @keyframes float {
               0% { transform: scale(1); }
-              50% { transform: scale(1.02); }
+              50% { transform: scale(1.015); }
               100% { transform: scale(1); }
             }
             @keyframes rotateGlow {
               0% { transform: rotate(0deg) scale(1); filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.2)); }
-              50% { transform: rotate(180deg) scale(1.1); filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5)); }
+              50% { transform: rotate(180deg) scale(1.05); filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.4)); }
               100% { transform: rotate(360deg) scale(1); filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.2)); }
-            }
-            @keyframes shimmer {
-              0% { background-position: -200% center; }
-              100% { background-position: 200% center; }
             }
             .coming-soon-card {
               animation: float 4s ease-in-out infinite;
@@ -213,42 +220,30 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
             .sparkle-icon {
               animation: rotateGlow 6s ease-in-out infinite;
             }
-            .shimmer-text {
-              background: linear-gradient(90deg, #1e293b 25%, #3b82f6 50%, #1e293b 75%);
-              background-size: 200% auto;
-              color: transparent;
-              -webkit-background-clip: text;
-              background-clip: text;
-              animation: shimmer 4s linear infinite;
-            }
-            .dark .shimmer-text {
-              background: linear-gradient(90deg, #f1f5f9 25%, #60a5fa 50%, #f1f5f9 75%);
-              background-size: 200% auto;
-              color: transparent;
-              -webkit-background-clip: text;
-              background-clip: text;
-            }
           `}</style>
 
-          {/* Animated Coming Soon Card */}
-          <div className="coming-soon-card flex flex-col items-center text-center p-2 rounded-2xl border border-gray-100 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-900/10 backdrop-blur-sm select-none">
-            {/* Sparkle Icon Container */}
-            <div className="w-7 h-7 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-0.5 shadow-inner">
-              <MdAutoAwesome size={14} className="sparkle-icon" />
+          {/* Overlapping Sparkle Icon Circle */}
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white border border-gray-200/90 flex items-center justify-center shadow-sm z-10">
+            <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+              <MdAutoAwesome size={13} className="sparkle-icon" />
             </div>
+          </div>
 
+          {/* Animated Coming Soon Card */}
+          <div className="coming-soon-card flex flex-col items-center text-center pt-6 pb-4 px-4 rounded-[22px] border border-gray-150 bg-slate-50/25 select-none relative shadow-[0_2px_10px_rgba(0,0,0,0.01)]">
+            
             {/* Badge */}
-            <div className="px-2 py-0.5 rounded-full text-[7px] font-extrabold tracking-widest bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 mb-0.5 uppercase border border-blue-100/30 dark:border-blue-900/25">
+            <div className="px-3 py-0.5 rounded-full text-[8px] font-[900] tracking-widest bg-indigo-50 text-indigo-600 uppercase border border-indigo-100/50 mb-1 mt-1">
               BETA LABS RELEASE
             </div>
 
             {/* COMING SOON Text */}
-            <h4 className="text-[11px] font-black tracking-widest mb-0.5 uppercase shimmer-text">
+            <h4 className="text-[12px] font-[950] tracking-widest text-[#9333ea] mb-0.5 uppercase">
               COMING SOON
             </h4>
 
             {/* Subtitle */}
-            <p className="text-[9px] text-gray-500 dark:text-gray-400 font-medium px-1 leading-normal">
+            <p className="text-[10px] text-slate-500 font-extrabold px-6 leading-normal">
               Building the next generation of Beta applications.
             </p>
           </div>
@@ -256,8 +251,8 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar }) => {
       </div>
 
       {/* Footer */}
-      <div className="bg-gray-50/50 py-2.5 text-center border-t border-gray-100 shrink-0 rounded-b-[24px]">
-        <span className="text-[8px] font-extrabold text-gray-400 tracking-[0.2em]">BETA ECOSYSTEM • FUTURE READY</span>
+      <div className="bg-white py-3.5 text-center border-t border-gray-100 shrink-0 rounded-b-[24px]">
+        <span className="text-[8.5px] font-[900] text-slate-400 tracking-[0.18em]">BETA ECOSYSTEM · FUTURE READY</span>
       </div>
     </div>
   );
