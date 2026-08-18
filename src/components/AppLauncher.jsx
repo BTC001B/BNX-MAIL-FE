@@ -64,7 +64,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
             fontFamily: "'Saira Stencil One', 'Anton', sans-serif",
             position: 'absolute',
             top: '-22px',
-            left: '16px',
+            left: '22px',
             lineHeight: '1',
             zIndex: 50
           }}
