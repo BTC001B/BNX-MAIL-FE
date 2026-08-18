@@ -30,7 +30,7 @@ const Unread = ({ searchQuery }) => {
   };
 
   useEffect(() => {
-    fetchEmails('all-mail');
+    fetchEmails('unread');
   }, [fetchEmails]);
 
   const visibleEmails = unreadEmails.filter(
@@ -77,12 +77,12 @@ const Unread = ({ searchQuery }) => {
       onBack={() => setSelectedEmailUid(null)}
       onClose={() => setSelectedEmailUid(null)}
       onDelete={(uid) => {
-        handleMoveToTrash(uid, "all-mail");
+        handleMoveToTrash(uid, "unread");
         setSelectedEmailUid(null);
       }}
-      onStar={(uid) => handleToggleStar(uid, "all-mail")}
+      onStar={(uid) => handleToggleStar(uid, "unread")}
       onArchive={(uid) => {
-        handleArchive(uid, "all-mail");
+        handleArchive(uid, "unread");
         setSelectedEmailUid(null);
       }}
       onUnarchive={(uid) => {
@@ -100,7 +100,7 @@ const Unread = ({ searchQuery }) => {
       selectedIds={selectedIds}
       setSelectedIds={setSelectedIds}
       visibleEmails={visibleEmails}
-      folder="all-mail"
+      folder="unread"
     />
   ) : (
     <div
@@ -136,7 +136,7 @@ const Unread = ({ searchQuery }) => {
           emails={visibleEmails}
           selectedEmailId={selectedEmailUid}
           onSelectEmail={handleSelectEmail}
-          onStar={(uid) => handleToggleStar(uid, "all-mail")}
+          onStar={(uid) => handleToggleStar(uid, "unread")}
           selectedIds={selectedIds}
           onToggleSelect={handleToggleSelect}
         />

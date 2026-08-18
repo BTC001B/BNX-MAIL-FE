@@ -236,6 +236,7 @@ export const mailAPI = {
     removeDraftAttachment: (id, fileName) => api.delete(`/api/mail/drafts/${id}/attachments/${fileName}`),
     sendDbDraft: (id) => api.post(`/api/mail/drafts/${id}/send`),
     getStarred: (page = 1, limit = 50) => api.get(`${API_ENDPOINTS.MAIL.STARRED}?page=${page}&limit=${limit}`),
+    getUnread: (page = 1, limit = 50) => api.get(`${API_ENDPOINTS.MAIL.UNREAD}?page=${page}&limit=${limit}`),
     getTrash: (page = 1, limit = 50) => api.get(`${API_ENDPOINTS.MAIL.TRASH}?page=${page}&limit=${limit}`),
     getSpam: (page = 1, limit = 50) => api.get(`${API_ENDPOINTS.MAIL.SPAM}?page=${page}&limit=${limit}`),
     getSnoozed: (page = 1, limit = 50) => api.get(`${API_ENDPOINTS.MAIL.SNOOZED}?page=${page}&limit=${limit}`),

@@ -163,6 +163,7 @@ export const API_ENDPOINTS = {
     EMAIL: '/api/mail/email',
     READ: '/api/mail/read',
     UNREAD: '/api/mail/unread',
+    UNREAD_LIST: '/api/mail/unread',
     MOVE_TRASH: '/api/mail/trash',
     RESTORE: '/api/mail/restore',
     PERMANENT: '/api/mail/permanent',

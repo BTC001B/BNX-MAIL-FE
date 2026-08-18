@@ -95,6 +95,7 @@ export const MailProvider = ({ children }) => {
                 case 'spam': res = await mailAPI.getSpam(page, limit); break;
                 case 'snoozed': res = await mailAPI.getSnoozed(page, limit); break;
                 case 'archive': res = await mailAPI.getArchive(page, limit); break;
+                case 'unread': res = await mailAPI.getUnread(page, limit); break;
                 case 'all-inbox':
                 case 'allinbox': {
                     const sessionsStr = localStorage.getItem('bnx_sessions');
