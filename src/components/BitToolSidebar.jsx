@@ -189,7 +189,7 @@ const BitToolSidebar = ({
         style={{ 
           width: selectedTool ? "360px" : "0px",
           height: selectedTool ? "100%" : "0px",
-          maxHeight: selectedTool ? "calc(100vh - 100px)" : "0px",
+          maxHeight: selectedTool ? "100%" : "0px",
           alignSelf: "flex-end",
           borderRightWidth: selectedTool ? "1px" : "0px",
           borderRightColor: theme.border,
