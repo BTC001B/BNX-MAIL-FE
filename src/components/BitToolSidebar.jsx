@@ -175,7 +175,7 @@ const BitToolSidebar = ({
 
   return (
     <div 
-      className={`h-full flex shrink-0 select-none transition-all duration-300 ease-in-out ${backgroundImage ? "bg-transparent" : "bg-white dark:bg-gray-900"} rounded-t-2xl animate-fade-in`}
+      className={`h-full flex shrink-0 select-none transition-all duration-300 ease-in-out ${backgroundImage ? "bg-transparent" : "bg-white dark:bg-gray-900"} animate-fade-in`}
       style={{ 
         width: !isOpen ? "0px" : (selectedTool ? "420px" : "60px"),
         borderLeftWidth: isOpen ? "1px" : "0px",
@@ -185,7 +185,7 @@ const BitToolSidebar = ({
     >
       {/* Mini-App Slide Panel (Shown to the left of the sidebar) */}
       <div 
-        className={`flex flex-col select-text transition-all duration-300 ease-in-out rounded-t-2xl ${backgroundImage ? "bg-transparent" : "bg-white dark:bg-gray-900"}`}
+        className={`flex flex-col select-text transition-all duration-300 ease-in-out ${backgroundImage ? "bg-transparent" : "bg-white dark:bg-gray-900"}`}
         style={{ 
           width: selectedTool ? "360px" : "0px",
           height: selectedTool ? "100%" : "0px",
@@ -222,7 +222,7 @@ const BitToolSidebar = ({
 
       {/* Right Sidebar Strip */}
       <div 
-        className="w-[60px] flex flex-col items-center py-4 pt-2 h-full justify-between select-none shrink-0 rounded-t-2xl"
+        className="w-[60px] flex flex-col items-center py-4 pt-2 h-full justify-between select-none shrink-0"
       >
         <div className="flex flex-col items-center w-full">
           {/* HEADER / EDIT MODE LABEL */}
