@@ -18,6 +18,18 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
     }
   });
 
+  const [favoriteNames, setFavoriteNames] = useState(() => {
+    try {
+      const saved = localStorage.getItem('beta_launcher_favorite_apps');
+      return saved ? JSON.parse(saved) : ['Cliks', 'BNXmail', 'Bit-Tool', 'B2Auth'];
+    } catch (e) {
+      return ['Cliks', 'BNXmail', 'Bit-Tool', 'B2Auth'];
+    }
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempFavorites, setTempFavorites] = useState([]);
+
   const publicApps = [
     { name: 'Cliks', icon: cliksLogo, href: 'https://cliks.beta-softnet.com' },
     { name: 'BNXmail', icon: bnxLogo, href: 'https://www.bnxmail.com' },
@@ -36,6 +48,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
       : businessApps;
 
   const allApps = [...publicApps, ...businessApps];
+  
   const resolvedRecentApps = recentNames
     .map(name => allApps.find(app => app.name === name))
     .filter(Boolean);
@@ -68,13 +81,35 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
           BE<span style={{ marginLeft: '0.5px' }}>TA</span>
         </div>
         
-        {/* Close button */}
-        <button 
-          onClick={onClose} 
-          className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-400 transition-colors border border-gray-150 cursor-pointer"
-        >
-          <MdClose size={18} />
-        </button>
+        {/* Right buttons */}
+        <div className="flex items-center gap-2">
+          {/* Edit / Done button */}
+          <button
+            onClick={() => {
+              if (isEditing) {
+                // Done clicked — Save
+                setFavoriteNames(tempFavorites);
+                localStorage.setItem('beta_launcher_favorite_apps', JSON.stringify(tempFavorites));
+                setIsEditing(false);
+              } else {
+                // Edit clicked — Start temporary session
+                setTempFavorites([...favoriteNames]);
+                setIsEditing(true);
+              }
+            }}
+            className="h-7 px-3.5 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-slate-700 text-[10px] font-extrabold tracking-wider transition-colors border border-gray-150 cursor-pointer uppercase select-none"
+          >
+            {isEditing ? "Done" : "Edit"}
+          </button>
+
+          {/* Close button */}
+          <button 
+            onClick={onClose} 
+            className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-400 transition-colors border border-gray-150 cursor-pointer"
+          >
+            <MdClose size={18} />
+          </button>
+        </div>
       </div>
 
       {/* Main Content Area — height: auto, max-height: calc(100vh - 100px) */}
@@ -108,18 +143,43 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
           {/* Fixed Height Wrapper to prevent layout shift between FAVORITES & RECENT */}
           <div className="w-full h-[116px] flex items-center justify-center">
             {activeTopTab === 'FAVORITES' ? (
-              <div className="grid grid-cols-3 gap-x-5 gap-y-3 w-full py-0.5 justify-items-center">
-                {publicApps.map((app, idx) => (
-                  <div
-                    key={idx}
-                    className="w-[84px] h-[54px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/60 hover:border-gray-100/60 border border-transparent rounded-[12px] p-0.5 outline-none"
-                    onClick={() => handleAppClick(app)}
-                  >
-                    <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain" />
-                    <span className="text-[10px] font-extrabold text-slate-800 mt-0.5 tracking-wide">{app.name}</span>
-                  </div>
-                ))}
-              </div>
+              (isEditing ? tempFavorites : favoriteNames).length > 0 ? (
+                <div className="grid grid-cols-3 gap-x-5 gap-y-3 w-full py-0.5 justify-items-center">
+                  {(isEditing ? tempFavorites : favoriteNames).map((name, idx) => {
+                    const app = allApps.find(a => a.name === name);
+                    if (!app) return null;
+                    return (
+                      <div
+                        key={idx}
+                        className="w-[84px] h-[54px] flex flex-col items-center justify-center border border-transparent rounded-[12px] p-0.5 outline-none relative group"
+                        style={{ cursor: isEditing ? 'default' : 'pointer' }}
+                        onClick={() => !isEditing && handleAppClick(app)}
+                      >
+                        <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain" />
+                        <span className="text-[10px] font-extrabold text-slate-800 mt-0.5 tracking-wide">{app.name}</span>
+                        
+                        {/* Red Remove X Badge in Edit Mode */}
+                        {isEditing && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setTempFavorites(prev => prev.filter(n => n !== app.name));
+                            }}
+                            className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 hover:bg-red-650 text-white flex items-center justify-center shadow-sm cursor-pointer z-10 border border-white"
+                            title="Remove from Favorites"
+                          >
+                            <span className="text-[9px] font-black leading-none">×</span>
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="w-full h-full border border-dashed border-gray-200 rounded-[12px] flex items-center justify-center bg-transparent">
+                  <span className="text-[10px] font-bold text-gray-400">No favorites saved</span>
+                </div>
+              )
             ) : resolvedRecentApps.length > 0 ? (
               <div className="grid grid-cols-3 gap-x-5 gap-y-3 w-full py-0.5 justify-items-center">
                 {resolvedRecentApps.map((app, idx) => (
@@ -174,18 +234,47 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
           {/* Fixed Height Wrapper to prevent layout shift for different grid row counts */}
           <div className="h-[144px]">
             <div className="grid grid-cols-4 gap-3.5">
-              {displayApps.map((app, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => handleAppClick(app)}
-                  className="w-[74px] h-[68px] border border-gray-100/90 rounded-[14px] flex flex-col items-center justify-center hover:border-gray-200 hover:shadow-sm hover:bg-white bg-white cursor-pointer group transition-all p-1 shadow-[0_1px_2px_rgba(0,0,0,0.015)]"
-                >
-                  <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain mb-0.5" />
-                  <span className="text-[10px] font-extrabold text-slate-800 text-center leading-tight truncate w-full px-0.5">
-                    {app.name}
-                  </span>
-                </div>
-              ))}
+              {displayApps.map((app, idx) => {
+                const isSelected = isEditing
+                  ? tempFavorites.includes(app.name)
+                  : favoriteNames.includes(app.name);
+
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      if (isEditing) {
+                        if (tempFavorites.includes(app.name)) {
+                          setTempFavorites(prev => prev.filter(n => n !== app.name));
+                        } else {
+                          setTempFavorites(prev => [...new Set([...prev, app.name])]);
+                        }
+                      } else {
+                        handleAppClick(app);
+                      }
+                    }}
+                    className={`w-[74px] h-[68px] border rounded-[14px] flex flex-col items-center justify-center bg-white cursor-pointer group transition-all p-1 shadow-[0_1px_2px_rgba(0,0,0,0.015)] relative ${
+                      isEditing
+                        ? isSelected
+                          ? "border-emerald-500 bg-emerald-50/20 ring-2 ring-emerald-500/20 scale-102"
+                          : "border-gray-150 opacity-60 hover:opacity-100 hover:border-gray-200"
+                        : "border-gray-100/90 hover:border-gray-200 hover:shadow-sm hover:bg-white"
+                    }`}
+                  >
+                    <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain mb-0.5" />
+                    <span className="text-[10px] font-extrabold text-slate-800 text-center leading-tight truncate w-full px-0.5">
+                      {app.name}
+                    </span>
+
+                    {/* Selection Checkmark Indicator in Edit Mode */}
+                    {isEditing && isSelected && (
+                      <div className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-xs">
+                        <span className="text-[8px] font-bold">✓</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
