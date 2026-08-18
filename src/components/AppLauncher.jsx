@@ -69,6 +69,10 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
         >
           BE<span style={{ marginLeft: '0.5px' }}>TA</span>
         </div>
+        
+        {/* Spacer to push flex items to the right */}
+        <div className="w-16 h-1 shrink-0" />
+
         <div className="flex items-center gap-2 ml-auto">
           {/* Edit button */}
           <button 
@@ -231,20 +235,20 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
             }
           `}</style>
 
-          {/* Overlapping BNX Logo Animation Circle */}
-          <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white border border-gray-200/90 flex items-center justify-center shadow-sm z-10 glow-circle">
-            <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden">
-              <img 
-                src={bnxLogo} 
-                alt="BNX Logo Animation" 
-                className="w-5.5 h-5.5 object-contain bnx-logo-anim" 
-              />
-            </div>
-          </div>
-
           {/* Animated Coming Soon Card */}
           <div className="coming-soon-card flex flex-col items-center text-center pt-6 pb-4 px-4 rounded-[22px] border border-gray-150 bg-slate-50/25 select-none relative shadow-[0_2px_10px_rgba(0,0,0,0.01)]">
             
+            {/* Overlapping BNX Logo Animation Circle (Placed inside the card for proper relative stacking) */}
+            <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white border border-gray-200/90 flex items-center justify-center shadow-sm z-10 glow-circle">
+              <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden">
+                <img 
+                  src={bnxLogo} 
+                  alt="BNX Logo Animation" 
+                  className="w-5.5 h-5.5 object-contain bnx-logo-anim" 
+                />
+              </div>
+            </div>
+
             {/* Badge */}
             <div className="px-3 py-0.5 rounded-full text-[8px] font-[900] tracking-widest bg-indigo-50 text-indigo-600 uppercase border border-indigo-100/50 mb-1 mt-1">
               BETA LABS RELEASE
@@ -262,7 +266,6 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
           </div>
         </div>
       </div>
-
       {/* Footer */}
       <div className="bg-white py-3.5 text-center border-t border-gray-100 shrink-0 rounded-b-[24px]">
         <span className="text-[8.5px] font-[900] text-slate-400 tracking-[0.18em]">BETA ECOSYSTEM · FUTURE READY</span>
