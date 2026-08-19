@@ -5,7 +5,6 @@ import StorageCard from '../components/StorageCard';
 import beta2 from '../assets/beta2.png';
 import cliksBusinessLogo from '../assets/cliks-business.png';
 import cliksLogo from '../assets/cliks.png';
-import bittoolLogo from '../assets/BIT-TOOL-2.png';
 
 const StorageManagement = () => {
   const { theme } = useTheme();
@@ -332,7 +331,6 @@ const StorageManagement = () => {
             />
             <StorageCard name="Cliks Business" logo={cliksBusinessLogo} />
             <StorageCard name="Cliks" logo={cliksLogo} />
-            <StorageCard name="BitTool" logo={bittoolLogo} />
           </div>
         )}
       </div>
