@@ -242,11 +242,11 @@ const BitToolSidebar = ({
                     e.stopPropagation();
                     setSelectedTool(selectedTool === 'apps' ? null : 'apps');
                   }}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer border ${selectedTool === 'apps' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400'}`}
+                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer border ${selectedTool === 'apps' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400'}`}
                   title="Beta Ecosystem"
                 >
                   {/* <MdApps size={22} /> */}
-                  <img src={betalogo} alt="beta-apps" className="w-5.5 h-5.5 object-contain" />
+                  <img src={betalogo} alt="beta-apps" className="w-6 h-6 object-contain" />
                 </button>
               </div>
             )}
