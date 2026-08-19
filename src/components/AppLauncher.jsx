@@ -157,7 +157,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
                         style={{ cursor: isEditing ? 'default' : 'pointer' }}
                         onClick={() => !isEditing && handleAppClick(app)}
                       >
-                        <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain" />
+                        <img src={app.icon} alt={app.name} className="w-[38px] h-[38px] object-contain" />
                         <span className="text-[10px] font-extrabold text-slate-800 mt-0.5 tracking-wide">{app.name}</span>
 
                         {/* Red Remove X Badge in Edit Mode */}
@@ -190,7 +190,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
                     className="w-[84px] h-[54px] flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 hover:bg-slate-50/60 hover:border-gray-100/60 border border-transparent rounded-[12px] p-0.5 outline-none"
                     onClick={() => handleAppClick(app)}
                   >
-                    <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain" />
+                    <img src={app.icon} alt={app.name} className="w-[38px] h-[38px] object-contain" />
                     <span className="text-[10px] font-extrabold text-slate-800 mt-0.5 tracking-wide">{app.name}</span>
                   </div>
                 ))}
