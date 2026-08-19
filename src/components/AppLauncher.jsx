@@ -76,6 +76,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
           style={{
             fontFamily: "'Saira Stencil One', 'Anton', sans-serif",
             lineHeight: '1',
+            marginLeft: '-10px'
           }}
         >
           BE<span style={{ marginLeft: '0.5px' }}>TA</span>
