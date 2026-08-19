@@ -251,10 +251,10 @@ const BitToolSidebar = ({
           </div>
 
           {/* Divider Line under the B Logo */}
-          <div className="w-8 h-[1px] bg-gray-200 dark:bg-gray-800 mt-2" />
+          <div className="w-8 h-[1px] bg-gray-200 dark:bg-gray-800 mt-0.5" />
 
           {/* ACTIVE & INACTIVE TOOLS LIST */}
-          <div className="flex flex-col items-center gap-4 w-full mt-4">
+          <div className="flex flex-col items-center gap-4 w-full mt-2">
             {isEditing ? (
               // EDIT MODE LAYOUT: Shows all tools, currently pinned ones have color rings, unpinned have dashed
               ALL_TOOLS.map((tool) => {
