@@ -198,7 +198,7 @@ const StorageManagement = () => {
                 <div className="space-y-2 mt-2">
                   <div className="flex justify-between items-center text-xs font-bold">
                     <span>Usage</span>
-                    <span>{usagePercentage.toFixed(1)}%</span>
+                    <span>{Math.round(usagePercentage)}%</span>
                   </div>
                   <div className="w-full h-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
                     <div
@@ -233,7 +233,7 @@ const StorageManagement = () => {
                           </div>
                           <div className="flex items-center gap-3">
                             <span className="opacity-70">{formatSize(cat.size)}</span>
-                            <span className="opacity-90 px-2 py-0.5 rounded bg-black/5 dark:bg-white/5">{catPct.toFixed(1)}%</span>
+                            <span className="opacity-90 px-2 py-0.5 rounded bg-black/5 dark:bg-white/5">{Math.round(catPct)}%</span>
                           </div>
                         </div>
                         {/* Category Progress Bar */}
