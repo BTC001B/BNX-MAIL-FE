@@ -70,7 +70,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
   return (
     <div className="flex flex-col h-full bg-white w-full select-none">
       {/* Header */}
-      <div className="flex items-center justify-between h-14 px-6 border-b border-gray-200 shrink-0">
+      <div className="flex items-center justify-between h-14 px-6 border-b border-gray-200 dark:border-gray-800 shrink-0">
         <div
           className="text-[24px] text-[#0f53c9] font-black tracking-tighter"
           style={{

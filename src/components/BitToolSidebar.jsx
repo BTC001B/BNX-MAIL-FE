@@ -222,32 +222,38 @@ const BitToolSidebar = ({
 
       {/* Right Sidebar Strip */}
       <div 
-        className="w-[60px] flex flex-col items-center py-4 pt-2 h-full justify-between select-none shrink-0"
+        className="w-[60px] flex flex-col items-center pb-4 h-full justify-between select-none shrink-0"
       >
         <div className="flex flex-col items-center w-full">
           {/* HEADER / EDIT MODE LABEL */}
-          {isEditing ? (
-            <div className="mb-4 text-[9px] font-bold text-gray-400 uppercase tracking-widest text-center leading-none">
-              Edit<br />Pins
-            </div>
-          ) : (
-            <div className="mb-4 mt-2 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedTool(selectedTool === 'apps' ? null : 'apps');
-                }}
-                className={`w-10 mb-2 h-10 bg-gray rounded-xl flex items-center justify-center transition-all cursor-pointer border ${selectedTool === 'apps' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400'}`}
-                title="Beta Ecosystem"
-              >
-                {/* <MdApps size={22} /> */}
-                <img src={betalogo} alt="beta-apps" />
-              </button>
-            </div>
-          )}
+          <div 
+            className={`flex items-center justify-center w-full h-14 shrink-0 transition-all ${
+              selectedTool === 'apps' ? 'border-b border-gray-200 dark:border-gray-800' : ''
+            }`}
+          >
+            {isEditing ? (
+              <div className="text-[9px] font-bold text-gray-450 uppercase tracking-widest text-center leading-none">
+                Edit<br />Pins
+              </div>
+            ) : (
+              <div className="relative">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedTool(selectedTool === 'apps' ? null : 'apps');
+                  }}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer border ${selectedTool === 'apps' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400'}`}
+                  title="Beta Ecosystem"
+                >
+                  {/* <MdApps size={22} /> */}
+                  <img src={betalogo} alt="beta-apps" className="w-5.5 h-5.5 object-contain" />
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* ACTIVE & INACTIVE TOOLS LIST */}
-          <div className="flex flex-col items-center gap-4 w-full">
+          <div className="flex flex-col items-center gap-4 w-full mt-4">
             {isEditing ? (
               // EDIT MODE LAYOUT: Shows all tools, currently pinned ones have color rings, unpinned have dashed
               ALL_TOOLS.map((tool) => {
