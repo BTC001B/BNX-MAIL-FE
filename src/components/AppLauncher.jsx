@@ -79,7 +79,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
             marginLeft: '-10px'
           }}
         >
-          BE<span style={{ marginLeft: '0.5px' }}> TA</span>
+          BE<span style={{ marginLeft: '0.5px' }}>TA</span>
         </div>
 
         {/* Right buttons */}
@@ -255,10 +255,10 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
                       }
                     }}
                     className={`w-[74px] h-[68px] border rounded-[14px] flex flex-col items-center justify-center bg-white cursor-pointer group transition-all p-1 shadow-[0_1px_2px_rgba(0,0,0,0.015)] relative ${isEditing
-                        ? isSelected
-                          ? "border-emerald-500 bg-emerald-50/20 ring-2 ring-emerald-500/20 scale-102"
-                          : "border-gray-150 opacity-60 hover:opacity-100 hover:border-gray-200"
-                        : "border-gray-100/90 hover:border-gray-200 hover:shadow-sm hover:bg-white"
+                      ? isSelected
+                        ? "border-emerald-500 bg-emerald-50/20 ring-2 ring-emerald-500/20 scale-102"
+                        : "border-gray-150 opacity-60 hover:opacity-100 hover:border-gray-200"
+                      : "border-gray-100/90 hover:border-gray-200 hover:shadow-sm hover:bg-white"
                       }`}
                   >
                     <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain mb-0.5" />
