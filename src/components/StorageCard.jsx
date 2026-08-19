@@ -88,7 +88,7 @@ const StorageCard = ({
             {usedStorage !== undefined ? formatSize(displayUsed) : '[Used Storage]'} / {formatSize(totalStorage)}
           </span>
           <span style={{ color: theme.subText }}>
-            {usedStorage !== undefined || usagePercentage !== undefined ? `${pct}%` : '[Usage Percentage]'}
+            {usedStorage !== undefined || usagePercentage !== undefined ? `${Math.round(pct)}%` : '[Usage Percentage]'}
           </span>
         </div>
 
