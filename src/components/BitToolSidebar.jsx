@@ -227,9 +227,7 @@ const BitToolSidebar = ({
         <div className="flex flex-col items-center w-full">
           {/* HEADER / EDIT MODE LABEL */}
           <div 
-            className={`flex items-center justify-center w-full h-14 shrink-0 transition-all ${
-              selectedTool ? 'border-b border-gray-200 dark:border-gray-800' : ''
-            }`}
+            className="flex items-center justify-center w-full h-14 shrink-0 transition-all"
           >
             {isEditing ? (
               <div className="text-[9px] font-bold text-gray-450 uppercase tracking-widest text-center leading-none">
@@ -251,6 +249,9 @@ const BitToolSidebar = ({
               </div>
             )}
           </div>
+
+          {/* Divider Line under the B Logo */}
+          <div className="w-8 h-[1px] bg-gray-200 dark:bg-gray-800 mt-2" />
 
           {/* ACTIVE & INACTIVE TOOLS LIST */}
           <div className="flex flex-col items-center gap-4 w-full mt-4">
