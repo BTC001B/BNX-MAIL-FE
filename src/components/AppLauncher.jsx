@@ -48,7 +48,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
       : businessApps;
 
   const allApps = [...publicApps, ...businessApps];
-  
+
   const resolvedRecentApps = recentNames
     .map(name => allApps.find(app => app.name === name))
     .filter(Boolean);
@@ -79,9 +79,9 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
             marginLeft: '-10px'
           }}
         >
-          BE<span style={{ marginLeft: '0.5px' }}>TA</span>
+          BE<span style={{ marginLeft: '0.5px' }}> TA</span>
         </div>
-        
+
         {/* Right buttons */}
         <div className="flex items-center gap-2">
           {/* Edit / Done button */}
@@ -104,8 +104,8 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
           </button>
 
           {/* Close button */}
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-400 transition-colors border border-gray-150 cursor-pointer"
           >
             <MdClose size={18} />
@@ -121,8 +121,8 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
             <button
               onClick={() => setActiveTopTab('FAVORITES')}
               className={`pb-1 transition-all border-b-2 ${activeTopTab === 'FAVORITES'
-                  ? 'border-emerald-700 text-emerald-700'
-                  : 'border-transparent text-slate-400 hover:text-slate-650'
+                ? 'border-emerald-700 text-emerald-700'
+                : 'border-transparent text-slate-400 hover:text-slate-650'
                 }`}
             >
               FAVORITES
@@ -131,8 +131,8 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
             <button
               onClick={() => setActiveTopTab('RECENT')}
               className={`pb-1 transition-all border-b-2 ${activeTopTab === 'RECENT'
-                  ? 'border-emerald-700 text-emerald-700'
-                  : 'border-transparent text-slate-400 hover:text-slate-650'
+                ? 'border-emerald-700 text-emerald-700'
+                : 'border-transparent text-slate-400 hover:text-slate-650'
                 }`}
             >
               RECENT
@@ -158,7 +158,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
                       >
                         <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain" />
                         <span className="text-[10px] font-extrabold text-slate-800 mt-0.5 tracking-wide">{app.name}</span>
-                        
+
                         {/* Red Remove X Badge in Edit Mode */}
                         {isEditing && (
                           <button
@@ -254,13 +254,12 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
                         handleAppClick(app);
                       }
                     }}
-                    className={`w-[74px] h-[68px] border rounded-[14px] flex flex-col items-center justify-center bg-white cursor-pointer group transition-all p-1 shadow-[0_1px_2px_rgba(0,0,0,0.015)] relative ${
-                      isEditing
+                    className={`w-[74px] h-[68px] border rounded-[14px] flex flex-col items-center justify-center bg-white cursor-pointer group transition-all p-1 shadow-[0_1px_2px_rgba(0,0,0,0.015)] relative ${isEditing
                         ? isSelected
                           ? "border-emerald-500 bg-emerald-50/20 ring-2 ring-emerald-500/20 scale-102"
                           : "border-gray-150 opacity-60 hover:opacity-100 hover:border-gray-200"
                         : "border-gray-100/90 hover:border-gray-200 hover:shadow-sm hover:bg-white"
-                    }`}
+                      }`}
                   >
                     <img src={app.icon} alt={app.name} className="w-[32px] h-[32px] object-contain mb-0.5" />
                     <span className="text-[10px] font-extrabold text-slate-800 text-center leading-tight truncate w-full px-0.5">
@@ -311,14 +310,14 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
 
           {/* Animated Coming Soon Card */}
           <div className="coming-soon-card flex flex-col items-center text-center pt-6 pb-4 px-4 rounded-[20px] border border-gray-150 bg-slate-50/25 select-none relative shadow-[0_1px_6px_rgba(0,0,0,0.01)]">
-            
+
             {/* Overlapping BNX Logo Animation Circle (Placed inside the card for proper relative stacking) */}
             <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-white border border-gray-200/90 flex items-center justify-center shadow-sm z-10 glow-circle">
               <div className="w-7.5 h-7.5 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden">
-                <img 
-                  src={bnxLogo} 
-                  alt="BNX Logo Animation" 
-                  className="w-5 h-5 object-contain bnx-logo-anim" 
+                <img
+                  src={bnxLogo}
+                  alt="BNX Logo Animation"
+                  className="w-5 h-5 object-contain bnx-logo-anim"
                 />
               </div>
             </div>
