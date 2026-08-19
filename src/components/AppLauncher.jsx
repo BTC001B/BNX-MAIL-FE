@@ -79,7 +79,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
             marginLeft: '-10px'
           }}
         >
-          BE<span style={{ marginLeft: '0.5px' }}>TA</span>
+          BE<span style={{ marginLeft: '1px' }}>TA</span>
         </div>
 
         {/* Right buttons */}
