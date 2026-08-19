@@ -71,7 +71,7 @@ const StorageWidget = ({ isDesktopOpen }) => {
       </div>
       
       <div className="text-[11px] hide-on-collapse opacity-70" style={{ color: theme.sidebarText || theme.text }}>
-        {formatSize(storageData.used)} of {formatSize(storageData.limit)} used
+        {formatSize(storageData.used)} of 1 GB used
       </div>
     </a>
   );
