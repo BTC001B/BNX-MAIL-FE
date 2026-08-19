@@ -319,18 +319,107 @@ const StorageManagement = () => {
             </button>
           </div>
         ) : (
-          /* 2-Column Responsive Grid Layout */
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <StorageCard 
-              name="BNX Mail" 
-              logo={beta2} 
-              usedStorage={used}
-              totalStorage={limit}
-              usagePercentage={usagePercentage}
-              onManage={() => setSelectedApp('BNX Mail')}
-            />
-            <StorageCard name="Cliks Business" logo={cliksBusinessLogo} />
-            <StorageCard name="Cliks" logo={cliksLogo} />
+          <div className="space-y-8">
+            {/* 2-Column Responsive Grid Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <StorageCard 
+                name="BNX Mail" 
+                logo={beta2} 
+                usedStorage={used}
+                totalStorage={limit}
+                usagePercentage={usagePercentage}
+                onManage={() => setSelectedApp('BNX Mail')}
+              />
+              <StorageCard name="Cliks Business" logo={cliksBusinessLogo} />
+              <StorageCard name="Cliks" logo={cliksLogo} />
+            </div>
+
+            {/* Upgrade Storage Plans Section */}
+            <div 
+              className="p-8 rounded-3xl border flex flex-col gap-6 shadow-sm bg-white/40 dark:bg-gray-900/40 backdrop-blur-md"
+              style={{ borderColor: theme.border }}
+            >
+              {/* Header */}
+              <div>
+                <h2 className="text-xl font-extrabold tracking-tight">Upgrade Storage Plans</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Choose a plan that fits your storage and feature requirements.</p>
+              </div>
+
+              {/* Pricing Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
+                {/* Basic Plan */}
+                <div className="flex flex-col items-center justify-between p-6 rounded-[20px] border border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 text-center min-h-[300px] shadow-sm hover:shadow-md transition-all">
+                  <div className="flex flex-col items-center w-full">
+                    <span className="text-sm font-extrabold text-slate-800 dark:text-slate-200">Basic Storage</span>
+                    <div className="flex items-baseline mt-4 mb-5">
+                      <span className="text-3xl font-black text-slate-900 dark:text-white">$1.99</span>
+                      <span className="text-[10px] font-bold text-slate-400 ml-1">/mo</span>
+                    </div>
+                    <div className="space-y-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      <p>50 GB total storage</p>
+                      <p>Standard support</p>
+                      <p>Ad-free Mail</p>
+                    </div>
+                  </div>
+                  <button 
+                    className="w-full mt-6 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-extrabold text-blue-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer transition-all active:scale-[0.98]"
+                  >
+                    Choose plan
+                  </button>
+                </div>
+
+                {/* Standard Plan */}
+                <div 
+                  className="flex flex-col items-center justify-between p-6 rounded-[20px] border-2 text-center min-h-[300px] shadow-sm hover:shadow-md transition-all"
+                  style={{ 
+                    borderColor: theme.accent || '#135bec',
+                    backgroundColor: theme.mode === 'dark' ? 'rgba(19, 91, 236, 0.05)' : 'rgba(19, 91, 236, 0.02)'
+                  }}
+                >
+                  <div className="flex flex-col items-center w-full">
+                    <span className="text-sm font-extrabold text-slate-800 dark:text-slate-200">Standard</span>
+                    <div className="flex items-baseline mt-4 mb-5">
+                      <span className="text-3xl font-black text-slate-900 dark:text-white">$2.99</span>
+                      <span className="text-[10px] font-bold text-slate-400 ml-1">/mo</span>
+                    </div>
+                    <div className="space-y-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      <p>200 GB total storage</p>
+                      <p>Priority support</p>
+                      <p>Ad-free Mail & Drive</p>
+                      <p>Advanced security tools</p>
+                    </div>
+                  </div>
+                  <button 
+                    className="w-full mt-6 py-2 text-white rounded-xl text-xs font-extrabold hover:opacity-90 cursor-pointer transition-all active:scale-[0.98]"
+                    style={{ backgroundColor: theme.accent || '#135bec' }}
+                  >
+                    Upgrade
+                  </button>
+                </div>
+
+                {/* Premium Plan */}
+                <div className="flex flex-col items-center justify-between p-6 rounded-[20px] border border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 text-center min-h-[300px] shadow-sm hover:shadow-md transition-all">
+                  <div className="flex flex-col items-center w-full">
+                    <span className="text-sm font-extrabold text-slate-800 dark:text-slate-200">Premium</span>
+                    <div className="flex items-baseline mt-4 mb-5">
+                      <span className="text-3xl font-black text-slate-900 dark:text-white">$9.99</span>
+                      <span className="text-[10px] font-bold text-slate-400 ml-1">/mo</span>
+                    </div>
+                    <div className="space-y-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      <p>2 TB total storage</p>
+                      <p>24/7 Phone & Email support</p>
+                      <p>Full Suite premium access</p>
+                      <p>Custom domain support</p>
+                    </div>
+                  </div>
+                  <button 
+                    className="w-full mt-6 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-extrabold text-blue-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer transition-all active:scale-[0.98]"
+                  >
+                    Choose plan
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
