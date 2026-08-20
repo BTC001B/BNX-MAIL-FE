@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
