@@ -71,6 +71,7 @@ const FloatingCompose = () => {
   }, [composeData, isComposeOpen]);
 
   const [sending, setSending] = useState(false);
+  const sendingRef = useRef(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -365,20 +366,26 @@ const FloatingCompose = () => {
   /* ---------------- SEND EMAIL ---------------- */
   const handleSend = async (e) => {
     e.preventDefault();
+    if (sendingRef.current) return;
+    sendingRef.current = true;
+    setSending(true);
     setError("");
     setSuccess("");
 
     if (!formData.to) {
       setError("Recipient email is required");
+      sendingRef.current = false;
+      setSending(false);
       return;
     }
 
     if (composeMode === "casbox") {
         if (!formData.body) {
            setError("Message body is required");
+           sendingRef.current = false;
+           setSending(false);
            return;
         }
-        setSending(true);
         try {
             // Strip HTML but preserve newlines for casbox
             let rawHtml = formData.body;
@@ -404,6 +411,7 @@ const FloatingCompose = () => {
             setError(err.response?.data?.message || "Failed to send casbox message");
             toast.error("Failed to send message");
         } finally {
+            sendingRef.current = false;
             setSending(false);
         }
         return;
@@ -411,11 +419,15 @@ const FloatingCompose = () => {
 
     if (!formData.subject) {
       setError("Subject is required");
+      sendingRef.current = false;
+      setSending(false);
       return;
     }
 
     if (uploading) {
       setError("Please wait for files to finish uploading");
+      sendingRef.current = false;
+      setSending(false);
       return;
     }
 
@@ -461,11 +473,10 @@ const FloatingCompose = () => {
         setError(err.response?.data?.message || "Failed to send email");
         toast.error("Failed to send email", { id: tid });
       } finally {
+        sendingRef.current = false;
         setSending(false);
       }
     };
-
-    setSending(true);
 
     if (delaySeconds > 0) {
       let isUndone = false;
@@ -502,6 +513,8 @@ const FloatingCompose = () => {
       setTimeout(() => {
         if (isUndone) {
           toast.error("Sending cancelled", { id: toastId });
+          sendingRef.current = false;
+          setSending(false);
           openCompose({
             draft: true,
             id: draftId,
@@ -523,27 +536,34 @@ const FloatingCompose = () => {
 
   /* ---------------- SCHEDULE EMAIL ---------------- */
   const handleScheduleSend = async (sendAtIso) => {
+    if (sendingRef.current) return;
+    sendingRef.current = true;
+    setSending(true);
     setError("");
     setSuccess("");
 
     if (!formData.to) {
       setError("Recipient email is required");
+      sendingRef.current = false;
+      setSending(false);
       return;
     }
 
     if (!formData.subject) {
       setError("Subject is required");
+      sendingRef.current = false;
+      setSending(false);
       return;
     }
 
     if (uploading) {
       setError("Please wait for files to finish uploading");
+      sendingRef.current = false;
+      setSending(false);
       return;
     }
 
     try {
-      setSending(true);
-
       const payload = {
         to: formData.to,
         subject: formData.subject,
@@ -566,6 +586,7 @@ const FloatingCompose = () => {
     } catch (err) {
       setError(err.response?.data?.message || "Failed to schedule email");
     } finally {
+      sendingRef.current = false;
       setSending(false);
       setShowScheduleMenu(false);
       setShowCustomSchedule(false);

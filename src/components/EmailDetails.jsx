@@ -165,6 +165,7 @@ const EmailDetails = ({
   const [replyBody, setReplyBody] = useState("");
   const [forwardTo, setForwardTo] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
+  const sendingReplyRef = React.useRef(false);
   const [showFormatting, setShowFormatting] = useState(false);
   const [showLabels, setShowLabels] = useState(false);
 
@@ -344,6 +345,8 @@ const EmailDetails = ({
       toast.error("Please wait for files to finish uploading");
       return;
     }
+    if (sendingReplyRef.current) return;
+    sendingReplyRef.current = true;
     setSendingReply(true);
     const toastId = toast.loading("Sending message...");
     try {
@@ -399,6 +402,7 @@ const EmailDetails = ({
       console.error("Failed to send inline reply/forward:", err);
       toast.error(err.response?.data?.message || err.message || "Failed to send email", { id: toastId });
     } finally {
+      sendingReplyRef.current = false;
       setSendingReply(false);
     }
   };
