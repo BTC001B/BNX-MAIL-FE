@@ -168,6 +168,78 @@ const EmailDetails = ({
   const [showFormatting, setShowFormatting] = useState(false);
   const [showLabels, setShowLabels] = useState(false);
 
+  // File Upload states and ref
+  const fileInputRef = React.useRef(null);
+  const [draftId, setDraftId] = useState(null);
+  const [attachments, setAttachments] = useState([]);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    try {
+      setUploading(true);
+      let activeDraftId = draftId;
+
+      if (!activeDraftId) {
+        const payload = {
+          to: replyMode === 'forward' ? forwardTo : cleanSenderEmail,
+          cc: "",
+          bcc: "",
+          subject: replyMode === 'forward' 
+            ? (email.subject.startsWith("Fwd:") ? email.subject : `Fwd: ${email.subject}`)
+            : (email.subject.startsWith("Re:") ? email.subject : `Re: ${email.subject}`),
+          body: replyBody,
+          isHtml: true
+        };
+        const draftRes = await mailAPI.createDbDraft(payload);
+        if (draftRes.data?.success) {
+          activeDraftId = draftRes.data.data.id;
+          setDraftId(activeDraftId);
+        } else {
+          throw new Error("Failed to initialize draft session");
+        }
+      }
+
+      for (const file of files) {
+        const fileForm = new FormData();
+        fileForm.append("file", file);
+
+        toast.loading(`Uploading ${file.name}...`, { id: "upload-attachment" });
+        const uploadRes = await mailAPI.uploadDraftAttachment(activeDraftId, fileForm);
+        if (uploadRes.data?.success) {
+          const info = uploadRes.data.data;
+          setAttachments((prev) => [...prev, info]);
+          toast.success(`${file.name} uploaded`, { id: "upload-attachment" });
+        } else {
+          throw new Error(`Failed to upload ${file.name}`);
+        }
+      }
+    } catch (err) {
+      console.error("Attachment upload error:", err);
+      toast.error("Upload failed", { id: "upload-attachment" });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveAttachment = async (fileName) => {
+    if (!draftId) return;
+    try {
+      toast.loading(`Removing ${fileName}...`, { id: "remove-attachment" });
+      const res = await mailAPI.removeDraftAttachment(draftId, fileName);
+      if (res.data?.success) {
+        setAttachments((prev) => prev.filter((a) => a.fileName !== fileName));
+        toast.success("Attachment removed", { id: "remove-attachment" });
+      }
+    } catch (err) {
+      console.error("Failed to remove attachment:", err);
+      toast.error("Failed to remove attachment", { id: "remove-attachment" });
+    }
+  };
+
   const handleSendReply = async () => {
     const recipient = replyMode === 'forward' ? forwardTo.trim() : cleanSenderEmail;
     if (!recipient) {
@@ -176,6 +248,10 @@ const EmailDetails = ({
     }
     if (!replyBody.trim()) {
       toast.error("Message body cannot be empty");
+      return;
+    }
+    if (uploading) {
+      toast.error("Please wait for files to finish uploading");
       return;
     }
     setSendingReply(true);
@@ -189,12 +265,26 @@ const EmailDetails = ({
         body: replyBody,
         isHtml: true
       };
-      const res = await mailAPI.send(payload);
+
+      let res;
+      if (draftId) {
+        await mailAPI.createDbDraft({
+          id: draftId,
+          ...payload,
+          isHtml: true
+        });
+        res = await mailAPI.sendDbDraft(draftId);
+      } else {
+        res = await mailAPI.send(payload);
+      }
+
       if (res.data?.success) {
         toast.success(replyMode === 'forward' ? "Forwarded successfully" : "Reply sent successfully", { id: toastId });
         setShowReply(false);
         setReplyBody("");
         setForwardTo("");
+        setDraftId(null);
+        setAttachments([]);
         if (fetchEmails) {
           fetchEmails(currentFolder || "inbox");
         }
@@ -1166,6 +1256,14 @@ const EmailDetails = ({
             </button>
           </div>
 
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+            multiple
+          />
+
           {/* Body */}
           <div className="flex-1 mt-1 overflow-y-auto w-full inline-reply-quill" style={{ minHeight: "120px" }}>
             <style>{`
@@ -1191,6 +1289,30 @@ const EmailDetails = ({
               className="h-full bg-white text-black"
             />
           </div>
+
+          {/* ATTACHMENT CHIPS RENDERING */}
+          {attachments.length > 0 && (
+            <div className="flex flex-wrap gap-2 py-2 mt-2 border-t" style={{ borderColor: theme.border }}>
+              {attachments.map((file, i) => (
+                <div 
+                  key={i}
+                  className="flex items-center gap-2 bg-black/[0.03] dark:bg-white/[0.04] border px-2.5 py-1 rounded-xl text-xs"
+                  style={{ borderColor: theme.border, color: theme.text }}
+                >
+                  <span className="truncate max-w-[150px]">{file.fileName}</span>
+                  <span className="opacity-55 font-medium">({Math.round(file.size / 1024)} KB)</span>
+                  <button 
+                    type="button" 
+                    onClick={() => handleRemoveAttachment(file.fileName)}
+                    className="text-red-500 hover:text-red-700 font-bold text-sm leading-none cursor-pointer"
+                    title="Remove attachment"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Horizontal divider line above toolbar */}
           <hr className="border-gray-150 dark:border-neutral-800" style={{ borderColor: theme.border }} />
@@ -1253,6 +1375,7 @@ const EmailDetails = ({
             <div className="flex items-center gap-3">
               <button
                 type="button"
+                onClick={() => fileInputRef.current?.click()}
                 className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-550 hover:text-gray-700 dark:hover:text-gray-300"
                 title="Attach files"
               >
