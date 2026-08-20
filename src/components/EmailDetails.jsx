@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import { 
   MdArchive, 
   MdUnarchive, 
@@ -28,7 +30,17 @@ import {
   MdMarkEmailUnread,
   MdBlock,
   MdAdd,
-  MdReport
+  MdReport,
+  MdArrowDropDown,
+  MdFormatSize,
+  MdAutoAwesome,
+  MdAttachFile,
+  MdLink,
+  MdSentimentSatisfiedAlt,
+  MdCloudQueue,
+  MdImage,
+  MdLock,
+  MdEditDocument
 } from "react-icons/md";
 import { useMail } from "../context/MailContext";
 import { useAuth } from "../context/AuthContext";
@@ -149,7 +161,53 @@ const EmailDetails = ({
   };
   const isActuallyArchived = isArchiveFolder || email.folderName?.toLowerCase() === "archive";
   const [showReply, setShowReply] = useState(false);
+  const [replyMode, setReplyMode] = useState("reply"); // 'reply' or 'forward'
+  const [replyBody, setReplyBody] = useState("");
+  const [forwardTo, setForwardTo] = useState("");
+  const [sendingReply, setSendingReply] = useState(false);
+  const [showFormatting, setShowFormatting] = useState(false);
   const [showLabels, setShowLabels] = useState(false);
+
+  const handleSendReply = async () => {
+    const recipient = replyMode === 'forward' ? forwardTo.trim() : cleanSenderEmail;
+    if (!recipient) {
+      toast.error("Recipient email is required");
+      return;
+    }
+    if (!replyBody.trim()) {
+      toast.error("Message body cannot be empty");
+      return;
+    }
+    setSendingReply(true);
+    const toastId = toast.loading("Sending message...");
+    try {
+      const payload = {
+        to: recipient,
+        subject: replyMode === 'forward' 
+          ? (email.subject.startsWith("Fwd:") ? email.subject : `Fwd: ${email.subject}`)
+          : (email.subject.startsWith("Re:") ? email.subject : `Re: ${email.subject}`),
+        body: replyBody,
+        isHtml: true
+      };
+      const res = await mailAPI.send(payload);
+      if (res.data?.success) {
+        toast.success(replyMode === 'forward' ? "Forwarded successfully" : "Reply sent successfully", { id: toastId });
+        setShowReply(false);
+        setReplyBody("");
+        setForwardTo("");
+        if (fetchEmails) {
+          fetchEmails(currentFolder || "inbox");
+        }
+      } else {
+        throw new Error(res.data?.message || "Failed to send email");
+      }
+    } catch (err) {
+      console.error("Failed to send inline reply/forward:", err);
+      toast.error(err.response?.data?.message || err.message || "Failed to send email", { id: toastId });
+    } finally {
+      setSendingReply(false);
+    }
+  };
   const [isCreatingInlineLabel, setIsCreatingInlineLabel] = useState(false);
   const [inlineLabelName, setInlineLabelName] = useState("");
   const [showMove, setShowMove] = useState(false);
@@ -1069,6 +1127,222 @@ const EmailDetails = ({
           </div>
         );
       })()}
+
+      {/* INLINE REPLY COMPOSER */}
+      {showReply && (
+        <div 
+          className="border rounded-2xl p-4 bg-white dark:bg-neutral-900 shadow-sm flex flex-col gap-3 mt-6 text-left"
+          style={{ borderColor: theme.border }}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between text-xs sm:text-sm font-medium">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <MdReply size={20} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer shrink-0" />
+              <MdArrowDropDown size={16} className="text-gray-400 -ml-1 shrink-0 cursor-pointer" />
+              
+              {replyMode === 'forward' ? (
+                <input
+                  type="text"
+                  placeholder="Forward to recipient..."
+                  value={forwardTo}
+                  onChange={(e) => setForwardTo(e.target.value)}
+                  className="flex-1 min-w-[200px] sm:min-w-[300px] bg-transparent border-none text-sm outline-none text-gray-800 dark:text-gray-200"
+                  autoFocus
+                />
+              ) : (
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {cleanSenderEmail}
+                </span>
+              )}
+              <MdArrowDropDown size={16} className="text-gray-400 cursor-pointer -ml-1 shrink-0" />
+            </div>
+            
+            <button 
+              type="button"
+              onClick={() => setShowReply(false)}
+              className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 text-gray-400 hover:text-red-500 transition-colors"
+            >
+              <MdClose size={16} />
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="flex-1 mt-1 overflow-y-auto w-full inline-reply-quill" style={{ minHeight: "120px" }}>
+            <style>{`
+              .inline-reply-quill .ql-toolbar {
+                display: none !important;
+              }
+              .inline-reply-quill .ql-container {
+                border: none !important;
+              }
+              .inline-reply-quill .ql-editor {
+                padding: 8px 0 !important;
+                font-size: 14px !important;
+                line-height: 1.6 !important;
+                min-height: 120px !important;
+              }
+            `}</style>
+            <ReactQuill
+              theme="snow"
+              modules={showFormatting ? { toolbar: "#inline-reply-toolbar" } : { toolbar: false }}
+              value={replyBody}
+              onChange={setReplyBody}
+              placeholder={replyMode === 'forward' ? "Type your forwarded message here..." : "Type your reply here..."}
+              className="h-full bg-white text-black"
+            />
+          </div>
+
+          {/* Formatting bar container */}
+          {showFormatting && (
+            <div id="inline-reply-toolbar" className="flex flex-wrap items-center gap-1 sm:gap-2.5 py-1 px-2 bg-gray-50 dark:bg-neutral-800 rounded-lg border" style={{ borderColor: theme.border }}>
+              <select className="ql-header bg-transparent border border-gray-200 dark:border-neutral-700 rounded px-1.5 py-1 text-xs font-bold outline-none cursor-pointer">
+                <option value="">Normal</option>
+                <option value="1">Heading 1</option>
+                <option value="2">Heading 2</option>
+              </select>
+              
+              <button className="ql-bold font-bold hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">B</button>
+              <button className="ql-italic italic hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">I</button>
+              <button className="ql-underline underline hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">U</button>
+              <button className="ql-strike line-through hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">S</button>
+              <button className="ql-blockquote hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-[15px] font-bold">”</button>
+              
+              <button className="ql-list !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="bullet" title="Bullet List"></button>
+              <button className="ql-list !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="ordered" title="Numbered List"></button>
+              <button className="ql-indent !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="-1" title="Decrease Indent"></button>
+              <button className="ql-indent !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="+1" title="Increase Indent"></button>
+              
+              <button className="ql-link !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" title="Insert Link"></button>
+            </div>
+          )}
+
+          {/* Horizontal divider line above toolbar */}
+          <hr className="border-gray-150 dark:border-neutral-800" style={{ borderColor: theme.border }} />
+
+          {/* Bottom Toolbar Row */}
+          <div className="flex items-center justify-between mt-1">
+            <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap">
+              {/* Split Send Button */}
+              <div className="inline-flex items-center rounded-full overflow-hidden shadow-sm hover:shadow transition-all bg-[#0b57d0]">
+                <button
+                  type="button"
+                  onClick={handleSendReply}
+                  disabled={sendingReply}
+                  className="px-5 py-2 text-white text-xs font-bold disabled:opacity-60 cursor-pointer hover:bg-black/10 transition-colors border-r border-white/20"
+                >
+                  {sendingReply ? "Sending…" : "Send"}
+                </button>
+                <button
+                  type="button"
+                  disabled={sendingReply}
+                  className="px-3 py-2 text-white disabled:opacity-60 cursor-pointer flex items-center justify-center hover:bg-black/10 transition-colors"
+                >
+                  <MdArrowDropDown size={16} />
+                </button>
+              </div>
+
+              {/* Action icons */}
+              <button
+                type="button"
+                onClick={() => setShowFormatting(!showFormatting)}
+                className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500 ${showFormatting ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20' : ''}`}
+                title="Formatting options"
+              >
+                <MdFormatSize size={18} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toast.success("AI helper active")}
+                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500"
+                title="BNX AI Spark"
+              >
+                <MdAutoAwesome size={18} />
+              </button>
+
+              <button
+                type="button"
+                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500"
+                title="Attach files"
+              >
+                <MdAttachFile size={18} className="transform rotate-45" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const url = prompt("Enter URL:");
+                  if (url) {
+                    setReplyBody(prev => prev + ` <a href="${url}" target="_blank" style="color:#0b57d0;text-decoration:underline;">${url}</a>`);
+                  }
+                }}
+                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-550"
+                title="Insert link"
+              >
+                <MdLink size={18} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setReplyBody(prev => prev + " 😊")}
+                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500"
+                title="Insert emoji"
+              >
+                <MdSentimentSatisfiedAlt size={18} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toast.success("Drive connection feature is coming soon!")}
+                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500"
+                title="Insert files using Drive"
+              >
+                <MdCloudQueue size={18} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const url = prompt("Enter image URL:");
+                  if (url) {
+                    setReplyBody(prev => prev + `<br/><img src="${url}" alt="inserted" style="max-width:100%"/>`);
+                  }
+                }}
+                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-550"
+                title="Insert photo"
+              >
+                <MdImage size={18} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toast.success("Confidential mode is active")}
+                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-550"
+                title="Toggle confidential mode"
+              >
+                <MdLock size={18} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toast.success("Insert signature")}
+                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500"
+                title="Insert signature"
+              >
+                <MdEditDocument size={18} />
+              </button>
+
+              <button
+                type="button"
+                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-550"
+                title="More options"
+              >
+                <MdMoreVert size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
 
       {/* FOOTER ACTIONS */}
@@ -1080,7 +1354,12 @@ const EmailDetails = ({
           {currentFolder !== "draft" && (
             <div className="flex flex-wrap items-center gap-3">
               <button 
-                onClick={() => onReply?.(email)}
+                onClick={() => {
+                  setShowReply(true);
+                  setReplyMode('reply');
+                  setReplyBody("");
+                  setForwardTo("");
+                }}
                 className={`px-6 py-2.5 rounded-full font-medium text-sm transition-all duration-200 flex items-center gap-2
                   ${theme.name === 'dark' 
                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-[0_2px_8px_-2px_rgba(37,99,235,0.5)]' 
@@ -1089,7 +1368,12 @@ const EmailDetails = ({
                 <MdReply size={18} /> Reply
               </button>
               <button 
-                onClick={() => onForward?.(email)}
+                onClick={() => {
+                  setShowReply(true);
+                  setReplyMode('forward');
+                  setReplyBody("");
+                  setForwardTo("");
+                }}
                 className={`px-6 py-2.5 rounded-full font-medium text-sm transition-all duration-200 flex items-center gap-2
                   ${theme.name === 'dark' 
                     ? 'bg-gray-800 hover:bg-gray-700 text-white shadow-sm' 
