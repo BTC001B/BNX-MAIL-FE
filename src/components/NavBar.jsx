@@ -19,10 +19,10 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
   const { theme, currentThemeName, changeTheme, backgroundImage } = useTheme();
   const { openCompose } = useMail();
   const isPrimary = user?.isPrimary || user?.mailboxes?.find(m => m.email === user.email)?.isPrimary;
-  
-  const currentTab = location.pathname.startsWith('/colab') || location.pathname.startsWith('/chat') || location.pathname.startsWith('/casbox') ? 'chat' 
-                   : location.pathname.startsWith('/vault') ? 'vault' 
-                   : 'mail';
+
+  const currentTab = location.pathname.startsWith('/colab') || location.pathname.startsWith('/chat') || location.pathname.startsWith('/casbox') ? 'chat'
+    : location.pathname.startsWith('/vault') ? 'vault'
+      : 'mail';
 
   const allSessions = getSessions();
   const otherSessions = allSessions.filter(sess => sess.email !== user?.email);
@@ -51,15 +51,15 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
       const res = await userAPI.updateProfilePicture(formData);
       if (res.data?.success) {
         toast.success("Profile picture updated!");
-        
+
         // Update user session data in localStorage so the reload picks it up
         const newUrl = res.data.data?.profilePictureUrl;
         if (newUrl && user) {
           const updatedUser = { ...user, profilePictureUrl: newUrl };
-          
+
           // Update active profile
           localStorage.setItem('userProfile', JSON.stringify(updatedUser));
-          
+
           // Update in sessions list
           try {
             const sessionsStr = localStorage.getItem('bnx_sessions');
@@ -74,7 +74,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
             console.error("Failed to update sessions storage", e);
           }
         }
-        
+
         if (typeof switchAccount === "function") {
           window.location.reload();
         }
@@ -146,13 +146,13 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
 
         {/* CENTER: SEGMENTED CONTROL */}
         <div className="md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center bg-white/10 backdrop-blur-sm shadow-sm rounded-full p-1 border border-white/10 shrink-0 mx-auto">
-          <button 
+          <button
             onClick={() => navigate('/inbox')}
-            className={`px-3 sm:px-6 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${currentTab === 'mail' ? 'bg-white text-[#1e3a8a] shadow-sm' : 'text-white/70 hover:text-white hover:bg-white/10'}`} 
+            className={`px-3 sm:px-6 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${currentTab === 'mail' ? 'bg-white text-[#1e3a8a] shadow-sm' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
           >
             Mail
           </button>
-          <button 
+          <button
             onClick={() => navigate('/casbox')}
             className={`px-3 sm:px-6 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${currentTab === 'chat' ? 'bg-white text-[#1e3a8a] shadow-sm' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
           >
@@ -230,14 +230,14 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
               >
                 {/* Active User Large Header */}
                 <div className="flex flex-col items-center px-5 py-5 border-b text-center relative" style={{ borderColor: theme.border }}>
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    className="hidden" 
-                    accept="image/jpeg, image/png, image/webp" 
-                    onChange={handleProfilePictureUpload} 
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/jpeg, image/png, image/webp"
+                    onChange={handleProfilePictureUpload}
                   />
-                  
+
                   <div className="relative inline-block group cursor-pointer mb-2.5" onClick={() => fileInputRef.current?.click()}>
                     {user?.profilePictureUrl ? (
                       <img
@@ -250,7 +250,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
                         {(user?.username || user?.email || "U").charAt(0).toUpperCase()}
                       </div>
                     )}
-                    
+
                     {/* Hover Overlay */}
                     <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
                       <MdPhotoCamera size={24} className="text-white" />
@@ -371,7 +371,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
 
           <button
             onClick={onToggleBitToolSidebar}
-            className="h-9 p-1 px-2 rounded-full bg-white dark:hover:bg-white/10 transition-colors flex items-center justify-center shrink-0 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 ml-2 sm:ml-0"
+            className="h-9 p-1 px-2 rounded-full bg-white dark:hover:bg-white/10 transition-colors flex items-center justify-center shrink-0 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 ml-4 sm:ml-2"
             title="Toggle BIT Tools"
           >
             <img
