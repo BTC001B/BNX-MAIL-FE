@@ -1184,7 +1184,7 @@ const EmailDetails = ({
             `}</style>
             <ReactQuill
               theme="snow"
-              modules={showFormatting ? { toolbar: "#inline-reply-toolbar" } : { toolbar: false }}
+              modules={{ toolbar: "#inline-reply-toolbar" }}
               value={replyBody}
               onChange={setReplyBody}
               placeholder={replyMode === 'forward' ? "Type your forwarded message here..." : "Type your reply here..."}
@@ -1192,68 +1192,68 @@ const EmailDetails = ({
             />
           </div>
 
-          {/* Formatting bar container */}
-          {showFormatting && (
-            <div id="inline-reply-toolbar" className="flex flex-wrap items-center gap-1 sm:gap-2.5 py-1 px-2 bg-gray-50 dark:bg-neutral-800 rounded-lg border" style={{ borderColor: theme.border }}>
-              <select className="ql-header bg-transparent border border-gray-200 dark:border-neutral-700 rounded px-1.5 py-1 text-xs font-bold outline-none cursor-pointer">
-                <option value="">Normal</option>
-                <option value="1">Heading 1</option>
-                <option value="2">Heading 2</option>
-              </select>
-              
-              <button className="ql-bold font-bold hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">B</button>
-              <button className="ql-italic italic hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">I</button>
-              <button className="ql-underline underline hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">U</button>
-              <button className="ql-strike line-through hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">S</button>
-              <button className="ql-blockquote hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-[15px] font-bold">”</button>
-              
-              <button className="ql-list !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="bullet" title="Bullet List"></button>
-              <button className="ql-list !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="ordered" title="Numbered List"></button>
-              <button className="ql-indent !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="-1" title="Decrease Indent"></button>
-              <button className="ql-indent !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="+1" title="Increase Indent"></button>
-              
-              <button className="ql-link !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" title="Insert Link"></button>
-            </div>
-          )}
-
           {/* Horizontal divider line above toolbar */}
           <hr className="border-gray-150 dark:border-neutral-800" style={{ borderColor: theme.border }} />
 
           {/* Bottom Toolbar Row */}
-          <div className="flex items-center justify-between mt-1">
-            <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap">
+          <div className="flex items-center justify-between mt-1 flex-wrap gap-4">
+            <div className="flex items-center gap-3 flex-wrap">
               {/* Split Send Button */}
               <div className="inline-flex items-center rounded-full overflow-hidden shadow-sm hover:shadow transition-all bg-[#0b57d0]">
                 <button
                   type="button"
                   onClick={handleSendReply}
                   disabled={sendingReply}
-                  className="px-5 py-2 text-white text-xs font-bold disabled:opacity-60 cursor-pointer hover:bg-black/10 transition-colors border-r border-white/20"
+                  className="px-5 py-2.5 text-white text-xs font-bold disabled:opacity-60 cursor-pointer hover:bg-black/10 transition-colors border-r border-white/20"
                 >
                   {sendingReply ? "Sending…" : "Send"}
                 </button>
                 <button
                   type="button"
                   disabled={sendingReply}
-                  className="px-3 py-2 text-white disabled:opacity-60 cursor-pointer flex items-center justify-center hover:bg-black/10 transition-colors"
+                  className="px-3 py-2.5 text-white disabled:opacity-60 cursor-pointer flex items-center justify-center hover:bg-black/10 transition-colors"
                 >
                   <MdArrowDropDown size={16} />
                 </button>
               </div>
 
-              {/* Action icons */}
-              <button
-                type="button"
-                onClick={() => setShowFormatting(!showFormatting)}
-                className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500 ${showFormatting ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20' : ''}`}
-                title="Formatting options"
+              {/* Formatting bar container - always visible now next to Send button */}
+              <div 
+                id="inline-reply-toolbar" 
+                className="flex flex-col gap-1.5 p-2 bg-white dark:bg-neutral-800 rounded-lg border text-gray-700 dark:text-gray-300 max-w-[280px] sm:max-w-xs shrink-0" 
+                style={{ borderColor: theme.border }}
               >
-                <MdFormatSize size={18} />
-              </button>
+                {/* Row 1 */}
+                <div className="flex items-center gap-1.5">
+                  <select className="ql-header bg-transparent border border-gray-200 dark:border-neutral-700 rounded px-1.5 py-0.5 text-xs font-bold outline-none cursor-pointer">
+                    <option value="">Normal</option>
+                    <option value="1">Heading 1</option>
+                    <option value="2">Heading 2</option>
+                  </select>
+                  
+                  <button className="ql-bold font-bold hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">B</button>
+                  <button className="ql-italic italic hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">I</button>
+                  <button className="ql-underline underline hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">U</button>
+                  <button className="ql-strike line-through hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">S</button>
+                  <button className="ql-blockquote hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-[15px] font-bold">”</button>
+                </div>
 
+                {/* Row 2 */}
+                <div className="flex items-center gap-1.5">
+                  <button className="ql-list !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="bullet" title="Bullet List"></button>
+                  <button className="ql-list !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="ordered" title="Numbered List"></button>
+                  <button className="ql-indent !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="-1" title="Decrease Indent"></button>
+                  <button className="ql-indent !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="+1" title="Increase Indent"></button>
+                  <button className="ql-link !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" title="Insert Link"></button>
+                </div>
+              </div>
+            </div>
+
+            {/* Right side utility icons: Attach file, Insert signature, Discard/Trash */}
+            <div className="flex items-center gap-3">
               <button
                 type="button"
-                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500"
+                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-550 hover:text-gray-700 dark:hover:text-gray-300"
                 title="Attach files"
               >
                 <MdAttachFile size={18} className="transform rotate-45" />
@@ -1261,63 +1261,8 @@ const EmailDetails = ({
 
               <button
                 type="button"
-                onClick={() => {
-                  const url = prompt("Enter URL:");
-                  if (url) {
-                    setReplyBody(prev => prev + ` <a href="${url}" target="_blank" style="color:#0b57d0;text-decoration:underline;">${url}</a>`);
-                  }
-                }}
-                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-550"
-                title="Insert link"
-              >
-                <MdLink size={18} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setReplyBody(prev => prev + " 😊")}
-                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500"
-                title="Insert emoji"
-              >
-                <MdSentimentSatisfiedAlt size={18} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => toast.success("Drive connection feature is coming soon!")}
-                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500"
-                title="Insert files using Drive"
-              >
-                <MdCloudQueue size={18} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  const url = prompt("Enter image URL:");
-                  if (url) {
-                    setReplyBody(prev => prev + `<br/><img src="${url}" alt="inserted" style="max-width:100%"/>`);
-                  }
-                }}
-                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-550"
-                title="Insert photo"
-              >
-                <MdImage size={18} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => toast.success("Confidential mode is active")}
-                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-550"
-                title="Toggle confidential mode"
-              >
-                <MdLock size={18} />
-              </button>
-
-              <button
-                type="button"
                 onClick={() => toast.success("Insert signature")}
-                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500"
+                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-550 hover:text-gray-700 dark:hover:text-gray-300"
                 title="Insert signature"
               >
                 <MdEditDocument size={18} />
@@ -1325,10 +1270,16 @@ const EmailDetails = ({
 
               <button
                 type="button"
-                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-550"
-                title="More options"
+                onClick={() => {
+                  if (confirm("Discard draft?")) {
+                    setReplyBody("");
+                    setShowReply(false);
+                  }
+                }}
+                className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 hover:text-red-700 transition-colors cursor-pointer"
+                title="Discard draft"
               >
-                <MdMoreVert size={18} />
+                <MdDelete size={18} />
               </button>
             </div>
           </div>
