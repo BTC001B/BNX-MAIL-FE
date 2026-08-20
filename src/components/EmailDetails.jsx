@@ -252,6 +252,7 @@ const EmailDetails = ({
 
   // Conversation Thread states and fetchers
   const localSentRepliesRef = React.useRef([]);
+  const lastEmailUidRef = React.useRef(null);
   const [threadEmails, setThreadEmails] = useState([]);
   const [loadingThread, setLoadingThread] = useState(false);
   const [expandedMessages, setExpandedMessages] = useState({});
@@ -353,7 +354,12 @@ const EmailDetails = ({
 
   useEffect(() => {
     if (email) {
-      setExpandedMessages({});
+      const currentUid = email.uid || email.id;
+      if (lastEmailUidRef.current !== currentUid) {
+        lastEmailUidRef.current = currentUid;
+        setExpandedMessages({});
+        setThreadEmails([]); // Clear old thread so it doesn't show old thread emails while loading new thread
+      }
       fetchThreadEmails();
     }
   }, [email]);
