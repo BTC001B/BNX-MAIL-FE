@@ -1597,32 +1597,26 @@ const EmailDetails = ({
               {/* Formatting bar container - always visible now next to Send button */}
               <div 
                 id="inline-reply-toolbar" 
-                className="flex flex-col gap-1.5 p-2 bg-white dark:bg-neutral-800 rounded-lg border text-gray-700 dark:text-gray-300 max-w-[280px] sm:max-w-xs shrink-0" 
+                className="flex items-center gap-1 p-1 bg-white dark:bg-neutral-800 rounded-lg border text-gray-700 dark:text-gray-300 shrink-0 select-none overflow-x-auto whitespace-nowrap max-w-full" 
                 style={{ borderColor: theme.border }}
               >
-                {/* Row 1 */}
-                <div className="flex items-center gap-1.5">
-                  <select className="ql-header bg-transparent border border-gray-200 dark:border-neutral-700 rounded px-1.5 py-0.5 text-xs font-bold outline-none cursor-pointer">
-                    <option value="">Normal</option>
-                    <option value="1">Heading 1</option>
-                    <option value="2">Heading 2</option>
-                  </select>
-                  
-                  <button className="ql-bold font-bold hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">B</button>
-                  <button className="ql-italic italic hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">I</button>
-                  <button className="ql-underline underline hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">U</button>
-                  <button className="ql-strike line-through hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">S</button>
-                  <button className="ql-blockquote hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-[15px] font-bold">”</button>
-                </div>
-
-                {/* Row 2 */}
-                <div className="flex items-center gap-1.5">
-                  <button className="ql-list !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="bullet" title="Bullet List"></button>
-                  <button className="ql-list !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="ordered" title="Numbered List"></button>
-                  <button className="ql-indent !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="-1" title="Decrease Indent"></button>
-                  <button className="ql-indent !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="+1" title="Increase Indent"></button>
-                  <button className="ql-link !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" title="Insert Link"></button>
-                </div>
+                <select className="ql-header bg-transparent border border-gray-200 dark:border-neutral-700 rounded px-1.5 py-0.5 text-xs font-bold outline-none cursor-pointer mr-1">
+                  <option value="">Normal</option>
+                  <option value="1">Heading 1</option>
+                  <option value="2">Heading 2</option>
+                </select>
+                
+                <button className="ql-bold font-bold hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">B</button>
+                <button className="ql-italic italic hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">I</button>
+                <button className="ql-underline underline hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">U</button>
+                <button className="ql-strike line-through hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-sm">S</button>
+                <button className="ql-blockquote hover:bg-black/5 dark:hover:bg-white/5 !w-7 !h-7 rounded flex items-center justify-center text-[15px] font-bold">”</button>
+                
+                <button className="ql-list !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="bullet" title="Bullet List"></button>
+                <button className="ql-list !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="ordered" title="Numbered List"></button>
+                <button className="ql-indent !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="-1" title="Decrease Indent"></button>
+                <button className="ql-indent !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" value="+1" title="Increase Indent"></button>
+                <button className="ql-link !w-7 !h-7 rounded flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5" title="Insert Link"></button>
               </div>
             </div>
 
