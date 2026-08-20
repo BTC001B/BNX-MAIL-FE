@@ -7,7 +7,7 @@ const StorageWidget = ({ isDesktopOpen }) => {
   const { theme } = useTheme();
   const [storageData, setStorageData] = useState({
     used: 0,
-    limit: 5368709120, // default 5 GB
+    limit: 1073741824, // default 1 GB
     percentage: 0
   });
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ const StorageWidget = ({ isDesktopOpen }) => {
         const res = await mailAPI.getStorageQuota();
         if (res.data?.success && res.data?.data) {
           const used = res.data.data.storageUsed;
-          const limit = 5368709120; // strictly 5 GB in frontend
+          const limit = 1073741824; // strictly 1 GB in frontend
           const percentage = limit > 0 ? (used / limit) * 100 : 0;
           setStorageData({
             used,
@@ -50,27 +50,57 @@ const StorageWidget = ({ isDesktopOpen }) => {
       href="/storage-management"
       target="_blank"
       rel="noopener noreferrer"
-      className={`px-4 py-3 mb-2 flex flex-col gap-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-all cursor-pointer block ${!isDesktopOpen ? 'items-center hide-on-collapse' : ''}`}
-      style={{ textDecoration: 'none', color: 'inherit' }}
+      className={`mx-3 mb-2 p-3.5 flex flex-col gap-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all cursor-pointer block ${!isDesktopOpen ? 'items-center justify-center p-2' : ''}`}
+      style={{ 
+        textDecoration: 'none', 
+        color: 'inherit',
+        backgroundColor: theme.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#e9eef6',
+        border: theme.mode === 'dark' ? `1px solid ${theme.border}` : 'none'
+      }}
     >
-      <div className="flex items-center justify-between text-xs font-medium" style={{ color: theme.sidebarText || theme.text }}>
-        <div className="flex items-center gap-1.5">
-          <MdCloudQueue size={16} />
-          <span className="hide-on-collapse">Storage</span>
+      <div className="flex items-center justify-between w-full">
+        {/* Left side: Icon + Storage Label */}
+        <div className="flex items-center gap-2">
+          <MdCloudQueue size={20} className="text-blue-600 dark:text-blue-400 shrink-0" />
+          <span className="text-[13px] font-bold text-gray-800 dark:text-gray-200 hide-on-collapse font-sans">
+            Storage
+          </span>
         </div>
-        <span className="hide-on-collapse opacity-70">
-          {storageData.percentage.toFixed(0)}%
-        </span>
+        
+        {/* Right side: Circular indicator + percentage */}
+        <div className="flex items-center gap-2 hide-on-collapse">
+          {/* Circular Progress Ring */}
+          <div className="relative w-5 h-5 flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5 transform -rotate-90">
+              <circle
+                cx="10"
+                cy="10"
+                r="7.5"
+                className="stroke-blue-100 dark:stroke-neutral-800"
+                strokeWidth="2"
+                fill="transparent"
+              />
+              <circle
+                cx="10"
+                cy="10"
+                r="7.5"
+                className="stroke-blue-600 dark:stroke-blue-400"
+                strokeWidth="2.5"
+                fill="transparent"
+                strokeDasharray={2 * Math.PI * 7.5}
+                strokeDashoffset={2 * Math.PI * 7.5 * (1 - Math.min(storageData.percentage, 100) / 100)}
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+          <span className="text-[13px] font-bold text-blue-600 dark:text-blue-400">
+            {storageData.percentage.toFixed(0)}%
+          </span>
+        </div>
       </div>
       
-      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 hide-on-collapse overflow-hidden">
-        <div 
-          className="bg-blue-600 h-1.5 rounded-full transition-all duration-500" 
-          style={{ width: `${Math.min(storageData.percentage, 100)}%`, backgroundColor: storageData.percentage > 90 ? '#ef4444' : theme.accent || '#2563eb' }}
-        ></div>
-      </div>
-      
-      <div className="text-[11px] hide-on-collapse opacity-70" style={{ color: theme.sidebarText || theme.text }}>
+      {/* Bottom text */}
+      <div className="text-[12px] text-gray-600 dark:text-gray-400 font-medium pl-0.5 hide-on-collapse">
         {formatSize(storageData.used)} of 1 GB used
       </div>
     </a>
