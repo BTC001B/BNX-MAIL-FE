@@ -1118,10 +1118,10 @@ const FloatingCompose = () => {
           zIndex: 100,
           display: "flex",
           flexDirection: "column",
-          borderRadius: isReply ? "16px 16px 0 0" : (isComposeMinimized ? "12px 12px 0 0" : "0"),
+          borderRadius: isComposeMinimized ? "12px 12px 0 0" : "0",
           boxShadow: "0 12px 30px rgba(0,0,0,0.15)",
           border: `1px solid ${theme.border}`,
-          backgroundColor: isReply ? (theme.name === 'dark' ? theme.cardBg : '#ffffff') : theme.cardBg,
+          backgroundColor: theme.cardBg,
           overflow: "hidden"
         }}
       >
@@ -1159,10 +1159,10 @@ const FloatingCompose = () => {
         zIndex: 100,
         display: "flex",
         flexDirection: "column",
-        borderRadius: isReply ? "16px" : "12px 12px 0 0",
+        borderRadius: "12px 12px 0 0",
         boxShadow: "0 12px 30px rgba(0,0,0,0.15)",
         border: `1px solid ${theme.border}`,
-        backgroundColor: isReply ? (theme.name === 'dark' ? theme.cardBg : '#ffffff') : theme.cardBg,
+        backgroundColor: theme.cardBg,
         overflow: "hidden"
       }}
     >
