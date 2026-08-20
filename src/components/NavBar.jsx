@@ -367,7 +367,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
           </div>
 
 
-          <div className="h-6 w-[1px] bg-gray-200 dark:bg-gray-700 ml-5 mr-1 hidden sm:block" />
+          <div className="h-6 w-[1px] bg-gray-200 dark:bg-gray-700 ml-8 mr-0 hidden sm:block" />
 
           <button
             onClick={onToggleBitToolSidebar}
