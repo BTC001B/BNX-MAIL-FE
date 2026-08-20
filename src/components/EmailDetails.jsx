@@ -325,10 +325,27 @@ const EmailDetails = ({
       });
 
       setThreadEmails(filtered);
+      setExpandedMessages(prev => {
+        if (Object.keys(prev).length === 0 && filtered.length > 0) {
+          const lastIdx = filtered.length - 1;
+          const lastUid = filtered[lastIdx].uid || filtered[lastIdx].id;
+          return { [lastUid]: true };
+        }
+        return prev;
+      });
     } catch (err) {
       console.error("Failed to fetch thread emails:", err);
       const matchingLocal = localSentRepliesRef.current.filter(m => cleanSubject(m.subject) === cleanSubject(email.subject));
-      setThreadEmails([...matchingLocal, email].sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0)));
+      const fallbackList = [...matchingLocal, email].sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+      setThreadEmails(fallbackList);
+      setExpandedMessages(prev => {
+        if (Object.keys(prev).length === 0 && fallbackList.length > 0) {
+          const lastIdx = fallbackList.length - 1;
+          const lastUid = fallbackList[lastIdx].uid || fallbackList[lastIdx].id;
+          return { [lastUid]: true };
+        }
+        return prev;
+      });
     } finally {
       setLoadingThread(false);
     }
@@ -336,17 +353,10 @@ const EmailDetails = ({
 
   useEffect(() => {
     if (email) {
+      setExpandedMessages({});
       fetchThreadEmails();
     }
   }, [email]);
-
-  useEffect(() => {
-    if (threadEmails.length > 0) {
-      const lastIdx = threadEmails.length - 1;
-      const lastUid = threadEmails[lastIdx].uid || threadEmails[lastIdx].id;
-      setExpandedMessages({ [lastUid]: true });
-    }
-  }, [threadEmails]);
 
   const handleSendReply = async () => {
     const recipient = replyMode === 'forward' ? forwardTo.trim() : cleanSenderEmail;
