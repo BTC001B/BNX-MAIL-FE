@@ -9,7 +9,18 @@ import {
   MdRemove, 
   MdOpenInFull, 
   MdCloseFullscreen,
-  MdEditDocument
+  MdEditDocument,
+  MdArrowBack,
+  MdArrowDropDown,
+  MdFormatSize,
+  MdLink,
+  MdSentimentSatisfiedAlt,
+  MdCloudQueue,
+  MdImage,
+  MdLock,
+  MdMoreVert,
+  MdDelete,
+  MdAutoAwesome
 } from "react-icons/md";
 import { mailAPI, api, userAPI, signatureAPI, casboxAPI } from "../services/api";
 import { useTheme } from "../context/ThemeContext";
@@ -54,9 +65,11 @@ const FloatingCompose = () => {
     openCompose
   } = useMail();
 
+  const isReply = !!(composeData?.replyTo || composeData?.forward);
   const fileInputRef = useRef(null);
 
   const [composeMode, setComposeMode] = useState("email"); // "email" or "casbox"
+  const [showFormatting, setShowFormatting] = useState(true);
 
   // Sync mode if opened with data
   useEffect(() => {
@@ -650,62 +663,122 @@ const FloatingCompose = () => {
     }
   };
 
-  const renderContent = () => (
+  const renderContent = () => {
+    return (
     <>
+      <style>{`
+        .hide-quill-toolbar .ql-toolbar {
+          display: none !important;
+        }
+        .hide-quill-toolbar .ql-container {
+          border-top: 1px solid ${theme.border || '#e5e7eb'} !important;
+          border-top-left-radius: 0.375rem !important;
+          border-top-right-radius: 0.375rem !important;
+        }
+      `}</style>
       {/* HEADER / DRAG HANDLE */}
-      <div
-        className={`${isMobile ? "" : "compose-drag-handle"} flex items-center justify-between px-4 py-2 cursor-move shrink-0 border-b select-none`}
-        style={{ 
-          backgroundColor: theme.primary || "#f2f6fc",
-          borderColor: theme.border || "rgba(0,0,0,0.1)"
-        }}
-        onClick={() => {
-          if (isMobile && isComposeMinimized) {
-            setIsComposeMinimized(false);
-          }
-        }}
-      >
-        <div className="flex-1 flex items-center bg-black/5 dark:bg-white/10 rounded-lg p-0.5 mr-4" onClick={e => e.stopPropagation()}>
-           <button 
-             onClick={() => setComposeMode('email')}
-             className={`flex-1 flex justify-center py-1.5 rounded-md text-xs font-bold transition-all ${composeMode === 'email' ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
-           >
-             Email
-           </button>
-           <button 
-             onClick={() => setComposeMode('casbox')}
-             className={`flex-1 flex justify-center py-1.5 rounded-md text-xs font-bold transition-all ${composeMode === 'casbox' ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
-           >
-             Casbox
-           </button>
-        </div>
-
-        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-          <button
-            onClick={() => setIsComposeMinimized(!isComposeMinimized)}
-            className="p-1 rounded hover:bg-white/10 transition-colors text-black flex items-center justify-center cursor-pointer"
-            title="Minimize"
-          >
-            <MdRemove size={16} />
-          </button>
-          {!isMobile && (
+      {isReply ? (
+        <div
+          className={`${isMobile ? "" : "compose-drag-handle"} flex items-center justify-between px-4 py-3 cursor-move shrink-0 select-none bg-white dark:bg-neutral-900 border-b`}
+          style={{ borderColor: theme.border || "rgba(0,0,0,0.1)" }}
+          onClick={() => {
+            if (isMobile && isComposeMinimized) {
+              setIsComposeMinimized(false);
+            }
+          }}
+        >
+          <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+            <MdArrowBack size={18} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer" onClick={handleClose} />
+            <MdArrowDropDown size={18} className="text-gray-400" />
+            <div className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-[200px] sm:max-w-[400px]">
+              {formData.to || composeData?.replyTo || (composeData?.forward ? "Forward" : "Reply")}
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
             <button
-              onClick={() => setIsComposeMaximized(!isComposeMaximized)}
-              className="p-1 rounded hover:bg-white/10 transition-colors text-black flex items-center justify-center cursor-pointer"
-              title={isComposeMaximized ? "Restore Window" : "Maximize"}
+              type="button"
+              onClick={() => setIsComposeMinimized(!isComposeMinimized)}
+              className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center justify-center cursor-pointer"
+              title="Minimize"
             >
-              {isComposeMaximized ? <MdCloseFullscreen size={14} /> : <MdOpenInFull size={14} />}
+              <MdRemove size={16} />
             </button>
-          )}
-          <button
-            onClick={handleClose}
-            className="p-1 rounded hover:bg-white/10 transition-colors text-black flex items-center justify-center cursor-pointer"
-            title="Save & Close"
-          >
-            <MdClose size={16} />
-          </button>
+            {!isMobile && (
+              <button
+                type="button"
+                onClick={() => setIsComposeMaximized(!isComposeMaximized)}
+                className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center justify-center cursor-pointer"
+                title={isComposeMaximized ? "Restore Window" : "Pop out"}
+              >
+                {isComposeMaximized ? <MdCloseFullscreen size={14} /> : <MdOpenInFull size={14} />}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={handleClose}
+              className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 flex items-center justify-center cursor-pointer"
+              title="Save & Close"
+            >
+              <MdClose size={16} />
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div
+          className={`${isMobile ? "" : "compose-drag-handle"} flex items-center justify-between px-4 py-2 cursor-move shrink-0 border-b select-none`}
+          style={{ 
+            backgroundColor: theme.primary || "#f2f6fc",
+            borderColor: theme.border || "rgba(0,0,0,0.1)"
+          }}
+          onClick={() => {
+            if (isMobile && isComposeMinimized) {
+              setIsComposeMinimized(false);
+            }
+          }}
+        >
+          <div className="flex-1 flex items-center bg-black/5 dark:bg-white/10 rounded-lg p-0.5 mr-4" onClick={e => e.stopPropagation()}>
+             <button 
+               onClick={() => setComposeMode('email')}
+               className={`flex-1 flex justify-center py-1.5 rounded-md text-xs font-bold transition-all ${composeMode === 'email' ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
+             >
+               Email
+             </button>
+             <button 
+               onClick={() => setComposeMode('casbox')}
+               className={`flex-1 flex justify-center py-1.5 rounded-md text-xs font-bold transition-all ${composeMode === 'casbox' ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
+             >
+               Casbox
+             </button>
+          </div>
+
+          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setIsComposeMinimized(!isComposeMinimized)}
+              className="p-1 rounded hover:bg-white/10 transition-colors text-black flex items-center justify-center cursor-pointer"
+              title="Minimize"
+            >
+              <MdRemove size={16} />
+            </button>
+            {!isMobile && (
+              <button
+                onClick={() => setIsComposeMaximized(!isComposeMaximized)}
+                className="p-1 rounded hover:bg-white/10 transition-colors text-black flex items-center justify-center cursor-pointer"
+                title={isComposeMaximized ? "Restore Window" : "Maximize"}
+              >
+                {isComposeMaximized ? <MdCloseFullscreen size={14} /> : <MdOpenInFull size={14} />}
+              </button>
+            )}
+            <button
+              onClick={handleClose}
+              className="p-1 rounded hover:bg-white/10 transition-colors text-black flex items-center justify-center cursor-pointer"
+              title="Save & Close"
+            >
+              <MdClose size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* BODY CONTENT (HIDDEN WHEN MINIMIZED) */}
       {!isComposeMinimized && (
@@ -725,7 +798,7 @@ const FloatingCompose = () => {
           {/* FIELDS */}
           <div className="flex-1 flex flex-col gap-0.5 overflow-y-auto hidden-scrollbar min-h-0 pr-1">
             {/* Cc & Bcc toggles */}
-            {composeMode === "email" && (
+            {!isReply && composeMode === "email" && (
                 <div className="flex px-4 py-2 border-b items-center text-sm dark:border-gray-800 shrink-0">
                   <div className="text-gray-400 dark:text-gray-500 w-10">To</div>
                   <input
@@ -746,7 +819,7 @@ const FloatingCompose = () => {
                   </div>
                 </div>
             )}
-            {composeMode === "casbox" && (
+            {!isReply && composeMode === "casbox" && (
                 <div className="flex px-4 py-2 border-b items-center text-sm dark:border-gray-800 shrink-0">
                   <div className="text-gray-400 dark:text-gray-500 w-10">To</div>
                   <input
@@ -761,7 +834,7 @@ const FloatingCompose = () => {
             )}
 
             {/* CC */}
-            {showCc && composeMode === "email" && (
+            {!isReply && showCc && composeMode === "email" && (
               <div className="flex items-center gap-2 border-b py-1.5 shrink-0 animate-fade-in" style={{ borderColor: theme.border }}>
                 <span className="text-xs font-semibold w-10 text-gray-500">Cc:</span>
                 <input
@@ -777,7 +850,7 @@ const FloatingCompose = () => {
             )}
 
             {/* BCC */}
-            {showBcc && composeMode === "email" && (
+            {!isReply && showBcc && composeMode === "email" && (
               <div className="flex items-center gap-2 border-b py-1.5 shrink-0 animate-fade-in" style={{ borderColor: theme.border }}>
                 <span className="text-xs font-semibold w-10 text-gray-500">Bcc:</span>
                 <input
@@ -793,21 +866,23 @@ const FloatingCompose = () => {
             )}
 
             {/* SUBJECT */}
-            <div className="flex items-center gap-2 border-b py-1.5 shrink-0" style={{ borderColor: theme.border }}>
-              <span className="text-xs font-semibold w-10 text-gray-500">Subject:</span>
-              <input
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
-                className="flex-1 bg-transparent text-sm outline-none border-none"
-                style={{ color: theme.text }}
-                placeholder="Enter subject..."
-                spellCheck="false"
-              />
-            </div>
+            {!isReply && (
+              <div className="flex items-center gap-2 border-b py-1.5 shrink-0" style={{ borderColor: theme.border }}>
+                <span className="text-xs font-semibold w-10 text-gray-500">Subject:</span>
+                <input
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className="flex-1 bg-transparent text-sm outline-none border-none"
+                  style={{ color: theme.text }}
+                  placeholder="Enter subject..."
+                  spellCheck="false"
+                />
+              </div>
+            )}
 
             {/* BODY */}
-            <div className="flex-1 mt-2 overflow-y-auto w-full compose-quill rounded-md" style={{ minHeight: "150px" }}>
+            <div className={`flex-1 mt-2 overflow-y-auto w-full compose-quill rounded-md ${showFormatting ? '' : 'hide-quill-toolbar'}`} style={{ minHeight: "150px" }}>
               <ReactQuill
                 theme="snow"
                 modules={quillModules}
@@ -851,156 +926,257 @@ const FloatingCompose = () => {
             className="hidden"
             multiple
           />
-
-          {/* ACTIONS FOOTER */}
-          <div className="flex items-center justify-between border-t pt-3 mt-2 shrink-0 relative" style={{ borderColor: theme.border }}>
-            <div className="flex items-center gap-2">
-              <div className="inline-flex rounded-full shadow-md hover:shadow-lg transition-all">
-                <button
-                  type="submit"
-                  disabled={sending || uploading}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-l-full text-white text-xs font-semibold disabled:opacity-60 cursor-pointer border-r border-white/20"
-                  style={{ background: `linear-gradient(135deg, ${theme.accent || '#135bec'} 0%, #3b82f6 100%)` }}
-                >
-                  {sending ? "Sending…" : "Send"}
-                  {!sending && <MdSend size={14} />}
-                </button>
-                {composeMode === "email" && (
+          {/* ACTIONS FOOTER */}
+          {isReply ? (
+            <div className="flex items-center justify-between border-t pt-3 mt-2 shrink-0 relative" style={{ borderColor: theme.border }}>
+              <div className="flex items-center gap-1 sm:gap-2">
+                {/* SPLIT SEND BUTTON */}
+                <div className="inline-flex items-center rounded-full shadow-sm hover:shadow transition-all" style={{ backgroundColor: theme.accent || '#135bec' }}>
                   <button
-                    type="button"
+                    type="submit"
                     disabled={sending || uploading}
-                    onClick={() => {
-                      setShowScheduleMenu(!showScheduleMenu);
-                      setShowCustomSchedule(false);
-                    }}
-                    className="px-2 py-2 rounded-r-full text-white text-xs font-semibold disabled:opacity-60 cursor-pointer flex items-center justify-center hover:bg-white/10"
-                    style={{ background: `linear-gradient(135deg, ${theme.accent || '#135bec'} 0%, #3b82f6 100%)` }}
-                    title="Schedule send"
+                    className="flex items-center gap-1.5 pl-5 pr-3 py-2 rounded-l-full text-white text-xs font-semibold disabled:opacity-60 cursor-pointer border-r border-white/20"
                   >
-                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
-                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                    </svg>
+                    {sending ? "Sending…" : "Send"}
                   </button>
-                )}
-              </div>
-
-              {/* Schedule Send Dropdown Menu */}
-              {showScheduleMenu && (
-                <div
-                  className="absolute bottom-12 left-0 w-64 rounded-xl border shadow-2xl z-50 p-1.5 bg-white dark:bg-neutral-900 animate-in fade-in duration-200"
-                  style={{ borderColor: theme.border }}
-                >
-                  <div className="flex items-center justify-between p-2 mb-1 border-b" style={{ borderColor: theme.border }}>
-                    <span className="text-xs font-bold text-gray-700 dark:text-gray-200">Schedule send</span>
+                  {composeMode === "email" && (
                     <button
                       type="button"
-                      onClick={() => { setShowScheduleMenu(false); setShowCustomSchedule(false); }}
-                      className="text-xs p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-400"
+                      disabled={sending || uploading}
+                      onClick={() => {
+                        setShowScheduleMenu(!showScheduleMenu);
+                        setShowCustomSchedule(false);
+                      }}
+                      className="pl-2 pr-4 py-2 rounded-r-full text-white text-xs font-semibold disabled:opacity-60 cursor-pointer flex items-center justify-center hover:bg-white/10"
+                      title="Schedule send"
                     >
-                      ✕
+                      <MdArrowDropDown size={16} />
                     </button>
-                  </div>
+                  )}
+                </div>
 
-                  {showCustomSchedule ? (
-                    <div className="p-2 flex flex-col gap-3">
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                        Select Date & Time
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={customScheduleDateTime}
-                        onChange={(e) => setCustomScheduleDateTime(e.target.value)}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-gray-300 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <div className="flex gap-2 justify-end mt-1">
-                        <button
-                          type="button"
-                          onClick={() => setShowCustomSchedule(false)}
-                          className="px-2.5 py-1 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800"
-                        >
-                          Back
-                        </button>
+                {/* Schedule Send Dropdown Menu */}
+                {showScheduleMenu && (
+                  <div
+                    className="absolute bottom-12 left-0 w-64 rounded-xl border shadow-2xl z-50 p-1.5 bg-white dark:bg-neutral-900 animate-in fade-in duration-200"
+                    style={{ borderColor: theme.border }}
+                  >
+                    <div className="flex items-center justify-between p-2 mb-1 border-b" style={{ borderColor: theme.border }}>
+                      <span className="text-xs font-bold text-gray-700 dark:text-gray-200">Schedule send</span>
+                      <button
+                        type="button"
+                        onClick={() => { setShowScheduleMenu(false); setShowCustomSchedule(false); }}
+                        className="text-xs p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-400"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    {showCustomSchedule ? (
+                      <div className="p-2 flex flex-col gap-3">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                          Select Date & Time
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={customScheduleDateTime}
+                          onChange={(e) => setCustomScheduleDateTime(e.target.value)}
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-gray-300 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <div className="flex gap-2 justify-end mt-1">
+                          <button
+                            type="button"
+                            onClick={() => setShowCustomSchedule(false)}
+                            className="px-2.5 py-1 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800"
+                          >
+                            Back
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!customScheduleDateTime) {
+                                alert("Please select a valid date and time.");
+                                return;
+                              }
+                              const dateObj = new Date(customScheduleDateTime);
+                              if (dateObj <= new Date()) {
+                                alert("Please select a future date and time.");
+                                return;
+                              }
+                              handleScheduleSend(dateObj.toISOString());
+                            }}
+                            className="px-3 py-1 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-500/20"
+                          >
+                            Schedule
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-0.5 py-1">
+                        {getScheduleOptions().map((opt, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => handleScheduleSend(opt.time.toISOString())}
+                            className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center justify-between gap-2 text-gray-800 dark:text-gray-200 cursor-pointer font-medium"
+                          >
+                            <span>{opt.label}</span>
+                            <span className="text-gray-400 dark:text-gray-500 text-[11px]">{opt.display}</span>
+                          </button>
+                        ))}
+                        <div className="border-t my-1" style={{ borderColor: theme.border }}></div>
                         <button
                           type="button"
                           onClick={() => {
-                            if (!customScheduleDateTime) {
-                              alert("Please select a valid date and time.");
-                              return;
-                            }
-                            const dateObj = new Date(customScheduleDateTime);
-                            if (dateObj <= new Date()) {
-                              alert("Please select a future date and time.");
-                              return;
-                            }
-                            handleScheduleSend(dateObj.toISOString());
+                            setShowCustomSchedule(true);
+                            const defaultCustom = new Date();
+                            defaultCustom.setMinutes(defaultCustom.getMinutes() - defaultCustom.getTimezoneOffset());
+                            setCustomScheduleDateTime(defaultCustom.toISOString().slice(0, 16));
                           }}
-                          className="px-3 py-1 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-500/20"
+                          className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-blue-500 dark:text-blue-400 font-semibold cursor-pointer"
                         >
-                          Schedule
+                          Select date & time
                         </button>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-0.5 py-1">
-                      {getScheduleOptions().map((opt, idx) => (
+                    )}
+                  </div>
+                )}
+
+                {/* TOOLBAR ACTIONS */}
+                <button
+                  type="button"
+                  onClick={() => setShowFormatting(!showFormatting)}
+                  className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors ${showFormatting ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20' : 'text-gray-500 dark:text-gray-400'} cursor-pointer`}
+                  title="Formatting options"
+                >
+                  <MdFormatSize size={18} />
+                </button>
+
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowTemplates(!showTemplates)}
+                    className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors ${showTemplates ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20' : 'text-gray-500 dark:text-gray-400'} cursor-pointer`}
+                    title="Templates (Text/editing option)"
+                  >
+                    <MdAutoAwesome size={18} />
+                  </button>
+                  {showTemplates && (
+                    <div
+                      className="absolute bottom-10 left-0 w-56 max-h-48 overflow-y-auto rounded-xl border shadow-xl z-50 p-1.5 bg-white dark:bg-neutral-900"
+                      style={{ borderColor: theme.border }}
+                    >
+                      <div className="flex items-center justify-between p-1.5 mb-1 border-b" style={{ borderColor: theme.border }}>
+                        <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">Templates</span>
                         <button
-                          key={idx}
                           type="button"
-                          onClick={() => handleScheduleSend(opt.time.toISOString())}
-                          className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center justify-between gap-2 text-gray-800 dark:text-gray-200 cursor-pointer font-medium"
+                          onClick={() => setShowTemplates(false)}
+                          className="text-xs p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-500"
                         >
-                          <span>{opt.label}</span>
-                          <span className="text-gray-400 dark:text-gray-500 text-[11px]">{opt.display}</span>
+                          <MdClose size={12} />
                         </button>
-                      ))}
-                      <div className="border-t my-1" style={{ borderColor: theme.border }}></div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowCustomSchedule(true);
-                          const defaultCustom = new Date();
-                          defaultCustom.setMinutes(defaultCustom.getMinutes() - defaultCustom.getTimezoneOffset());
-                          setCustomScheduleDateTime(defaultCustom.toISOString().slice(0, 16));
-                        }}
-                        className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-blue-500 dark:text-blue-400 font-semibold cursor-pointer"
-                      >
-                        Select date & time
-                      </button>
+                      </div>
+                      {allTemplates.length === 0 ? (
+                        <p className="text-[10px] text-center p-2 opacity-60">No templates found</p>
+                      ) : (
+                        <div className="flex flex-col gap-0.5">
+                          {allTemplates.map((t) => (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() => handleApplyTemplate(t)}
+                              className="w-full text-left px-2.5 py-1.5 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors truncate text-gray-800 dark:text-gray-200 cursor-pointer"
+                            >
+                              <div className="font-semibold truncate">{t.title}</div>
+                              <div className="text-[10px] opacity-60 truncate">{t.subject}</div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
 
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
-                title="Attach file"
-              >
-                <MdAttachFile size={18} className="transform rotate-45" />
-              </button>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 cursor-pointer"
+                  title="Attach file"
+                >
+                  <MdAttachFile size={18} className="transform rotate-45" />
+                </button>
 
-              {/* Signatures quick selector */}
-              {composeMode === "email" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = prompt("Enter URL:");
+                    if (url) {
+                      setFormData(prev => ({ ...prev, body: prev.body + ` <a href="${url}" target="_blank" style="color:#135bec;text-decoration:underline;">${url}</a>` }));
+                    }
+                  }}
+                  className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 cursor-pointer"
+                  title="Insert link"
+                >
+                  <MdLink size={18} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, body: prev.body + " 😊" }));
+                  }}
+                  className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 cursor-pointer"
+                  title="Insert emoji"
+                >
+                  <MdSentimentSatisfiedAlt size={18} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => toast.success("Drive connection feature is coming soon!")}
+                  className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 cursor-pointer"
+                  title="Insert files using Drive"
+                >
+                  <MdCloudQueue size={18} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = prompt("Enter image URL:");
+                    if (url) {
+                      setFormData(prev => ({ ...prev, body: prev.body + `<br/><img src="${url}" alt="inserted-img" style="max-width:100%"/>` }));
+                    }
+                  }}
+                  className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 cursor-pointer"
+                  title="Insert photo"
+                >
+                  <MdImage size={18} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => toast.success("Confidential mode is active for this session")}
+                  className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 cursor-pointer"
+                  title="Toggle confidential mode"
+                >
+                  <MdLock size={18} />
+                </button>
+
                 <div className="relative">
                   <button
                     type="button"
                     onClick={() => setShowSignaturesMenu(!showSignaturesMenu)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xs font-semibold"
-                    title="Insert Signature"
+                    className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors ${showSignaturesMenu ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20' : 'text-gray-500 dark:text-gray-400'} cursor-pointer`}
+                    title="Insert signature"
                   >
-                    <MdEditDocument size={16} />
-                    <span className="hidden sm:inline">Signature</span>
+                    <MdEditDocument size={18} />
                   </button>
 
                   {showSignaturesMenu && (
                     <div
-                      className="absolute bottom-10 right-0 md:right-auto md:left-0 w-56 max-h-48 overflow-y-auto rounded-xl border shadow-xl z-50 p-1.5 glass"
-                      style={{
-                        backgroundColor: theme.cardBg,
-                        borderColor: theme.border,
-                        color: theme.text,
-                      }}
+                      className="absolute bottom-10 left-0 w-56 max-h-48 overflow-y-auto rounded-xl border shadow-xl z-50 p-1.5 bg-white dark:bg-neutral-900"
+                      style={{ borderColor: theme.border }}
                     >
                       <div className="flex items-center justify-between p-1.5 mb-1 border-b" style={{ borderColor: theme.border }}>
                         <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">Signatures</span>
@@ -1035,76 +1211,282 @@ const FloatingCompose = () => {
                     </div>
                   )}
                 </div>
-              )}
 
-              {/* Inline Templates quick selector */}
-              {composeMode === "email" && (
-                <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => toast.success("More options configured")}
+                  className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400 cursor-pointer"
+                  title="More options"
+                >
+                  <MdMoreVert size={18} />
+                </button>
+              </div>
+
+              {/* DISCARD BUTTON */}
+              <button
+                type="button"
+                onClick={handleDiscard}
+                className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-950/20 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors cursor-pointer"
+                title="Discard draft"
+              >
+                <MdDelete size={18} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between border-t pt-3 mt-2 shrink-0 relative" style={{ borderColor: theme.border }}>
+              <div className="flex items-center gap-2">
+                <div className="inline-flex rounded-full shadow-md hover:shadow-lg transition-all">
                   <button
-                    type="button"
-                    onClick={() => setShowTemplates(!showTemplates)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xs font-semibold"
-                    title="Insert Template"
+                    type="submit"
+                    disabled={sending || uploading}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-l-full text-white text-xs font-semibold disabled:opacity-60 cursor-pointer border-r border-white/20"
+                    style={{ background: `linear-gradient(135deg, ${theme.accent || '#135bec'} 0%, #3b82f6 100%)` }}
                   >
-                    <MdAssignment size={16} />
-                    <span className="hidden sm:inline">Templates</span>
+                    {sending ? "Sending…" : "Send"}
+                    {!sending && <MdSend size={14} />}
                   </button>
-
-                  {showTemplates && (
-                    <div
-                      className="absolute bottom-10 right-0 md:right-auto md:left-0 w-56 max-h-48 overflow-y-auto rounded-xl border shadow-xl z-50 p-1.5 glass"
-                      style={{
-                        backgroundColor: theme.cardBg,
-                        borderColor: theme.border,
-                        color: theme.text,
+                  {composeMode === "email" && (
+                    <button
+                      type="button"
+                      disabled={sending || uploading}
+                      onClick={() => {
+                        setShowScheduleMenu(!showScheduleMenu);
+                        setShowCustomSchedule(false);
                       }}
+                      className="px-2 py-2 rounded-r-full text-white text-xs font-semibold disabled:opacity-60 cursor-pointer flex items-center justify-center hover:bg-white/10"
+                      style={{ background: `linear-gradient(135deg, ${theme.accent || '#135bec'} 0%, #3b82f6 100%)` }}
+                      title="Schedule send"
                     >
-                      <div className="flex items-center justify-between p-1.5 mb-1 border-b" style={{ borderColor: theme.border }}>
-                        <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">Templates</span>
-                        <button
-                          type="button"
-                          onClick={() => setShowTemplates(false)}
-                          className="text-xs p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-500"
-                        >
-                          <MdClose size={12} />
-                        </button>
-                      </div>
-                      {allTemplates.length === 0 ? (
-                        <p className="text-[10px] text-center p-2 opacity-60">No templates found</p>
-                      ) : (
-                        <div className="flex flex-col gap-0.5">
-                          {allTemplates.map((t) => (
-                            <button
-                              key={t.id}
-                              type="button"
-                              onClick={() => handleApplyTemplate(t)}
-                              className="w-full text-left px-2.5 py-1.5 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors truncate text-gray-800 dark:text-gray-200 cursor-pointer"
-                            >
-                              <div className="font-semibold truncate">{t.title}</div>
-                              <div className="text-[10px] opacity-60 truncate">{t.subject}</div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                      <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+                        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                      </svg>
+                    </button>
                   )}
                 </div>
-              )}
-            </div>
 
-            <button
-              type="button"
-              onClick={handleDiscard}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-xs font-semibold transition-colors cursor-pointer"
-            >
-              <MdDeleteOutline size={18} />
-              <span className="hidden sm:inline">Discard</span>
-            </button>
-          </div>
+                {/* Schedule Send Dropdown Menu */}
+                {showScheduleMenu && (
+                  <div
+                    className="absolute bottom-12 left-0 w-64 rounded-xl border shadow-2xl z-50 p-1.5 bg-white dark:bg-neutral-900 animate-in fade-in duration-200"
+                    style={{ borderColor: theme.border }}
+                  >
+                    <div className="flex items-center justify-between p-2 mb-1 border-b" style={{ borderColor: theme.border }}>
+                      <span className="text-xs font-bold text-gray-700 dark:text-gray-200">Schedule send</span>
+                      <button
+                        type="button"
+                        onClick={() => { setShowScheduleMenu(false); setShowCustomSchedule(false); }}
+                        className="text-xs p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-400"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    {showCustomSchedule ? (
+                      <div className="p-2 flex flex-col gap-3">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                          Select Date & Time
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={customScheduleDateTime}
+                          onChange={(e) => setCustomScheduleDateTime(e.target.value)}
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-gray-300 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <div className="flex gap-2 justify-end mt-1">
+                          <button
+                            type="button"
+                            onClick={() => setShowCustomSchedule(false)}
+                            className="px-2.5 py-1 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800"
+                          >
+                            Back
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!customScheduleDateTime) {
+                                alert("Please select a valid date and time.");
+                                return;
+                              }
+                              const dateObj = new Date(customScheduleDateTime);
+                              if (dateObj <= new Date()) {
+                                alert("Please select a future date and time.");
+                                return;
+                              }
+                              handleScheduleSend(dateObj.toISOString());
+                            }}
+                            className="px-3 py-1 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-500/20"
+                          >
+                            Schedule
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-0.5 py-1">
+                        {getScheduleOptions().map((opt, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => handleScheduleSend(opt.time.toISOString())}
+                            className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center justify-between gap-2 text-gray-800 dark:text-gray-200 cursor-pointer font-medium"
+                          >
+                            <span>{opt.label}</span>
+                            <span className="text-gray-400 dark:text-gray-500 text-[11px]">{opt.display}</span>
+                          </button>
+                        ))}
+                        <div className="border-t my-1" style={{ borderColor: theme.border }}></div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowCustomSchedule(true);
+                            const defaultCustom = new Date();
+                            defaultCustom.setMinutes(defaultCustom.getMinutes() - defaultCustom.getTimezoneOffset());
+                            setCustomScheduleDateTime(defaultCustom.toISOString().slice(0, 16));
+                          }}
+                          className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-blue-500 dark:text-blue-400 font-semibold cursor-pointer"
+                        >
+                          Select date & time
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
+                  title="Attach file"
+                >
+                  <MdAttachFile size={18} className="transform rotate-45" />
+                </button>
+
+                {/* Signatures quick selector */}
+                {composeMode === "email" && (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowSignaturesMenu(!showSignaturesMenu)}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xs font-semibold"
+                      title="Insert Signature"
+                    >
+                      <MdEditDocument size={16} />
+                      <span className="hidden sm:inline">Signature</span>
+                    </button>
+
+                    {showSignaturesMenu && (
+                      <div
+                        className="absolute bottom-10 right-0 md:right-auto md:left-0 w-56 max-h-48 overflow-y-auto rounded-xl border shadow-xl z-50 p-1.5 glass"
+                        style={{
+                          backgroundColor: theme.cardBg,
+                          borderColor: theme.border,
+                          color: theme.text,
+                        }}
+                      >
+                        <div className="flex items-center justify-between p-1.5 mb-1 border-b" style={{ borderColor: theme.border }}>
+                          <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">Signatures</span>
+                          <button
+                            type="button"
+                            onClick={() => setShowSignaturesMenu(false)}
+                            className="text-xs p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-500"
+                          >
+                            <MdClose size={12} />
+                          </button>
+                        </div>
+                        {signatures.length === 0 ? (
+                          <p className="text-[10px] text-center p-2 opacity-60">No signatures configured</p>
+                        ) : (
+                          <div className="flex flex-col gap-0.5">
+                            {signatures.map((s) => (
+                              <button
+                                key={s.id}
+                                type="button"
+                                onClick={() => {
+                                  setFormData(prev => ({ ...prev, body: prev.body + `<br/><br/>${s.content}` }));
+                                  setShowSignaturesMenu(false);
+                                }}
+                                className="w-full text-left px-2.5 py-1.5 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors truncate text-gray-800 dark:text-gray-200 cursor-pointer flex justify-between items-center"
+                              >
+                                <span className="font-semibold truncate">{s.name}</span>
+                                {s.isDefault && <span className="text-[10px] text-green-600 bg-green-100 dark:bg-green-900/30 px-1.5 rounded">Default</span>}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Inline Templates quick selector */}
+                {composeMode === "email" && (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowTemplates(!showTemplates)}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xs font-semibold"
+                      title="Insert Template"
+                    >
+                      <MdAssignment size={16} />
+                      <span className="hidden sm:inline">Templates</span>
+                    </button>
+
+                    {showTemplates && (
+                      <div
+                        className="absolute bottom-10 right-0 md:right-auto md:left-0 w-56 max-h-48 overflow-y-auto rounded-xl border shadow-xl z-50 p-1.5 glass"
+                        style={{
+                          backgroundColor: theme.cardBg,
+                          borderColor: theme.border,
+                          color: theme.text,
+                        }}
+                      >
+                        <div className="flex items-center justify-between p-1.5 mb-1 border-b" style={{ borderColor: theme.border }}>
+                          <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">Templates</span>
+                          <button
+                            type="button"
+                            onClick={() => setShowTemplates(false)}
+                            className="text-xs p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-gray-500"
+                          >
+                            <MdClose size={12} />
+                          </button>
+                        </div>
+                        {allTemplates.length === 0 ? (
+                          <p className="text-[10px] text-center p-2 opacity-60">No templates found</p>
+                        ) : (
+                          <div className="flex flex-col gap-0.5">
+                            {allTemplates.map((t) => (
+                              <button
+                                key={t.id}
+                                type="button"
+                                onClick={() => handleApplyTemplate(t)}
+                                className="w-full text-left px-2.5 py-1.5 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors truncate text-gray-800 dark:text-gray-200 cursor-pointer"
+                              >
+                                <div className="font-semibold truncate">{t.title}</div>
+                                <div className="text-[10px] opacity-60 truncate">{t.subject}</div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleDiscard}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-full text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-xs font-semibold transition-colors cursor-pointer"
+              >
+                <MdDeleteOutline size={18} />
+                <span className="hidden sm:inline">Discard</span>
+              </button>
+            </div>
+          )}
         </form>
       )}
     </>
-  );
+    );
+  };
 
   if (isMobile) {
     return (
@@ -1119,10 +1501,10 @@ const FloatingCompose = () => {
           zIndex: 100,
           display: "flex",
           flexDirection: "column",
-          borderRadius: isComposeMinimized ? "12px 12px 0 0" : "0",
+          borderRadius: isReply ? "16px 16px 0 0" : (isComposeMinimized ? "12px 12px 0 0" : "0"),
           boxShadow: "0 12px 30px rgba(0,0,0,0.15)",
           border: `1px solid ${theme.border}`,
-          backgroundColor: theme.cardBg,
+          backgroundColor: isReply ? (theme.name === 'dark' ? theme.cardBg : '#ffffff') : theme.cardBg,
           overflow: "hidden"
         }}
       >
@@ -1160,10 +1542,10 @@ const FloatingCompose = () => {
         zIndex: 100,
         display: "flex",
         flexDirection: "column",
-        borderRadius: "12px 12px 0 0",
+        borderRadius: isReply ? "16px" : "12px 12px 0 0",
         boxShadow: "0 12px 30px rgba(0,0,0,0.15)",
         border: `1px solid ${theme.border}`,
-        backgroundColor: theme.cardBg,
+        backgroundColor: isReply ? (theme.name === 'dark' ? theme.cardBg : '#ffffff') : theme.cardBg,
         overflow: "hidden"
       }}
     >
