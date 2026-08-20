@@ -288,12 +288,23 @@ const EmailDetails = ({
       // Filter by clean subject match
       let filtered = allRelated.filter(m => cleanSubject(m.subject) === cleanSubj);
       
-      // Deduplicate
-      const seen = new Set();
+      // Deduplicate identical messages (e.g. from self-sends in Inbox and Sent)
+      const seenMessages = new Set();
       filtered = filtered.filter(m => {
-        const id = m.uid || m.id;
-        if (seen.has(id)) return false;
-        seen.add(id);
+        const cleanBody = (m.body || m.textPlain || "")
+          .replace(/<[^>]+>/g, '')
+          .replace(/\s+/g, '')
+          .trim();
+        const dateStr = m.date || m.receivedDate || m.sentDate || "";
+        const dateEpoch = dateStr ? new Date(dateStr).getTime() : 0;
+        const timeBucket = Math.round(dateEpoch / 10000); 
+        const sender = (m.from || "").trim().toLowerCase();
+        
+        const signature = `${sender}|${cleanBody.substring(0, 100)}|${timeBucket}`;
+        if (seenMessages.has(signature)) {
+          return false;
+        }
+        seenMessages.add(signature);
         return true;
       });
 
