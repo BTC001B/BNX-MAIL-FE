@@ -251,6 +251,7 @@ const EmailDetails = ({
   const [imagePreviews, setImagePreviews] = useState({});
 
   // Conversation Thread states and fetchers
+  const localSentRepliesRef = React.useRef([]);
   const [threadEmails, setThreadEmails] = useState([]);
   const [loadingThread, setLoadingThread] = useState(false);
   const [expandedMessages, setExpandedMessages] = useState({});
@@ -285,6 +286,10 @@ const EmailDetails = ({
         allRelated = [...allRelated, ...sentMails];
       }
 
+      // Merge session local sent replies matching the clean subject
+      const matchingLocal = localSentRepliesRef.current.filter(m => cleanSubject(m.subject) === cleanSubj);
+      allRelated = [...allRelated, ...matchingLocal];
+
       // Filter by clean subject match
       let filtered = allRelated.filter(m => cleanSubject(m.subject) === cleanSubj);
       
@@ -308,7 +313,7 @@ const EmailDetails = ({
         return true;
       });
 
-      if (!seen.has(email.uid || email.id)) {
+      if (!filtered.some(f => (f.uid || f.id) === (email.uid || email.id))) {
         filtered.push(email);
       }
 
@@ -322,7 +327,8 @@ const EmailDetails = ({
       setThreadEmails(filtered);
     } catch (err) {
       console.error("Failed to fetch thread emails:", err);
-      setThreadEmails([email]);
+      const matchingLocal = localSentRepliesRef.current.filter(m => cleanSubject(m.subject) === cleanSubject(email.subject));
+      setThreadEmails([...matchingLocal, email].sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0)));
     } finally {
       setLoadingThread(false);
     }
@@ -396,6 +402,7 @@ const EmailDetails = ({
           sentDate: new Date().toISOString(),
           attachments: attachments.map(a => a.fileName)
         };
+        localSentRepliesRef.current.push(newReplyMail);
         setThreadEmails(prev => [...prev, newReplyMail]);
 
         setShowReply(false);
