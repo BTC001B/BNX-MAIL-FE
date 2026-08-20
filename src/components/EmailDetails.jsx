@@ -1253,15 +1253,6 @@ const EmailDetails = ({
 
               <button
                 type="button"
-                onClick={() => toast.success("AI helper active")}
-                className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500"
-                title="BNX AI Spark"
-              >
-                <MdAutoAwesome size={18} />
-              </button>
-
-              <button
-                type="button"
                 className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-gray-500"
                 title="Attach files"
               >
