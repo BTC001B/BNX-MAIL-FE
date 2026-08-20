@@ -367,11 +367,11 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
           </div>
 
 
-          <div className="h-6 w-[1px] bg-gray-200 dark:bg-gray-700 mx-1 hidden sm:block" />
+          <div className="h-6 w-[1px] bg-gray-200 dark:bg-gray-700 ml-5 mr-1 hidden sm:block" />
 
           <button
             onClick={onToggleBitToolSidebar}
-            className="h-9 p-1 px-2 rounded-full bg-white dark:hover:bg-white/10 transition-colors flex items-center justify-center shrink-0 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 ml-5"
+            className="h-9 p-1 px-2 rounded-full bg-white dark:hover:bg-white/10 transition-colors flex items-center justify-center shrink-0 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 ml-2 sm:ml-0"
             title="Toggle BIT Tools"
           >
             <img
