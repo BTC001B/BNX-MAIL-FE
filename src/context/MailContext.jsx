@@ -214,6 +214,31 @@ export const MailProvider = ({ children }) => {
                     if (folder === 'starred') {
                         normalizedEmails = normalizedEmails.filter(m => m.folderName?.toLowerCase() !== 'trash');
                     }
+
+                    // Filter logic for Inbox and Sent folders based on currently logged-in user's email ID
+                    const lowerFolder = folder.toLowerCase();
+                    if (user?.email) {
+                        const loginEmail = user.email.trim().toLowerCase();
+                        const isEmailMatch = (emailField, currentEmail) => {
+                            if (!emailField) return false;
+                            const cleanEmail = emailField.trim().toLowerCase();
+                            const match = cleanEmail.match(/<([^>]+)>/);
+                            const actualEmail = match ? match[1].trim().toLowerCase() : cleanEmail;
+                            return actualEmail === currentEmail;
+                        };
+
+                        if (['inbox', 'all-inbox', 'allinbox'].includes(lowerFolder)) {
+                            normalizedEmails = normalizedEmails.filter(m => {
+                                const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
+                                return !isSenderMe;
+                            });
+                        } else if (lowerFolder === 'sent') {
+                            normalizedEmails = normalizedEmails.filter(m => {
+                                const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
+                                return isSenderMe;
+                            });
+                        }
+                    }
                     
                     // Update Cache
                     const folderKey = folder.toLowerCase();
@@ -398,7 +423,6 @@ export const MailProvider = ({ children }) => {
             }
         } catch (error) {
             console.error('Update label error:', error);
-            // Error handling via interceptor
         }
         return false;
     };
