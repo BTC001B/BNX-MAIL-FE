@@ -14,6 +14,14 @@ export const MailProvider = ({ children }) => {
     const [currentFolder, setCurrentFolder] = useState('inbox');
     const currentFolderRef = useRef('inbox');
     const pagesCache = useRef({});
+    const invalidateCache = useCallback((folder) => {
+        if (!folder) return;
+        const folderKey = folder.toLowerCase();
+        delete pagesCache.current[folderKey];
+        if (user?.email) {
+            sessionStorage.removeItem(`bnx_cache_${user.email}_${folderKey}_1`);
+        }
+    }, [user]);
     const [loading, setLoading] = useState(false);
     const [unreadCounts, setUnreadCounts] = useState({ inbox: 0, spam: 0, trash: 0 });
     const [labels, setLabels] = useState([]);
@@ -61,6 +69,77 @@ export const MailProvider = ({ children }) => {
         }
     }, [user, limit]);
 
+    const fetchEmailsSilently = useCallback(async (folder, page = 1) => {
+        if (!user) return;
+        const folderKey = folder.toLowerCase();
+        try {
+            let res;
+            switch (folderKey) {
+                case 'inbox': res = await mailAPI.getInbox(page, limit); break;
+                case 'sent': res = await mailAPI.getSent(page, limit); break;
+                case 'draft':
+                case 'drafts': res = await mailAPI.getDrafts(page, limit); break;
+                case 'starred': res = await mailAPI.getStarred(page, limit); break;
+                case 'trash': res = await mailAPI.getTrash(page, limit); break;
+                case 'spam': res = await mailAPI.getSpam(page, limit); break;
+                case 'snoozed': res = await mailAPI.getSnoozed(page, limit); break;
+                case 'archive': res = await mailAPI.getArchive(page, limit); break;
+                case 'unread': res = await mailAPI.getUnread(page, limit); break;
+                default: res = await mailAPI.getInbox(page, limit);
+            }
+
+            if (res && res.data?.success) {
+                const data = res.data.data;
+                let normalizedEmails = (data.emails || []).map(m => ({
+                    ...m,
+                    starred: m.starred ?? m.isStarred ?? false
+                }));
+                if (folderKey === 'starred') {
+                    normalizedEmails = normalizedEmails.filter(m => m.folderName?.toLowerCase() !== 'trash');
+                }
+
+                if (user?.email) {
+                    const loginEmail = user.email.trim().toLowerCase();
+                    const isEmailMatch = (emailField, currentEmail) => {
+                        if (!emailField) return false;
+                        const cleanEmail = emailField.trim().toLowerCase();
+                        const match = cleanEmail.match(/<([^>]+)>/);
+                        const actualEmail = match ? match[1].trim().toLowerCase() : cleanEmail;
+                        return actualEmail === currentEmail;
+                    };
+
+                    if (['inbox', 'all-inbox', 'allinbox'].includes(folderKey)) {
+                        normalizedEmails = normalizedEmails.filter(m => {
+                            const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
+                            const isRecipientMe = isEmailMatch(m.recipientEmail, loginEmail) || isEmailMatch(m.to, loginEmail) || isEmailMatch(m.cc, loginEmail) || isEmailMatch(m.bcc, loginEmail);
+                            return !isSenderMe || isRecipientMe;
+                        });
+                    } else if (folderKey === 'sent') {
+                        normalizedEmails = normalizedEmails.filter(m => {
+                            const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
+                            return isSenderMe;
+                        });
+                    }
+                }
+
+                // Update caches
+                if (!pagesCache.current[folderKey]) pagesCache.current[folderKey] = {};
+                pagesCache.current[folderKey][page] = normalizedEmails;
+                sessionStorage.setItem(`bnx_cache_${user.email}_${folderKey}_${page}`, JSON.stringify(normalizedEmails));
+
+                // Only update active screen if it matches the current folder
+                if (currentFolderRef.current.toLowerCase() === folderKey) {
+                    setTotalEmails(data.totalCount || 0);
+                    setEmails(normalizedEmails);
+                    const countKey = folderKey.replace('-', '').replace(' ', '');
+                    setUnreadCounts(prev => ({ ...prev, [countKey]: data.unreadCount || 0 }));
+                }
+            }
+        } catch (e) {
+            console.error(`Silent refresh failed for ${folder}:`, e);
+        }
+    }, [user, limit]);
+
     const fetchEmails = useCallback(async (folder = currentFolderRef.current, silent = false, page = 1) => {
         const folderKey = folder.toLowerCase();
         const isActiveFolder = currentFolderRef.current.toLowerCase() === folderKey;
@@ -70,12 +149,33 @@ export const MailProvider = ({ children }) => {
         
         if (!user) return;
 
-        // Check cache if not silent (manual navigation)
+        // 1. Check in-memory cache
         if (!silent && pagesCache.current[folderKey] && pagesCache.current[folderKey][page]) {
             setEmails(pagesCache.current[folderKey][page]);
             setCurrentFolder(folder);
             currentFolderRef.current = folder;
+            fetchEmailsSilently(folder, page);
             return;
+        }
+
+        // 2. Check sessionStorage cache (cross-refresh persistence)
+        const sessionCached = sessionStorage.getItem(`bnx_cache_${user.email}_${folderKey}_${page}`);
+        if (!silent && sessionCached) {
+            try {
+                const parsed = JSON.parse(sessionCached);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    if (!pagesCache.current[folderKey]) pagesCache.current[folderKey] = {};
+                    pagesCache.current[folderKey][page] = parsed;
+                    
+                    setEmails(parsed);
+                    setCurrentFolder(folder);
+                    currentFolderRef.current = folder;
+                    fetchEmailsSilently(folder, page);
+                    return;
+                }
+            } catch (e) {
+                console.error("Failed to parse session cache", e);
+            }
         }
 
         if (!silent) {
@@ -260,6 +360,9 @@ export const MailProvider = ({ children }) => {
                 // Update Cache
                 if (!pagesCache.current[folderKey]) pagesCache.current[folderKey] = {};
                 pagesCache.current[folderKey][page] = normalizedEmails;
+                if (user?.email) {
+                    sessionStorage.setItem(`bnx_cache_${user.email}_${folderKey}_${page}`, JSON.stringify(normalizedEmails));
+                }
                 
                 // Only update state if this is still the active page
                 if (currentFolderRef.current.toLowerCase() === folderKey) {
@@ -454,8 +557,8 @@ export const MailProvider = ({ children }) => {
         try {
             await mailAPI.trash(uid, folder);
             setEmails(prev => prev.filter(m => String(m.uid) !== String(uid)));
-            delete pagesCache.current['trash'];
-            if (folder) delete pagesCache.current[folder.toLowerCase()];
+            invalidateCache('trash');
+            if (folder) invalidateCache(folder);
             if (!silent) toast.success('Moved to trash');
         } catch (error) {
             if (!silent) toast.error('Failed to move to trash');
@@ -466,8 +569,8 @@ export const MailProvider = ({ children }) => {
         try {
             await mailAPI.permanentDelete(uid);
             setEmails(prev => prev.filter(m => String(m.uid) !== String(uid)));
-            delete pagesCache.current['trash'];
-            if (currentFolder) delete pagesCache.current[currentFolder.toLowerCase()];
+            invalidateCache('trash');
+            if (currentFolder) invalidateCache(currentFolder);
             if (!silent) toast.success('Permanently deleted');
         } catch (error) {
             if (!silent) toast.error('Failed to delete permanently');
@@ -561,8 +664,8 @@ export const MailProvider = ({ children }) => {
                 setEmails(prev => prev.map(m => String(m.uid) === String(uid) ? { ...m, folderName: 'Archive' } : m));
             }
             // Invalidate cache
-            if (folder) delete pagesCache.current[folder.toLowerCase()];
-            delete pagesCache.current['archive'];
+            if (folder) invalidateCache(folder);
+            invalidateCache('archive');
             if (!silent) toast.success('Email archived');
         } catch (error) {
             console.error('Failed to archive:', error);
@@ -579,8 +682,8 @@ export const MailProvider = ({ children }) => {
                 setEmails(prev => prev.map(m => String(m.uid) === String(uid) ? { ...m, folderName: 'INBOX' } : m));
             }
             // Invalidate cache
-            delete pagesCache.current['archive'];
-            delete pagesCache.current['inbox'];
+            invalidateCache('archive');
+            invalidateCache('inbox');
             if (!silent) toast.success('Email restored');
         } catch (error) {
             console.error('Failed to unarchive:', error);
