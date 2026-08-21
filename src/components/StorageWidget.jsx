@@ -50,7 +50,7 @@ const StorageWidget = ({ isDesktopOpen }) => {
       href="/storage-management"
       target="_blank"
       rel="noopener noreferrer"
-      className={`mx-3 mb-2 p-3.5 flex flex-col gap-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all cursor-pointer block ${!isDesktopOpen ? 'items-center justify-center p-2' : ''}`}
+      className={`mx-3 mb-2 p-4 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all cursor-pointer block ${!isDesktopOpen ? 'items-center justify-center p-2' : ''}`}
       style={{ 
         textDecoration: 'none', 
         color: 'inherit',
@@ -58,50 +58,48 @@ const StorageWidget = ({ isDesktopOpen }) => {
         border: theme.mode === 'dark' ? `1px solid ${theme.border}` : 'none'
       }}
     >
-      <div className="flex items-center justify-between w-full">
-        {/* Left side: Icon + Storage Label */}
+      {/* Left side: Icon, Storage title, and usage description */}
+      <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <MdCloudQueue size={20} className="text-blue-600 dark:text-blue-400 shrink-0" />
-          <span className="text-[13px] font-bold text-gray-800 dark:text-gray-200 hide-on-collapse font-sans">
+          <span className="text-[14px] font-bold text-gray-800 dark:text-gray-200 font-sans hide-on-collapse">
             Storage
           </span>
         </div>
-        
-        {/* Right side: Circular indicator + percentage */}
-        <div className="flex items-center gap-2 hide-on-collapse">
-          {/* Circular Progress Ring */}
-          <div className="relative w-5 h-5 flex items-center justify-center shrink-0">
-            <svg className="w-5 h-5 transform -rotate-90">
-              <circle
-                cx="10"
-                cy="10"
-                r="7.5"
-                className="stroke-blue-100 dark:stroke-neutral-800"
-                strokeWidth="2"
-                fill="transparent"
-              />
-              <circle
-                cx="10"
-                cy="10"
-                r="7.5"
-                className="stroke-blue-600 dark:stroke-blue-400"
-                strokeWidth="2.5"
-                fill="transparent"
-                strokeDasharray={2 * Math.PI * 7.5}
-                strokeDashoffset={2 * Math.PI * 7.5 * (1 - Math.min(storageData.percentage, 100) / 100)}
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-          <span className="text-[13px] font-bold text-blue-600 dark:text-blue-400">
-            {storageData.percentage.toFixed(0)}%
-          </span>
+        <div className="text-[12px] text-gray-600 dark:text-gray-400 font-medium pl-0.5 hide-on-collapse">
+          {formatSize(storageData.used)} of 1 GB used
         </div>
       </div>
-      
-      {/* Bottom text */}
-      <div className="text-[12px] text-gray-600 dark:text-gray-400 font-medium pl-0.5 hide-on-collapse">
-        {formatSize(storageData.used)} of 1 GB used
+
+      {/* Right side: Circular progress indicator with percentage inside */}
+      <div className="relative w-11 h-11 flex items-center justify-center shrink-0 hide-on-collapse">
+        <svg className="w-11 h-11 transform -rotate-90">
+          {/* Background circle */}
+          <circle
+            cx="22"
+            cy="22"
+            r="17"
+            className="stroke-blue-100 dark:stroke-neutral-800"
+            strokeWidth="3.5"
+            fill="transparent"
+          />
+          {/* Foreground circle */}
+          <circle
+            cx="22"
+            cy="22"
+            r="17"
+            className="stroke-blue-600 dark:stroke-blue-400"
+            strokeWidth="3.5"
+            fill="transparent"
+            strokeDasharray={2 * Math.PI * 17}
+            strokeDashoffset={2 * Math.PI * 17 * (1 - Math.min(storageData.percentage, 100) / 100)}
+            strokeLinecap="round"
+          />
+        </svg>
+        {/* Percentage inside */}
+        <span className="absolute text-[11px] font-bold text-blue-600 dark:text-blue-400 font-sans">
+          {storageData.percentage.toFixed(0)}%
+        </span>
       </div>
     </a>
   );
