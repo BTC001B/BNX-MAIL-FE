@@ -76,8 +76,9 @@ const AllMail = ({ searchQuery }) => {
   const handleForward = (email) => {
     openCompose({
       forward: true,
-      subject: `Fwd: ${email.subject || ""}`,
+      subject: email.subject?.startsWith("Fwd:") ? email.subject : `Fwd: ${email.subject || ""}`,
       originalBody: email.body,
+      originalEmail: email,
     });
   };
 const handleReply = (email) => {

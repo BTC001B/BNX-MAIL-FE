@@ -364,6 +364,56 @@ const EmailDetails = ({
     }
   }, [email]);
 
+  const getOriginalEmailContentHTML = (emailObj) => {
+    if (!emailObj) return "<div class=\"original-unavailable\">Original message unavailable</div>";
+
+    const fromVal = emailObj.from || "";
+    const toVal = emailObj.to || "";
+    const dateVal = emailObj.date ? formatDate(emailObj.date) : "";
+    const subjectVal = emailObj.subject || "";
+
+    let bodyContent = "";
+    // Detect if content is HTML
+    const isHtml = emailObj.htmlBody || (emailObj.isHtml && emailObj.body) || (emailObj.body && (
+      emailObj.body.trim().startsWith('<!DOCTYPE html') ||
+      emailObj.body.trim().startsWith('<html') ||
+      emailObj.body.includes('</html>') ||
+      emailObj.body.includes('</p>') ||
+      emailObj.body.includes('</div>') ||
+      emailObj.body.includes('</td>')
+    ));
+
+    if (isHtml) {
+      bodyContent = emailObj.htmlBody || emailObj.body;
+    } else {
+      const rawText = emailObj.body || emailObj.textPlain || "";
+      if (rawText) {
+        bodyContent = `<div style="white-space: pre-wrap;">${rawText}</div>`;
+      } else {
+        bodyContent = "<div class=\"original-unavailable\">Original message unavailable</div>";
+      }
+    }
+
+    const escapedFrom = fromVal.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const escapedTo = toVal.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    return `
+      <br/><br/>
+      <div class="gmail_quote" style="margin-top: 15px; border-top: 1px solid #e0e0e0; padding-top: 15px;">
+        <div style="font-family: Arial, sans-serif; font-size: 12px; color: #5f6368; margin-bottom: 15px;">
+          ---------- Forwarded message ----------<br/>
+          <b>From:</b> ${escapedFrom}<br/>
+          <b>To:</b> ${escapedTo}<br/>
+          <b>Date:</b> ${dateVal}<br/>
+          <b>Subject:</b> ${subjectVal}<br/>
+        </div>
+        <div style="font-family: inherit; font-size: inherit; color: inherit;">
+          ${bodyContent}
+        </div>
+      </div>
+    `;
+  };
+
   const handleSendReply = async () => {
     const recipient = replyMode === 'forward' ? forwardTo.trim() : cleanSenderEmail;
     if (!recipient) {
@@ -383,12 +433,16 @@ const EmailDetails = ({
     setSendingReply(true);
     const toastId = toast.loading("Sending message...");
     try {
+      const finalBody = replyMode === 'forward' 
+        ? `${replyBody}${getOriginalEmailContentHTML(email)}`
+        : replyBody;
+
       const payload = {
         to: recipient,
         subject: replyMode === 'forward' 
           ? (email.subject.startsWith("Fwd:") ? email.subject : `Fwd: ${email.subject}`)
           : (email.subject.startsWith("Re:") ? email.subject : `Re: ${email.subject}`),
-        body: replyBody,
+        body: finalBody,
         isHtml: true
       };
 

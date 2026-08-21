@@ -102,6 +102,78 @@ const FloatingCompose = () => {
   const [showCustomSchedule, setShowCustomSchedule] = useState(false);
   const [customScheduleDateTime, setCustomScheduleDateTime] = useState("");
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getOriginalEmailContentHTML = (email) => {
+    if (!email) return "<div class=\"original-unavailable\">Original message unavailable</div>";
+
+    const fromVal = email.from || "";
+    const toVal = email.to || "";
+    const dateVal = email.date ? formatDate(email.date) : "";
+    const subjectVal = email.subject || "";
+
+    let bodyContent = "";
+    // Detect if content is HTML
+    const isHtml = email.htmlBody || (email.isHtml && email.body) || (email.body && (
+      email.body.trim().startsWith('<!DOCTYPE html') ||
+      email.body.trim().startsWith('<html') ||
+      email.body.includes('</html>') ||
+      email.body.includes('</p>') ||
+      email.body.includes('</div>') ||
+      email.body.includes('</td>')
+    ));
+
+    if (isHtml) {
+      bodyContent = email.htmlBody || email.body;
+    } else {
+      const rawText = email.body || email.textPlain || "";
+      if (rawText) {
+        bodyContent = `<div style="white-space: pre-wrap;">${rawText}</div>`;
+      } else {
+        bodyContent = "<div class=\"original-unavailable\">Original message unavailable</div>";
+      }
+    }
+
+    const escapedFrom = fromVal.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const escapedTo = toVal.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    return `
+      <br/><br/>
+      <div class="gmail_quote" style="margin-top: 15px; border-top: 1px solid #e0e0e0; padding-top: 15px;">
+        <div style="font-family: Arial, sans-serif; font-size: 12px; color: #5f6368; margin-bottom: 15px;">
+          ---------- Forwarded message ----------<br/>
+          <b>From:</b> ${escapedFrom}<br/>
+          <b>To:</b> ${escapedTo}<br/>
+          <b>Date:</b> ${dateVal}<br/>
+          <b>Subject:</b> ${subjectVal}<br/>
+        </div>
+        <div style="font-family: inherit; font-size: inherit; color: inherit;">
+          ${bodyContent}
+        </div>
+      </div>
+    `;
+  };
+
+  const getFinalBody = (bodyVal) => {
+    if (composeData?.forward) {
+      if (composeData.originalEmail) {
+        return `${bodyVal}${getOriginalEmailContentHTML(composeData.originalEmail)}`;
+      } else if (composeData.originalBody) {
+        return `${bodyVal}<br/><br/><div>---------- Forwarded message ----------<br/>Subject: ${composeData.subject || ""}<br/><br/>${composeData.originalBody.replace(/\\n/g, '<br/>')}</div>`;
+      }
+    }
+    return bodyVal;
+  };
+
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [size, setSize] = useState({ width: 540, height: 500 });
   const [position, setPosition] = useState({ x: window.innerWidth - 570, y: window.innerHeight - 520 });
@@ -218,9 +290,11 @@ const FloatingCompose = () => {
               cc: "",
               bcc: "",
               subject: composeData.subject || "",
-              body: composeData.originalBody && composeData.mode !== 'casbox'
-                ? `<br/><br/><div>--- ${composeData.forward ? "Forwarded Message" : "Original Message"} ---<br/>${composeData.originalBody.replace(/\n/g, '<br/>')}</div>`
-                : "",
+              body: composeData.forward
+                ? ""
+                : (composeData.originalBody && composeData.mode !== 'casbox'
+                    ? `<br/><br/><div>--- Original Message ---<br/>${composeData.originalBody.replace(/\n/g, '<br/>')}</div>`
+                    : ""),
             });
           } else if (composeData.draft) {
             const d = composeData.draft;
@@ -310,7 +384,7 @@ const FloatingCompose = () => {
           cc: formData.cc,
           bcc: formData.bcc,
           subject: formData.subject || "(No Subject)",
-          body: formData.body,
+          body: getFinalBody(formData.body),
           isHtml: true
         };
         const draftRes = await mailAPI.createDbDraft(payload);
@@ -436,7 +510,7 @@ const FloatingCompose = () => {
     const payload = {
       to: formData.to,
       subject: formData.subject,
-      body: formData.body,
+      body: getFinalBody(formData.body),
       isHtml: true
     };
     if (formData.cc) payload.cc = formData.cc;
@@ -567,7 +641,7 @@ const FloatingCompose = () => {
       const payload = {
         to: formData.to,
         subject: formData.subject,
-        body: formData.body,
+        body: getFinalBody(formData.body),
         attachments: attachments,
         isHtml: true
       };
@@ -631,7 +705,7 @@ const FloatingCompose = () => {
       const payload = {
         to: formData.to,
         subject: formData.subject || "(No Subject)",
-        body: formData.body,
+        body: getFinalBody(formData.body),
         isHtml: true,
       };
       if (formData.cc) payload.cc = formData.cc;
@@ -907,14 +981,63 @@ const FloatingCompose = () => {
 
               {/* BODY */}
               <div className={`flex-1 mt-2 overflow-y-auto w-full compose-quill rounded-md ${isReply ? 'reply-composer-style' : ''}`} style={{ minHeight: "150px" }}>
-                <ReactQuill
-                  theme="snow"
-                  modules={dynamicQuillModules}
-                  value={formData.body}
-                  onChange={(content) => setFormData((prev) => ({ ...prev, body: content }))}
-                  placeholder="Type your message here..."
-                  className="h-full bg-white text-black"
-                />
+                <div className={composeData?.forward ? "" : "h-full"}>
+                  <ReactQuill
+                    theme="snow"
+                    modules={dynamicQuillModules}
+                    value={formData.body}
+                    onChange={(content) => setFormData((prev) => ({ ...prev, body: content }))}
+                    placeholder={composeData?.forward ? "Type your forwarded message here..." : "Type your message here..."}
+                    className="h-full bg-white text-black"
+                  />
+                </div>
+
+                {composeData?.forward && (
+                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-800 text-sm" style={{ color: theme.text }}>
+                    <div className="text-gray-500 font-semibold mb-3 text-xs tracking-wide">
+                      ---------- Forwarded message ----------
+                    </div>
+                    
+                    {!composeData.originalEmail ? (
+                      <div className="text-gray-400 italic text-sm py-2">
+                        Original message unavailable
+                      </div>
+                    ) : (
+                      <>
+                        <div className="text-sm space-y-1 mb-4 opacity-80" style={{ color: theme.text }}>
+                          <div><strong className="font-semibold text-gray-700 dark:text-gray-300">From:</strong> {composeData.originalEmail.from || "Original message unavailable"}</div>
+                          <div><strong className="font-semibold text-gray-700 dark:text-gray-300">To:</strong> {composeData.originalEmail.to || "Original message unavailable"}</div>
+                          <div><strong className="font-semibold text-gray-700 dark:text-gray-300">Date:</strong> {composeData.originalEmail.date ? formatDate(composeData.originalEmail.date) : "Original message unavailable"}</div>
+                          <div><strong className="font-semibold text-gray-700 dark:text-gray-300">Subject:</strong> {composeData.originalEmail.subject || "(No Subject)"}</div>
+                        </div>
+
+                        <div className="text-sm select-text mt-3" style={{ color: theme.text }}>
+                          {(() => {
+                            const email = composeData.originalEmail;
+                            const isHtml = email.htmlBody || (email.isHtml && email.body) || (email.body && (
+                              email.body.trim().startsWith('<!DOCTYPE html') ||
+                              email.body.trim().startsWith('<html') ||
+                              email.body.includes('</html>') ||
+                              email.body.includes('</p>') ||
+                              email.body.includes('</div>') ||
+                              email.body.includes('</td>')
+                            ));
+                            
+                            if (isHtml) {
+                              return <div dangerouslySetInnerHTML={{ __html: email.htmlBody || email.body }} />;
+                            } else {
+                              return (
+                                <div style={{ whiteSpace: "pre-wrap" }}>
+                                  {email.body || email.textPlain || "Original message unavailable"}
+                                </div>
+                              );
+                            }
+                          })()}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* ATTACHMENT CHIPS RENDERING */}
