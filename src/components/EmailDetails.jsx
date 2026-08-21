@@ -1589,14 +1589,63 @@ const EmailDetails = ({
                 min-height: 120px !important;
               }
             `}</style>
-            <ReactQuill
-              theme="snow"
-              modules={{ toolbar: "#inline-reply-toolbar" }}
-              value={replyBody}
-              onChange={setReplyBody}
-              placeholder={replyMode === 'forward' ? "Type your forwarded message here..." : "Type your reply here..."}
-              className="h-full bg-white text-black"
-            />
+            
+            <div className={replyMode === 'forward' ? "" : "h-full"}>
+              <ReactQuill
+                theme="snow"
+                modules={{ toolbar: "#inline-reply-toolbar" }}
+                value={replyBody}
+                onChange={setReplyBody}
+                placeholder={replyMode === 'forward' ? "Type your forwarded message here..." : "Type your reply here..."}
+                className="h-full bg-white text-black"
+              />
+            </div>
+
+            {replyMode === 'forward' && (
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-800 text-sm" style={{ color: theme.text }}>
+                <div className="text-gray-500 font-semibold mb-3 text-xs tracking-wide">
+                  ---------- Forwarded message ----------
+                </div>
+                
+                {!email ? (
+                  <div className="text-gray-400 italic text-sm py-2">
+                    Original message unavailable
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-sm space-y-1 mb-4 opacity-80" style={{ color: theme.text }}>
+                      <div><strong className="font-semibold text-gray-700 dark:text-gray-300">From:</strong> {email.from || "Original message unavailable"}</div>
+                      <div><strong className="font-semibold text-gray-700 dark:text-gray-300">To:</strong> {email.to || "Original message unavailable"}</div>
+                      <div><strong className="font-semibold text-gray-700 dark:text-gray-300">Date:</strong> {email.date ? formatDate(email.date) : "Original message unavailable"}</div>
+                      <div><strong className="font-semibold text-gray-700 dark:text-gray-300">Subject:</strong> {email.subject || "(No Subject)"}</div>
+                    </div>
+
+                    <div className="text-sm select-text mt-3" style={{ color: theme.text }}>
+                      {(() => {
+                        const isHtml = email.htmlBody || (email.isHtml && email.body) || (email.body && (
+                          email.body.trim().startsWith('<!DOCTYPE html') ||
+                          email.body.trim().startsWith('<html') ||
+                          email.body.includes('</html>') ||
+                          email.body.includes('</p>') ||
+                          email.body.includes('</div>') ||
+                          email.body.includes('</td>')
+                        ));
+                        
+                        if (isHtml) {
+                          return <div dangerouslySetInnerHTML={{ __html: email.htmlBody || email.body }} />;
+                        } else {
+                          return (
+                            <div style={{ whiteSpace: "pre-wrap" }}>
+                              {email.body || email.textPlain || "Original message unavailable"}
+                            </div>
+                          );
+                        }
+                      })()}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* ATTACHMENT CHIPS RENDERING */}
