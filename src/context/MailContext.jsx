@@ -63,9 +63,10 @@ export const MailProvider = ({ children }) => {
 
     const fetchEmails = useCallback(async (folder = currentFolder, silent = false, page = 1) => {
         const folderKey = folder.toLowerCase();
+        const isActiveFolder = currentFolderRef.current.toLowerCase() === folderKey;
         
-        if (currentFolder !== folder) setCurrentPage(1);
-        else setCurrentPage(page);
+        if (currentFolder !== folder && isActiveFolder) setCurrentPage(1);
+        else if (isActiveFolder) setCurrentPage(page);
         
         if (!user) return;
 
@@ -81,8 +82,11 @@ export const MailProvider = ({ children }) => {
             setLoading(true);
         }
         
-        setCurrentFolder(folder);
-        currentFolderRef.current = folder;
+        if (isActiveFolder) {
+            setCurrentFolder(folder);
+            currentFolderRef.current = folder;
+        }
+
         try {
             let res;
             switch (folder.toLowerCase()) {
@@ -189,6 +193,18 @@ export const MailProvider = ({ children }) => {
                         return dateB - dateA;
                     });
 
+                    // Deduplicate identical messages (e.g. from self-sends in Inbox and Sent)
+                    const seenUids = new Set();
+                    mergedEmails = mergedEmails.filter(e => {
+                        const uidStr = String(e.uid || e.id || '');
+                        if (!uidStr) return true;
+                        if (seenUids.has(uidStr)) {
+                            return false;
+                        }
+                        seenUids.add(uidStr);
+                        return true;
+                    });
+
                     res = {
                         data: {
                             success: true,
@@ -204,50 +220,51 @@ export const MailProvider = ({ children }) => {
             }
 
             if (res.data?.success) {
-                if (currentFolderRef.current === folder) {
-                    const data = res.data.data;
+                const data = res.data.data;
+                let normalizedEmails = (data.emails || []).map(m => ({
+                    ...m,
+                    starred: m.starred ?? m.isStarred ?? false
+                }));
+                if (folder === 'starred') {
+                    normalizedEmails = normalizedEmails.filter(m => m.folderName?.toLowerCase() !== 'trash');
+                }
+
+                // Filter logic for Inbox and Sent folders based on currently logged-in user's email ID
+                const lowerFolder = folder.toLowerCase();
+                if (user?.email) {
+                    const loginEmail = user.email.trim().toLowerCase();
+                    const isEmailMatch = (emailField, currentEmail) => {
+                        if (!emailField) return false;
+                        const cleanEmail = emailField.trim().toLowerCase();
+                        const match = cleanEmail.match(/<([^>]+)>/);
+                        const actualEmail = match ? match[1].trim().toLowerCase() : cleanEmail;
+                        return actualEmail === currentEmail;
+                    };
+
+                    if (['inbox', 'all-inbox', 'allinbox'].includes(lowerFolder)) {
+                        normalizedEmails = normalizedEmails.filter(m => {
+                            const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
+                            const isRecipientMe = isEmailMatch(m.recipientEmail, loginEmail) || isEmailMatch(m.to, loginEmail) || isEmailMatch(m.cc, loginEmail) || isEmailMatch(m.bcc, loginEmail);
+                            
+                            // Keep if I am NOT the sender, OR if I am both the sender and the recipient (self-send)
+                            return !isSenderMe || isRecipientMe;
+                        });
+                    } else if (lowerFolder === 'sent') {
+                        normalizedEmails = normalizedEmails.filter(m => {
+                            const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
+                            return isSenderMe;
+                        });
+                    }
+                }
+                
+                // Update Cache
+                if (!pagesCache.current[folderKey]) pagesCache.current[folderKey] = {};
+                pagesCache.current[folderKey][page] = normalizedEmails;
+                
+                // Only update state if this is still the active page
+                if (currentFolderRef.current.toLowerCase() === folderKey) {
                     setTotalEmails(data.totalCount || 0);
-                    let normalizedEmails = (data.emails || []).map(m => ({
-                        ...m,
-                        starred: m.starred ?? m.isStarred ?? false
-                    }));
-                    if (folder === 'starred') {
-                        normalizedEmails = normalizedEmails.filter(m => m.folderName?.toLowerCase() !== 'trash');
-                    }
-
-                    // Filter logic for Inbox and Sent folders based on currently logged-in user's email ID
-                    const lowerFolder = folder.toLowerCase();
-                    if (user?.email) {
-                        const loginEmail = user.email.trim().toLowerCase();
-                        const isEmailMatch = (emailField, currentEmail) => {
-                            if (!emailField) return false;
-                            const cleanEmail = emailField.trim().toLowerCase();
-                            const match = cleanEmail.match(/<([^>]+)>/);
-                            const actualEmail = match ? match[1].trim().toLowerCase() : cleanEmail;
-                            return actualEmail === currentEmail;
-                        };
-
-                        if (['inbox', 'all-inbox', 'allinbox'].includes(lowerFolder)) {
-                            normalizedEmails = normalizedEmails.filter(m => {
-                                const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
-                                return !isSenderMe;
-                            });
-                        } else if (lowerFolder === 'sent') {
-                            normalizedEmails = normalizedEmails.filter(m => {
-                                const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
-                                return isSenderMe;
-                            });
-                        }
-                    }
-                    
-                    // Update Cache
-                    const folderKey = folder.toLowerCase();
-                    if (!pagesCache.current[folderKey]) pagesCache.current[folderKey] = {};
-                    pagesCache.current[folderKey][page] = normalizedEmails;
-                    
-                    // Only update state if this is still the active page
                     setEmails(normalizedEmails);
-                    
                     const countKey = folderKey.replace('-', '').replace(' ', '');
                     setUnreadCounts(prev => ({ ...prev, [countKey]: data.unreadCount || 0 }));
                 }
@@ -256,7 +273,7 @@ export const MailProvider = ({ children }) => {
             console.error(`Failed to fetch ${folder}:`, error);
             toast.error(`Failed to load ${folder}`);
         } finally {
-            if (!silent) setLoading(false);
+            if (!silent && currentFolderRef.current.toLowerCase() === folderKey) setLoading(false);
         }
     }, [user, currentFolder, limit]);
 
