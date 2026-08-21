@@ -118,7 +118,7 @@ const FloatingCompose = () => {
 
     const fromVal = email.from || "";
     const toVal = email.to || "";
-    const dateVal = email.date ? formatDate(email.date) : "";
+    const dateVal = email.sentDate ? formatDate(email.sentDate) : (email.receivedDate ? formatDate(email.receivedDate) : (email.date ? formatDate(email.date) : ""));
     const subjectVal = email.subject || "";
 
     let bodyContent = "";
@@ -148,7 +148,7 @@ const FloatingCompose = () => {
 
     return `
       <br/><br/>
-      <div class="gmail_quote" style="margin-top: 15px; border-top: 1px solid #e0e0e0; padding-top: 15px;">
+      <div class="gmail_quote" contenteditable="false" style="margin-top: 15px; border-top: 1px solid #e0e0e0; padding-top: 15px;">
         <div style="font-family: Arial, sans-serif; font-size: 12px; color: #5f6368; margin-bottom: 15px;">
           ---------- Forwarded message ----------<br/>
           <b>From:</b> ${escapedFrom}<br/>
@@ -164,13 +164,6 @@ const FloatingCompose = () => {
   };
 
   const getFinalBody = (bodyVal) => {
-    if (composeData?.forward) {
-      if (composeData.originalEmail) {
-        return `${bodyVal}${getOriginalEmailContentHTML(composeData.originalEmail)}`;
-      } else if (composeData.originalBody) {
-        return `${bodyVal}<br/><br/><div>---------- Forwarded message ----------<br/>Subject: ${composeData.subject || ""}<br/><br/>${composeData.originalBody.replace(/\\n/g, '<br/>')}</div>`;
-      }
-    }
     return bodyVal;
   };
 
@@ -291,7 +284,7 @@ const FloatingCompose = () => {
               bcc: "",
               subject: composeData.subject || "",
               body: composeData.forward
-                ? ""
+                ? getOriginalEmailContentHTML(composeData.originalEmail)
                 : (composeData.originalBody && composeData.mode !== 'casbox'
                     ? `<br/><br/><div>--- Original Message ---<br/>${composeData.originalBody.replace(/\n/g, '<br/>')}</div>`
                     : ""),
@@ -981,63 +974,14 @@ const FloatingCompose = () => {
 
               {/* BODY */}
               <div className={`flex-1 mt-2 overflow-y-auto w-full compose-quill rounded-md ${isReply ? 'reply-composer-style' : ''}`} style={{ minHeight: "150px" }}>
-                <div className={composeData?.forward ? "" : "h-full"}>
-                  <ReactQuill
-                    theme="snow"
-                    modules={dynamicQuillModules}
-                    value={formData.body}
-                    onChange={(content) => setFormData((prev) => ({ ...prev, body: content }))}
-                    placeholder={composeData?.forward ? "Type your forwarded message here..." : "Type your message here..."}
-                    className="h-full bg-white text-black"
-                  />
-                </div>
-
-                {composeData?.forward && (
-                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-800 text-sm" style={{ color: theme.text }}>
-                    <div className="text-gray-500 font-semibold mb-3 text-xs tracking-wide">
-                      ---------- Forwarded message ----------
-                    </div>
-                    
-                    {!composeData.originalEmail ? (
-                      <div className="text-gray-400 italic text-sm py-2">
-                        Original message unavailable
-                      </div>
-                    ) : (
-                      <>
-                        <div className="text-sm space-y-1 mb-4 opacity-80" style={{ color: theme.text }}>
-                          <div><strong className="font-semibold text-gray-700 dark:text-gray-300">From:</strong> {composeData.originalEmail.from || "Original message unavailable"}</div>
-                          <div><strong className="font-semibold text-gray-700 dark:text-gray-300">To:</strong> {composeData.originalEmail.to || "Original message unavailable"}</div>
-                          <div><strong className="font-semibold text-gray-700 dark:text-gray-300">Date:</strong> {composeData.originalEmail.date ? formatDate(composeData.originalEmail.date) : "Original message unavailable"}</div>
-                          <div><strong className="font-semibold text-gray-700 dark:text-gray-300">Subject:</strong> {composeData.originalEmail.subject || "(No Subject)"}</div>
-                        </div>
-
-                        <div className="text-sm select-text mt-3" style={{ color: theme.text }}>
-                          {(() => {
-                            const email = composeData.originalEmail;
-                            const isHtml = email.htmlBody || (email.isHtml && email.body) || (email.body && (
-                              email.body.trim().startsWith('<!DOCTYPE html') ||
-                              email.body.trim().startsWith('<html') ||
-                              email.body.includes('</html>') ||
-                              email.body.includes('</p>') ||
-                              email.body.includes('</div>') ||
-                              email.body.includes('</td>')
-                            ));
-                            
-                            if (isHtml) {
-                              return <div dangerouslySetInnerHTML={{ __html: email.htmlBody || email.body }} />;
-                            } else {
-                              return (
-                                <div style={{ whiteSpace: "pre-wrap" }}>
-                                  {email.body || email.textPlain || "Original message unavailable"}
-                                </div>
-                              );
-                            }
-                          })()}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
+                <ReactQuill
+                  theme="snow"
+                  modules={dynamicQuillModules}
+                  value={formData.body}
+                  onChange={(content) => setFormData((prev) => ({ ...prev, body: content }))}
+                  placeholder={composeData?.forward ? "Type your forwarded message here..." : "Type your message here..."}
+                  className="h-full bg-white text-black"
+                />
               </div>
 
               {/* ATTACHMENT CHIPS RENDERING */}

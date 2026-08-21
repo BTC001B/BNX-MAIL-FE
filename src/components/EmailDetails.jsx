@@ -369,7 +369,7 @@ const EmailDetails = ({
 
     const fromVal = emailObj.from || "";
     const toVal = emailObj.to || "";
-    const dateVal = emailObj.date ? formatDate(emailObj.date) : "";
+    const dateVal = emailObj.sentDate ? formatDate(emailObj.sentDate) : (emailObj.receivedDate ? formatDate(emailObj.receivedDate) : (emailObj.date ? formatDate(emailObj.date) : ""));
     const subjectVal = emailObj.subject || "";
 
     let bodyContent = "";
@@ -399,7 +399,7 @@ const EmailDetails = ({
 
     return `
       <br/><br/>
-      <div class="gmail_quote" style="margin-top: 15px; border-top: 1px solid #e0e0e0; padding-top: 15px;">
+      <div class="gmail_quote" contenteditable="false" style="margin-top: 15px; border-top: 1px solid #e0e0e0; padding-top: 15px;">
         <div style="font-family: Arial, sans-serif; font-size: 12px; color: #5f6368; margin-bottom: 15px;">
           ---------- Forwarded message ----------<br/>
           <b>From:</b> ${escapedFrom}<br/>
@@ -433,9 +433,7 @@ const EmailDetails = ({
     setSendingReply(true);
     const toastId = toast.loading("Sending message...");
     try {
-      const finalBody = replyMode === 'forward' 
-        ? `${replyBody}${getOriginalEmailContentHTML(email)}`
-        : replyBody;
+      const finalBody = replyBody;
 
       const payload = {
         to: recipient,
@@ -1590,62 +1588,14 @@ const EmailDetails = ({
               }
             `}</style>
             
-            <div className={replyMode === 'forward' ? "" : "h-full"}>
-              <ReactQuill
-                theme="snow"
-                modules={{ toolbar: "#inline-reply-toolbar" }}
-                value={replyBody}
-                onChange={setReplyBody}
-                placeholder={replyMode === 'forward' ? "Type your forwarded message here..." : "Type your reply here..."}
-                className="h-full bg-white text-black"
-              />
-            </div>
-
-            {replyMode === 'forward' && (
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-800 text-sm" style={{ color: theme.text }}>
-                <div className="text-gray-500 font-semibold mb-3 text-xs tracking-wide">
-                  ---------- Forwarded message ----------
-                </div>
-                
-                {!email ? (
-                  <div className="text-gray-400 italic text-sm py-2">
-                    Original message unavailable
-                  </div>
-                ) : (
-                  <>
-                    <div className="text-sm space-y-1 mb-4 opacity-80" style={{ color: theme.text }}>
-                      <div><strong className="font-semibold text-gray-700 dark:text-gray-300">From:</strong> {email.from || "Original message unavailable"}</div>
-                      <div><strong className="font-semibold text-gray-700 dark:text-gray-300">To:</strong> {email.to || "Original message unavailable"}</div>
-                      <div><strong className="font-semibold text-gray-700 dark:text-gray-300">Date:</strong> {email.date ? formatDate(email.date) : "Original message unavailable"}</div>
-                      <div><strong className="font-semibold text-gray-700 dark:text-gray-300">Subject:</strong> {email.subject || "(No Subject)"}</div>
-                    </div>
-
-                    <div className="text-sm select-text mt-3" style={{ color: theme.text }}>
-                      {(() => {
-                        const isHtml = email.htmlBody || (email.isHtml && email.body) || (email.body && (
-                          email.body.trim().startsWith('<!DOCTYPE html') ||
-                          email.body.trim().startsWith('<html') ||
-                          email.body.includes('</html>') ||
-                          email.body.includes('</p>') ||
-                          email.body.includes('</div>') ||
-                          email.body.includes('</td>')
-                        ));
-                        
-                        if (isHtml) {
-                          return <div dangerouslySetInnerHTML={{ __html: email.htmlBody || email.body }} />;
-                        } else {
-                          return (
-                            <div style={{ whiteSpace: "pre-wrap" }}>
-                              {email.body || email.textPlain || "Original message unavailable"}
-                            </div>
-                          );
-                        }
-                      })()}
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
+            <ReactQuill
+              theme="snow"
+              modules={{ toolbar: "#inline-reply-toolbar" }}
+              value={replyBody}
+              onChange={setReplyBody}
+              placeholder={replyMode === 'forward' ? "Type your forwarded message here..." : "Type your reply here..."}
+              className="h-full bg-white text-black"
+            />
           </div>
 
           {/* ATTACHMENT CHIPS RENDERING */}
@@ -1788,7 +1738,7 @@ const EmailDetails = ({
                 onClick={() => {
                   setShowReply(true);
                   setReplyMode('forward');
-                  setReplyBody("");
+                  setReplyBody(getOriginalEmailContentHTML(email));
                   setForwardTo("");
                 }}
                 className={`px-6 py-2.5 rounded-full font-medium text-sm transition-all duration-200 flex items-center gap-2
