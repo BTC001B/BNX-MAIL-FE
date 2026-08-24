@@ -1823,11 +1823,17 @@ const EmailDetails = ({
                 className="max-w-full max-h-[82vh] object-contain rounded shadow-2xl select-none"
               />
             ) : previewFile.mimeType === "application/pdf" ? (
-              <iframe
-                src={previewFile.blobUrl}
-                title={previewFile.fileName}
+              <object
+                data={previewFile.blobUrl}
+                type="application/pdf"
                 className="w-[90vw] h-[80vh] rounded-lg shadow-2xl bg-white border-none"
-              />
+              >
+                <embed
+                  src={previewFile.blobUrl}
+                  type="application/pdf"
+                  className="w-full h-full border-none rounded-lg"
+                />
+              </object>
             ) : previewFile.mimeType === "text/plain" ? (
               <pre className="bg-zinc-950 text-zinc-100 p-6 rounded-xl shadow-2xl overflow-auto max-w-[90vw] max-h-[80vh] text-left font-mono text-xs sm:text-sm leading-relaxed border border-zinc-800 hidden-scrollbar">
                 {previewFile.textContent}
