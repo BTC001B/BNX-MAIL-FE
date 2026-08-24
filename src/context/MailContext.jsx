@@ -142,10 +142,12 @@ export const MailProvider = ({ children }) => {
 
     const fetchEmails = useCallback(async (folder = currentFolderRef.current, silent = false, page = 1) => {
         const folderKey = folder.toLowerCase();
-        const isActiveFolder = currentFolderRef.current.toLowerCase() === folderKey;
         
-        if (currentFolderRef.current !== folder && isActiveFolder) setCurrentPage(1);
-        else if (isActiveFolder) setCurrentPage(page);
+        if (currentFolderRef.current.toLowerCase() !== folderKey) {
+            setCurrentPage(1);
+        } else {
+            setCurrentPage(page);
+        }
         
         if (!user) return;
 
@@ -163,7 +165,7 @@ export const MailProvider = ({ children }) => {
         if (!silent && sessionCached) {
             try {
                 const parsed = JSON.parse(sessionCached);
-                if (Array.isArray(parsed) && parsed.length > 0) {
+                if (Array.isArray(parsed)) {
                     if (!pagesCache.current[folderKey]) pagesCache.current[folderKey] = {};
                     pagesCache.current[folderKey][page] = parsed;
                     
@@ -182,10 +184,10 @@ export const MailProvider = ({ children }) => {
             setLoading(true);
         }
         
-        if (isActiveFolder) {
-            setCurrentFolder(folder);
-            currentFolderRef.current = folder;
-        }
+        // Clear emails if switching folders to avoid flashing stale content
+        setEmails(prev => (currentFolderRef.current.toLowerCase() === folderKey ? prev : []));
+        setCurrentFolder(folder);
+        currentFolderRef.current = folder;
 
         try {
             let res;
@@ -398,66 +400,74 @@ export const MailProvider = ({ children }) => {
         }
     }, [user, fetchLabels]);
 
-    // Background pre-fetching of critical folders
+    // Background pre-fetching of critical folders in parallel
     useEffect(() => {
         if (user) {
             const prefetchFolders = async () => {
-                const folders = ['inbox', 'sent', 'draft', 'trash'];
-                for (const folder of folders) {
-                    const folderKey = folder.toLowerCase();
-                    // Pre-fetch only if not already cached and not the active folder
-                    if (
-                        (!pagesCache.current[folderKey] || !pagesCache.current[folderKey][1]) &&
-                        currentFolderRef.current.toLowerCase() !== folderKey
-                    ) {
-                        console.log(`🚀 Pre-fetching folder in background: ${folder}`);
-                        try {
-                            let res;
-                            if (folder === 'inbox') res = await mailAPI.getInbox(1, limit);
-                            else if (folder === 'sent') res = await mailAPI.getSent(1, limit);
-                            else if (folder === 'draft') res = await mailAPI.getDrafts(1, limit);
-                            else if (folder === 'trash') res = await mailAPI.getTrash(1, limit);
+                const folders = ['inbox', 'sent', 'draft', 'trash', 'starred', 'spam', 'archive', 'snoozed', 'unread'];
+                await Promise.all(
+                    folders.map(async (folder) => {
+                        const folderKey = folder.toLowerCase();
+                        // Pre-fetch only if not already cached and not the active folder
+                        if (
+                            (!pagesCache.current[folderKey] || !pagesCache.current[folderKey][1]) &&
+                            currentFolderRef.current.toLowerCase() !== folderKey
+                        ) {
+                            console.log(`🚀 Pre-fetching folder in background: ${folder}`);
+                            try {
+                                let res;
+                                if (folder === 'inbox') res = await mailAPI.getInbox(1, limit);
+                                else if (folder === 'sent') res = await mailAPI.getSent(1, limit);
+                                else if (folder === 'draft') res = await mailAPI.getDrafts(1, limit);
+                                else if (folder === 'trash') res = await mailAPI.getTrash(1, limit);
+                                else if (folder === 'starred') res = await mailAPI.getStarred(1, limit);
+                                else if (folder === 'spam') res = await mailAPI.getSpam(1, limit);
+                                else if (folder === 'archive') res = await mailAPI.getArchive(1, limit);
+                                else if (folder === 'snoozed') res = await mailAPI.getSnoozed(1, limit);
+                                else if (folder === 'unread') res = await mailAPI.getUnread(1, limit);
 
-                            if (res && res.data?.success) {
-                                const data = res.data.data;
-                                let normalized = (data.emails || []).map(m => ({
-                                    ...m,
-                                    starred: m.starred ?? m.isStarred ?? false
-                                }));
+                                if (res && res.data?.success) {
+                                    const data = res.data.data;
+                                    let normalized = (data.emails || []).map(m => ({
+                                        ...m,
+                                        starred: m.starred ?? m.isStarred ?? false
+                                    }));
 
-                                // Apply user filters to Inbox & Sent
-                                if (user?.email) {
-                                    const loginEmail = user.email.trim().toLowerCase();
-                                    const isEmailMatch = (emailField, currentEmail) => {
-                                        if (!emailField) return false;
-                                        const cleanEmail = emailField.trim().toLowerCase();
-                                        const match = cleanEmail.match(/<([^>]+)>/);
-                                        const actualEmail = match ? match[1].trim().toLowerCase() : cleanEmail;
-                                        return actualEmail === currentEmail;
-                                    };
+                                    // Apply user filters to Inbox & Sent
+                                    if (user?.email) {
+                                        const loginEmail = user.email.trim().toLowerCase();
+                                        const isEmailMatch = (emailField, currentEmail) => {
+                                            if (!emailField) return false;
+                                            const cleanEmail = emailField.trim().toLowerCase();
+                                            const match = cleanEmail.match(/<([^>]+)>/);
+                                            const actualEmail = match ? match[1].trim().toLowerCase() : cleanEmail;
+                                            return actualEmail === currentEmail;
+                                        };
 
-                                    if (folder === 'inbox') {
-                                        normalized = normalized.filter(m => {
-                                            const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
-                                            const isRecipientMe = isEmailMatch(m.recipientEmail, loginEmail) || isEmailMatch(m.to, loginEmail) || isEmailMatch(m.cc, loginEmail) || isEmailMatch(m.bcc, loginEmail);
-                                            return !isSenderMe || isRecipientMe;
-                                        });
-                                    } else if (folder === 'sent') {
-                                        normalized = normalized.filter(m => {
-                                            const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
-                                            return isSenderMe;
-                                        });
+                                        if (folder === 'inbox') {
+                                            normalized = normalized.filter(m => {
+                                                const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
+                                                const isRecipientMe = isEmailMatch(m.recipientEmail, loginEmail) || isEmailMatch(m.to, loginEmail) || isEmailMatch(m.cc, loginEmail) || isEmailMatch(m.bcc, loginEmail);
+                                                return !isSenderMe || isRecipientMe;
+                                            });
+                                        } else if (folder === 'sent') {
+                                            normalized = normalized.filter(m => {
+                                                const isSenderMe = isEmailMatch(m.senderEmail, loginEmail) || isEmailMatch(m.from, loginEmail);
+                                                return isSenderMe;
+                                            });
+                                        }
                                     }
-                                }
 
-                                if (!pagesCache.current[folderKey]) pagesCache.current[folderKey] = {};
-                                pagesCache.current[folderKey][1] = normalized;
+                                    if (!pagesCache.current[folderKey]) pagesCache.current[folderKey] = {};
+                                    pagesCache.current[folderKey][1] = normalized;
+                                    sessionStorage.setItem(`bnx_cache_${user.email}_${folderKey}_1`, JSON.stringify(normalized));
+                                }
+                            } catch (e) {
+                                console.error(`Failed to pre-fetch folder ${folder}:`, e);
                             }
-                        } catch (e) {
-                            console.error(`Failed to pre-fetch folder ${folder}:`, e);
                         }
-                    }
-                }
+                    })
+                );
             };
 
             const timer = setTimeout(prefetchFolders, 3000); // 3 seconds delay
