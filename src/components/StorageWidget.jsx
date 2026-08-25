@@ -50,23 +50,23 @@ const StorageWidget = ({ isDesktopOpen }) => {
       href="/storage-management"
       target="_blank"
       rel="noopener noreferrer"
-      className={`mx-3 mb-2 p-4 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all cursor-pointer block ${!isDesktopOpen ? 'items-center justify-center p-2' : ''}`}
+      className={`mx-3 mb-2 p-4 flex items-center justify-between hover:bg-black/5 rounded-2xl transition-all cursor-pointer block ${!isDesktopOpen ? 'items-center justify-center p-2' : ''}`}
       style={{ 
         textDecoration: 'none', 
-        color: 'inherit',
-        backgroundColor: theme.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#e9eef6',
-        border: theme.mode === 'dark' ? `1px solid ${theme.border}` : 'none'
+        color: '#1f2937',
+        backgroundColor: '#ffffff',
+        border: '1px solid #e5e7eb'
       }}
     >
       {/* Left side: Icon, Storage title, and usage description */}
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
-          <MdCloudQueue size={20} className="text-blue-600 dark:text-blue-400 shrink-0" />
-          <span className="text-[14px] font-bold text-gray-800 dark:text-gray-200 font-sans hide-on-collapse">
+          <MdCloudQueue size={20} className="text-blue-600 shrink-0" />
+          <span className="text-[14px] font-bold text-gray-800 font-sans hide-on-collapse">
             Storage
           </span>
         </div>
-        <div className="text-[12px] text-gray-600 dark:text-gray-400 font-medium pl-0.5 hide-on-collapse">
+        <div className="text-[12px] text-gray-600 font-medium pl-0.5 hide-on-collapse">
           {formatSize(storageData.used)} of 1 GB used
         </div>
       </div>
@@ -79,7 +79,7 @@ const StorageWidget = ({ isDesktopOpen }) => {
             cx="22"
             cy="22"
             r="17"
-            className="stroke-blue-100 dark:stroke-neutral-800"
+            className="stroke-blue-100"
             strokeWidth="3.5"
             fill="transparent"
           />
@@ -88,7 +88,7 @@ const StorageWidget = ({ isDesktopOpen }) => {
             cx="22"
             cy="22"
             r="17"
-            className="stroke-blue-600 dark:stroke-blue-400"
+            className="stroke-blue-600"
             strokeWidth="3.5"
             fill="transparent"
             strokeDasharray={2 * Math.PI * 17}
@@ -97,7 +97,7 @@ const StorageWidget = ({ isDesktopOpen }) => {
           />
         </svg>
         {/* Percentage inside */}
-        <span className="absolute text-[11px] font-bold text-blue-600 dark:text-blue-400 font-sans">
+        <span className="absolute text-[11px] font-bold text-blue-600 font-sans">
           {storageData.percentage.toFixed(0)}%
         </span>
       </div>
