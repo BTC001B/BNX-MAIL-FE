@@ -254,9 +254,7 @@ const AppContent = () => {
                 : theme.cardBg,
               backdropFilter: backgroundImage ? "none" : "none",
               WebkitBackdropFilter: backgroundImage ? "none" : "none",
-              borderColor: backgroundImage
-                ? (theme.mode === "dark" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.1)")
-                : theme.border,
+              borderColor: theme.accent || "#135bec",
             }}
           >
             <Routes>
