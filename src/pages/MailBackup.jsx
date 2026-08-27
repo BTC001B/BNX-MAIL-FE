@@ -72,8 +72,10 @@ const MailBackup = () => {
         setTotalItems(res.data.length || 0);
       }
     } catch (err) {
-      console.error("Failed to load backups:", err);
-      setError("Unable to load backup emails");
+      console.warn("Mail Backup API is offline or not yet connected:", err.message);
+      setBackups([]);
+      setTotalItems(0);
+      setError(null);
     } finally {
       setLoading(false);
     }

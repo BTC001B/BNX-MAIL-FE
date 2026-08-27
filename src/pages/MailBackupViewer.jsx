@@ -26,8 +26,9 @@ const MailBackupViewer = () => {
           setBackup(res.data);
         }
       } catch (err) {
-        console.error("Failed to load backup detail:", err);
-        setError("Unable to load backup email");
+        console.warn("Mail Backup Detail API is offline or not yet connected:", err.message);
+        setBackup(null);
+        setError(null);
       } finally {
         setLoading(false);
       }
