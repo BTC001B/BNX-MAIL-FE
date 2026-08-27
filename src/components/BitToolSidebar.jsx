@@ -271,7 +271,7 @@ const BitToolSidebar = ({
                           : "border-dashed border-gray-300 dark:border-gray-700 bg-transparent text-gray-400 hover:border-gray-400"
                         }`}
                     >
-                      <Icon size={40} />
+                      <Icon size={48} />
                     </button>
 
                     {/* CUSTOM POPOVER TOOLTIP */}
@@ -301,7 +301,7 @@ const BitToolSidebar = ({
                             : `border-transparent hover:scale-105 ${tool.bgClass} ${tool.textClass} shadow-sm`
                           }`}
                       >
-                        <Icon size={34} />
+                        <Icon size={48} />
                       </button>
 
                       {/* TOOLTIP */}
