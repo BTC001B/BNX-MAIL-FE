@@ -179,7 +179,7 @@ const BitToolSidebar = ({
       style={{ 
         width: !isOpen ? "0px" : (selectedTool ? "420px" : "60px"),
         borderLeftWidth: isOpen ? "1px" : "0px",
-        borderLeftColor: theme.border,
+        borderLeftColor: theme.accent || "#1E6FD9",
         overflow: "visible"
       }}
     >
