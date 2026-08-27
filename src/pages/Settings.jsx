@@ -637,7 +637,7 @@ const Settings = () => {
             <Section title="Email Accounts" theme={theme}>
               <p className="text-sm text-gray-500 mb-6">Manage multiple linked email addresses in your current session.</p>
 
-              <div className="flex flex-col gap-3 max-w-2xl">
+              <div className="flex flex-col gap-3 max-w-md">
                 {getSessions().map(session => (
                   <div
                     key={session.email}
