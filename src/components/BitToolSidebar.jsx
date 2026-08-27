@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { 
-  MdCalendarToday, MdCalculate, MdPeople, MdSecurity, MdKeyboard, 
-  MdTranslate, MdFilterCenterFocus, MdCloudQueue, MdNewspaper, 
+import {
+  MdCalendarToday, MdCalculate, MdPeople, MdSecurity, MdKeyboard,
+  MdTranslate, MdFilterCenterFocus, MdCloudQueue, MdNewspaper,
   MdAdd, MdCheck, MdClose, MdOutlineEdit, MdTune, MdApps, MdOutlineNoteAlt
 } from "react-icons/md";
 import { useTheme } from "../context/ThemeContext";
@@ -25,8 +25,8 @@ const ALL_TOOLS = [
   { id: "weather", name: "Weather", icon: MdCloudQueue, color: "#06b6d4", ringClass: "border-[#06b6d4]", textClass: "text-[#06b6d4]", bgClass: "bg-cyan-50 dark:bg-cyan-950/20" }
 ];
 
-const BitToolSidebar = ({ 
-  isOpen, 
+const BitToolSidebar = ({
+  isOpen,
   onClose,
   notes,
   openNoteIds,
@@ -136,7 +136,7 @@ const BitToolSidebar = ({
                 <div className="bg-teal-500 h-full transition-all duration-200" style={{ width: `${scanProgress}%` }} />
               </div>
             )}
-            <button 
+            <button
               disabled={isScanning}
               onClick={handleStartScan}
               className="px-6 py-2.5 rounded-xl text-white font-bold text-xs bg-teal-500 shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 cursor-pointer"
@@ -174,9 +174,9 @@ const BitToolSidebar = ({
   };
 
   return (
-    <div 
+    <div
       className={`h-full flex shrink-0 select-none transition-all duration-300 ease-in-out ${backgroundImage ? "bg-transparent" : "bg-white dark:bg-gray-900"} animate-fade-in`}
-      style={{ 
+      style={{
         width: !isOpen ? "0px" : (selectedTool ? "420px" : "60px"),
         borderLeftWidth: isOpen ? "1px" : "0px",
         borderLeftColor: theme.accent || "#1E6FD9",
@@ -184,9 +184,9 @@ const BitToolSidebar = ({
       }}
     >
       {/* Mini-App Slide Panel (Shown to the left of the sidebar) */}
-      <div 
+      <div
         className={`flex flex-col select-text transition-all duration-300 ease-in-out ${backgroundImage ? "bg-transparent" : "bg-white dark:bg-gray-900"}`}
-        style={{ 
+        style={{
           width: selectedTool ? "360px" : "0px",
           height: selectedTool ? "100%" : "0px",
           maxHeight: selectedTool ? "100%" : "0px",
@@ -198,15 +198,15 @@ const BitToolSidebar = ({
       >
         {selectedTool && (
           selectedTool === 'apps' ? (
-            <AppLauncher onClose={() => setSelectedTool(null)} onToggleBitToolSidebar={() => {}} onEdit={() => setIsEditing(true)} />
+            <AppLauncher onClose={() => setSelectedTool(null)} onToggleBitToolSidebar={() => { }} onEdit={() => setIsEditing(true)} />
           ) : (
             <>
               <div className="px-4 h-14 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01] shrink-0">
                 <h4 className="font-bold text-sm" style={{ color: theme.text }}>
                   {ALL_TOOLS.find(t => t.id === selectedTool)?.name}
                 </h4>
-                <button 
-                  onClick={() => setSelectedTool(null)} 
+                <button
+                  onClick={() => setSelectedTool(null)}
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer flex items-center justify-center"
                 >
                   <MdClose size={18} />
@@ -221,12 +221,12 @@ const BitToolSidebar = ({
       </div>
 
       {/* Right Sidebar Strip */}
-      <div 
+      <div
         className="w-[60px] flex flex-col items-center pb-4 h-full justify-between select-none shrink-0"
       >
         <div className="flex flex-col items-center w-full">
           {/* HEADER / EDIT MODE LABEL */}
-          <div 
+          <div
             className="flex items-center justify-center w-full h-14 shrink-0 transition-all"
           >
             {isEditing ? (
@@ -266,15 +266,14 @@ const BitToolSidebar = ({
                       onClick={() => handleTogglePin(tool.id)}
                       onMouseEnter={() => setHoveredTool(tool.id)}
                       onMouseLeave={() => setHoveredTool(null)}
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer border-2 ${
-                        isPinned 
-                          ? `${tool.ringClass} ${tool.bgClass} ${tool.textClass}` 
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer border-2 ${isPinned
+                          ? `${tool.ringClass} ${tool.bgClass} ${tool.textClass}`
                           : "border-dashed border-gray-300 dark:border-gray-700 bg-transparent text-gray-400 hover:border-gray-400"
-                      }`}
+                        }`}
                     >
-                      <Icon size={34} />
+                      <Icon size={40} />
                     </button>
-                    
+
                     {/* CUSTOM POPOVER TOOLTIP */}
                     {hoveredTool === tool.id && (
                       <div className="absolute right-[52px] top-1/2 -translate-y-1/2 bg-gray-800 text-white text-[11px] font-medium px-2 py-1 rounded shadow-md whitespace-nowrap z-50">
@@ -297,11 +296,10 @@ const BitToolSidebar = ({
                         onClick={() => setSelectedTool(isSelected ? null : tool.id)}
                         onMouseEnter={() => setHoveredTool(tool.id)}
                         onMouseLeave={() => setHoveredTool(null)}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer border-2 ${
-                          isSelected 
-                            ? `${tool.ringClass} ${tool.bgClass} ${tool.textClass} scale-95 shadow-inner` 
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer border-2 ${isSelected
+                            ? `${tool.ringClass} ${tool.bgClass} ${tool.textClass} scale-95 shadow-inner`
                             : `border-transparent hover:scale-105 ${tool.bgClass} ${tool.textClass} shadow-sm`
-                        }`}
+                          }`}
                       >
                         <Icon size={34} />
                       </button>
@@ -343,8 +341,8 @@ const BitToolSidebar = ({
         {/* BOTTOM UTILITY ICON BLOCK */}
         <div className="flex flex-col items-center gap-3.5 w-full mt-auto">
           <div className="w-8 h-[1px] bg-gray-200 dark:bg-gray-800" />
-          
-          <button 
+
+          <button
             className="w-10 h-10 rounded-xl border border-gray-200/60 dark:border-gray-850 hover:bg-gray-50 dark:hover:bg-gray-850 text-gray-500 dark:text-gray-400 flex items-center justify-center transition-all cursor-pointer bg-white/50 dark:bg-gray-900/50 shadow-sm"
             title="Shortcuts"
             onClick={() => setSelectedTool("keyboard")}
@@ -352,7 +350,7 @@ const BitToolSidebar = ({
             <MdOutlineEdit size={18} />
           </button>
 
-          <button 
+          <button
             className="w-10 h-10 rounded-xl border border-gray-200/60 dark:border-gray-850 hover:bg-gray-50 dark:hover:bg-gray-850 text-gray-500 dark:text-gray-400 flex items-center justify-center transition-all cursor-pointer bg-white/50 dark:bg-gray-900/50 shadow-sm"
             title="Customize Sidebar"
             onClick={() => setIsEditing(true)}
