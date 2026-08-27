@@ -48,6 +48,8 @@ import Support from "./pages/Support";
 import BulkMail from "./pages/BulkMail";
 import Notification from "./pages/Notification";
 import StorageManagement from "./pages/StorageManagement";
+import MailBackup from "./pages/MailBackup";
+import MailBackupViewer from "./pages/MailBackupViewer";
 import { StickyNote, NotesManager } from "./components/StickyNotes";
 
 /* Signup Pages */
@@ -287,6 +289,8 @@ const AppContent = () => {
               <Route path="/vault" element={<Vault />} />
               <Route path="/casbox" element={<Casbox />} />
               <Route path="/support" element={<Support />} />
+              <Route path="/mail-backup" element={<MailBackup />} />
+              <Route path="/mail-backup/:id" element={<MailBackupViewer />} />
             </Routes>
           </main>
 
