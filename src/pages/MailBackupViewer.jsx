@@ -14,7 +14,18 @@ const MailBackupViewer = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Route protection guard
   useEffect(() => {
+    const isVerified = sessionStorage.getItem("bnx_backup_verified") === "true";
+    if (!isVerified) {
+      navigate("/mail-backup", { replace: true });
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const isVerified = sessionStorage.getItem("bnx_backup_verified") === "true";
+    if (!isVerified) return;
+
     const fetchBackupDetail = async () => {
       try {
         setLoading(true);
