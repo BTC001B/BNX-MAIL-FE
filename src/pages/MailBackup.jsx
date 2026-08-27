@@ -1,15 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { mailBackupAPI } from "../services/mailBackupApi";
 import { useTheme } from "../context/ThemeContext";
-import { MdBackup, MdAttachFile, MdKeyboardArrowLeft, MdKeyboardArrowRight, MdInfoOutline, MdRefresh } from "react-icons/md";
+import { useAuth } from "../context/AuthContext";
+import { MdBackup, MdAttachFile, MdKeyboardArrowLeft, MdKeyboardArrowRight, MdRefresh, MdSecurity } from "react-icons/md";
 import toast from "react-hot-toast";
 
 const MailBackup = () => {
   const navigate = useNavigate();
-  const { theme, backgroundImage } = useTheme();
+  const { theme } = useTheme();
+  const { user } = useAuth();
 
-  // State Management
+  // Verification Gate States
+  const [isVerified, setIsVerified] = useState(
+    sessionStorage.getItem("bnx_backup_verified") === "true"
+  );
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [verifying, setVerifying] = useState(false);
+  const [otpError, setOtpError] = useState(null);
+  const [resendTimer, setResendTimer] = useState(0);
+
+  // References for OTP text boxes to handle focus changes cleanly
+  const inputRefs = [
+    useRef(),
+    useRef(),
+    useRef(),
+    useRef(),
+    useRef(),
+    useRef()
+  ];
+
+  // Backup List States
   const [backups, setBackups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,7 +39,23 @@ const MailBackup = () => {
   const [pageSize, setPageSize] = useState(20);
   const [totalItems, setTotalItems] = useState(0);
 
+  // Countdown timer for Resend OTP button
+  useEffect(() => {
+    let interval = null;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
   const fetchBackups = async () => {
+    // Only call backups API if verification is complete
+    if (!isVerified) return;
+
     try {
       setLoading(true);
       setError(null);
@@ -42,9 +79,108 @@ const MailBackup = () => {
     }
   };
 
+  // Fetch backups whenever page/filter parameters change (after verification passes)
   useEffect(() => {
-    fetchBackups();
-  }, [activeFilter, currentPage, pageSize]);
+    if (isVerified) {
+      fetchBackups();
+    }
+  }, [activeFilter, currentPage, pageSize, isVerified]);
+
+  // Mask user email (e.g. ashwin@example.com -> a•••••@example.com)
+  const maskEmail = (email) => {
+    if (!email) return "u•••••@example.com";
+    const [localPart, domain] = email.split("@");
+    if (localPart.length <= 1) return email;
+    return `${localPart[0]}•••••@${domain}`;
+  };
+
+  // OTP inputs keyboard shifting handlers
+  const handleOtpChange = (value, index) => {
+    // Accept only numeric input
+    if (value && isNaN(value)) return;
+
+    const newOtp = [...otp];
+    // Cache only the latest typed character in the box
+    newOtp[index] = value ? value.substring(value.length - 1) : "";
+    setOtp(newOtp);
+    setOtpError(null);
+
+    // Auto focus next box
+    if (value && index < 5) {
+      inputRefs[index + 1].current.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (e, index) => {
+    if (e.key === "Backspace") {
+      if (!otp[index] && index > 0) {
+        // Clear previous input digit and transfer focus backward
+        const newOtp = [...otp];
+        newOtp[index - 1] = "";
+        setOtp(newOtp);
+        inputRefs[index - 1].current.focus();
+      } else {
+        const newOtp = [...otp];
+        newOtp[index] = "";
+        setOtp(newOtp);
+      }
+      setOtpError(null);
+    }
+  };
+
+  const handleOtpPaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text").trim();
+    
+    // Ensure pasted text is exactly a 6-digit numeric code
+    if (!/^\d{6}$/.test(pastedData)) {
+      setOtpError("Please paste a valid 6-digit number");
+      return;
+    }
+
+    const newOtp = pastedData.split("");
+    setOtp(newOtp);
+    setOtpError(null);
+    inputRefs[5].current.focus();
+  };
+
+  const handleVerifyOtp = () => {
+    const fullOtp = otp.join("");
+    if (fullOtp.length < 6) {
+      setOtpError("Please enter a complete 6-digit OTP");
+      return;
+    }
+
+    setVerifying(true);
+    setOtpError(null);
+
+    // Mock API verification call to prepare structure for backend integration
+    setTimeout(() => {
+      // Demo scenarios for error/expired testing
+      if (fullOtp === "000000") {
+        setOtpError("Expired OTP. Please request a new one.");
+        setVerifying(false);
+      } else if (fullOtp === "111111") {
+        setOtpError("Invalid OTP. Please try again.");
+        setVerifying(false);
+      } else {
+        sessionStorage.setItem("bnx_backup_verified", "true");
+        setIsVerified(true);
+        setVerifying(false);
+        toast.success("Identity verified successfully");
+      }
+    }, 1500);
+  };
+
+  const handleResendOtp = () => {
+    if (resendTimer > 0) return;
+
+    // Trigger mock resend action
+    toast.success("A new OTP has been sent to your email address");
+    setResendTimer(30);
+    setOtp(["", "", "", "", "", ""]);
+    setOtpError(null);
+  };
 
   // Reset page when filter or page size changes
   const handleFilterChange = (filter) => {
@@ -60,6 +196,110 @@ const MailBackup = () => {
   const totalPages = Math.ceil(totalItems / pageSize) || 1;
   const startIndex = (currentPage - 1) * pageSize;
 
+  /* RENDER OTP VERIFICATION SCREEN */
+  if (!isVerified) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-6 bg-transparent select-none h-full">
+        <div 
+          className="w-full max-w-md border rounded-[24px] p-6 sm:p-8 flex flex-col items-center text-center shadow-[0_8px_30px_rgba(0,0,0,0.02)]"
+          style={{ borderColor: theme.border, background: theme.cardBg }}
+        >
+          {/* Security Icon Badge */}
+          <div 
+            className="w-14 h-14 rounded-full flex items-center justify-center mb-5 text-white shadow-sm"
+            style={{ background: `linear-gradient(135deg, ${theme.accent || "#1E6FD9"} 0%, #3b82f6 100%)` }}
+          >
+            <MdSecurity size={28} />
+          </div>
+
+          {/* Secure Title */}
+          <h2 className="text-lg font-bold mb-1.5" style={{ color: theme.text }}>
+            Secure Mail Backup
+          </h2>
+
+          {/* Description */}
+          <p className="text-xs sm:text-sm leading-relaxed mb-6 px-2" style={{ color: theme.subText }}>
+            Your Mail Backup contains protected copies of your emails. Verify your identity to continue.
+          </p>
+
+          {/* Masked Email */}
+          <div className="text-xs font-bold bg-black/[0.02] dark:bg-white/[0.02] py-2 px-4 rounded-full border border-gray-200/50 dark:border-gray-800/80 mb-6">
+            <span style={{ color: theme.subText }}>OTP sent to: </span>
+            <span style={{ color: theme.text }}>{maskEmail(user?.email)}</span>
+          </div>
+
+          {/* 6 OTP Inputs */}
+          <div className="flex justify-center gap-2.5 mb-6 w-full" onPaste={handleOtpPaste}>
+            {otp.map((digit, idx) => (
+              <input
+                key={idx}
+                ref={inputRefs[idx]}
+                type="text"
+                maxLength={1}
+                value={digit}
+                disabled={verifying}
+                onChange={(e) => handleOtpChange(e.target.value, idx)}
+                onKeyDown={(e) => handleOtpKeyDown(e, idx)}
+                className="w-10 h-12 sm:w-11 sm:h-13 text-center text-lg font-bold rounded-xl border outline-none transition-all focus:ring-2 focus:ring-primary/20 bg-white dark:bg-gray-900"
+                style={{ 
+                  borderColor: theme.border, 
+                  color: theme.text,
+                  caretColor: theme.accent || "#1E6FD9"
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = theme.accent || "#1E6FD9";
+                  e.target.style.boxShadow = `0 0 0 2px ${(theme.accent || "#1E6FD9")}20`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = theme.border;
+                  e.target.style.boxShadow = "none";
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Errors display */}
+          {otpError && (
+            <div className="mb-4 text-xs font-bold text-red-500 flex items-center gap-1 animate-fade-in">
+              <span>⚠️</span> {otpError}
+            </div>
+          )}
+
+          {/* Verify OTP Button */}
+          <button
+            onClick={handleVerifyOtp}
+            disabled={verifying}
+            className="w-full py-3 rounded-xl text-sm font-bold text-white shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mb-4"
+            style={{ backgroundColor: theme.accent || "#1E6FD9" }}
+          >
+            {verifying ? (
+              <>
+                <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Verifying OTP...
+              </>
+            ) : (
+              "Verify OTP"
+            )}
+          </button>
+
+          {/* Resend Option */}
+          <button
+            onClick={handleResendOtp}
+            disabled={verifying || resendTimer > 0}
+            className="text-xs font-bold hover:underline transition-all cursor-pointer disabled:opacity-50 disabled:no-underline"
+            style={{ color: theme.accent || "#1E6FD9" }}
+          >
+            {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : "Resend OTP"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  /* RENDER MAIN MAIL BACKUP LIST PAGE (AFTER SUCCESSFUL VERIFICATION) */
   return (
     <div className="flex-1 flex flex-col overflow-hidden h-full">
       {/* Header Panel */}
@@ -71,7 +311,7 @@ const MailBackup = () => {
           <div className="flex items-center gap-2.5">
             <span 
               className="p-1.5 rounded-lg text-white flex items-center justify-center shadow-sm"
-              style={{ background: `linear-gradient(135deg, ${theme.accent || "#135bec"} 0%, #3b82f6 100%)` }}
+              style={{ background: `linear-gradient(135deg, ${theme.accent || "#1E6FD9"} 0%, #3b82f6 100%)` }}
             >
               <MdBackup size={18} />
             </span>
@@ -108,7 +348,7 @@ const MailBackup = () => {
                   ? "shadow-sm border-transparent" 
                   : "bg-transparent border-gray-200/60 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
               }`}
-              style={isActive ? { backgroundColor: theme.accent || "#135bec", color: "#fff" } : { color: theme.subText }}
+              style={isActive ? { backgroundColor: theme.accent || "#1E6FD9", color: "#fff" } : { color: theme.subText }}
             >
               {filter}
             </button>
@@ -144,7 +384,7 @@ const MailBackup = () => {
             <button
               onClick={fetchBackups}
               className="px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
-              style={{ backgroundColor: theme.accent || "#135bec" }}
+              style={{ backgroundColor: theme.accent || "#1E6FD9" }}
             >
               Retry Connection
             </button>
