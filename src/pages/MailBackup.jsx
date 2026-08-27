@@ -144,7 +144,7 @@ const MailBackup = () => {
     inputRefs[5].current.focus();
   };
 
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     const fullOtp = otp.join("");
     if (fullOtp.length < 6) {
       setOtpError("Please enter a complete 6-digit OTP");
@@ -154,32 +154,43 @@ const MailBackup = () => {
     setVerifying(true);
     setOtpError(null);
 
-    // Mock API verification call to prepare structure for backend integration
-    setTimeout(() => {
-      // Demo scenarios for error/expired testing
-      if (fullOtp === "000000") {
-        setOtpError("Expired OTP. Please request a new one.");
-        setVerifying(false);
-      } else if (fullOtp === "111111") {
-        setOtpError("Invalid OTP. Please try again.");
-        setVerifying(false);
-      } else {
+    try {
+      const res = await mailBackupAPI.verifyOtp(fullOtp);
+      if (res.data && res.data.success) {
         sessionStorage.setItem("bnx_backup_verified", "true");
         setIsVerified(true);
-        setVerifying(false);
         toast.success("Identity verified successfully");
+      } else {
+        setOtpError(res.data?.message || "Invalid OTP code. Please try again.");
       }
-    }, 1500);
+    } catch (err) {
+      console.error("OTP verification error:", err);
+      const status = err.response?.status;
+      if (status === 400) {
+        setOtpError("Invalid OTP. Please check the code and try again.");
+      } else if (status === 410) {
+        setOtpError("Expired OTP. Please request a new one.");
+      } else {
+        setOtpError("OTP Verification is currently unavailable. Please try again later.");
+      }
+    } finally {
+      setVerifying(false);
+    }
   };
 
-  const handleResendOtp = () => {
+  const handleResendOtp = async () => {
     if (resendTimer > 0) return;
 
-    // Trigger mock resend action
-    toast.success("A new OTP has been sent to your email address");
-    setResendTimer(30);
-    setOtp(["", "", "", "", "", ""]);
     setOtpError(null);
+    try {
+      const res = await mailBackupAPI.resendOtp();
+      toast.success("A new OTP has been sent to your email address");
+      setResendTimer(30);
+      setOtp(["", "", "", "", "", ""]);
+    } catch (err) {
+      console.error("Resend OTP error:", err);
+      setOtpError("Failed to resend OTP. Verification service is currently offline.");
+    }
   };
 
   // Reset page when filter or page size changes

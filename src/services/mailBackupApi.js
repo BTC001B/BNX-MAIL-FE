@@ -13,5 +13,11 @@ export const mailBackupAPI = {
     getAttachmentDownloadUrl: (id, attachmentId) => {
         const apiBaseUrl = import.meta.env.VITE_API_URL || '';
         return `${apiBaseUrl}/api/mail-backups/${id}/attachments/${attachmentId}`;
+    },
+    verifyOtp: (otp) => {
+        return api.post('/api/mail-backups/verify-otp', { otp });
+    },
+    resendOtp: () => {
+        return api.post('/api/mail-backups/resend-otp');
     }
 };
