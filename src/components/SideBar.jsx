@@ -128,7 +128,7 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile, onOpenNotes }) =>
                </button>
             </div>
           ) : !isChatMode ? (
-            ["Inbox", "Starred", "Snoozed", "Sent", "Draft", "Trash", "Mail Backup"]
+            ["Inbox", "Starred", "Snoozed", "Sent", "Draft", "Trash"]
               .map(name => SIDEBAR_ITEMS.find(item => item.name === name))
               .filter(Boolean)
               .filter(item => sidebarPreferences?.[item.name] !== false)
@@ -204,7 +204,7 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile, onOpenNotes }) =>
             </div>
           )}
 
-          {!isChatMode && !isVaultMode && ["All Inbox", "Scheduled", "Spam", "All Mail", "Archive", "Unread", "Chat", "Templates", "Analytics", "Subscriptions"]
+          {!isChatMode && !isVaultMode && ["All Inbox", "Scheduled", "Spam", "All Mail", "Archive", "Unread", "Chat", "Templates", "Analytics", "Subscriptions", "Mail Backup"]
             .filter(name => name !== "All Inbox" || (getSessions && getSessions().length > 1))
             .map(name => SIDEBAR_ITEMS.find(item => item.name === name))
             .filter(Boolean)
@@ -226,7 +226,7 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile, onOpenNotes }) =>
 
               {isMoreOpen && (
                 <div className="mt-1 space-y-0 animate-fade-in origin-top">
-                  {["All Inbox", "Scheduled", "Spam", "All Mail", "Archive", "Unread", "Templates", "Analytics", "Subscriptions"]
+                  {["All Inbox", "Scheduled", "Spam", "All Mail", "Archive", "Unread", "Templates", "Analytics", "Subscriptions", "Mail Backup"]
                     .filter(name => name !== "All Inbox" || (getSessions && getSessions().length > 1))
                     .map(name => SIDEBAR_ITEMS.find(item => item.name === name))
                     .filter(Boolean)
