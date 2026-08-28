@@ -175,7 +175,7 @@ const BitToolSidebar = ({
 
   return (
     <div
-      className={`h-full flex shrink-0 select-none transition-all duration-300 ease-in-out ${backgroundImage ? "bg-transparent" : "bg-white dark:bg-gray-900"} animate-fade-in`}
+      className={`h-full flex shrink-0 select-none transition-all duration-300 ease-in-out ${backgroundImage ? "bg-transparent" : "bg-white dark:bg-gray-900"} animate-fade-in rounded-tl-2xl`}
       style={{
         width: !isOpen ? "0px" : (selectedTool ? "420px" : "60px"),
         borderLeftWidth: isOpen ? "1px" : "0px",
@@ -185,7 +185,7 @@ const BitToolSidebar = ({
     >
       {/* Mini-App Slide Panel (Shown to the left of the sidebar) */}
       <div
-        className={`flex flex-col select-text transition-all duration-300 ease-in-out ${backgroundImage ? "bg-transparent" : "bg-white dark:bg-gray-900"}`}
+        className={`flex flex-col select-text transition-all duration-300 ease-in-out ${backgroundImage ? "bg-transparent" : "bg-white dark:bg-gray-900"} rounded-tl-2xl`}
         style={{
           width: selectedTool ? "360px" : "0px",
           height: selectedTool ? "100%" : "0px",
