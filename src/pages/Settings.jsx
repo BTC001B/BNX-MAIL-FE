@@ -187,6 +187,11 @@ const Settings = () => {
       return;
     }
 
+    if (phone && !/^\d{10}$/.test(phone)) {
+      toast.error("Recovery Phone Number must be exactly 10 digits", { id: "settings-save-toast" });
+      return;
+    }
+
     let target = "email";
     if (email && !isRecoveryEmailVerified) {
       target = "email";
@@ -947,10 +952,13 @@ const Settings = () => {
                     </div>
                     <input
                       type="text"
-                      placeholder="+1 (555) 000-0000"
+                      inputMode="numeric"
+                      maxLength={10}
+                      placeholder="10-digit mobile number"
                       value={recoveryInfo.phoneNumber || ""}
                       onChange={e => {
-                        setRecoveryInfo({ ...recoveryInfo, phoneNumber: e.target.value });
+                        const digitsOnly = e.target.value.replace(/\D/g, "").slice(0, 10);
+                        setRecoveryInfo({ ...recoveryInfo, phoneNumber: digitsOnly });
                         setIsRecoveryPhoneVerified(false);
                       }}
                       className="p-3 text-sm rounded-xl border outline-none focus:ring-2 focus:border-transparent transition-all"
