@@ -956,43 +956,6 @@ const Settings = () => {
                 </div>
               </Section>
 
-              {/* 8. Connected Accounts */}
-              <Section title="Connected Accounts" theme={theme}>
-                <p className="text-sm text-gray-500 mb-4">Link external email providers or OAuth services for single sign-on & synchronization.</p>
-                <div className="flex flex-col gap-3 max-w-xl">
-                  {connectedServices.map((service) => (
-                    <div
-                      key={service.id}
-                      className="flex items-center justify-between p-4 rounded-xl border bg-white dark:bg-transparent"
-                      style={{ borderColor: theme.border }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-xl">{service.icon}</span>
-                        <span className="text-sm font-medium" style={{ color: theme.text }}>{service.name}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setConnectedServices(prev =>
-                            prev.map(s => s.id === service.id ? { ...s, connected: !s.connected } : s)
-                          );
-                          toast.success(
-                            service.connected ? `${service.name} disconnected` : `${service.name} connected`,
-                            { id: "settings-save-toast", duration: 3000 }
-                          );
-                        }}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors cursor-pointer ${
-                          service.connected
-                            ? "border-red-300 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300"
-                            : "border-blue-300 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300"
-                        }`}
-                      >
-                        {service.connected ? "Disconnect" : "Connect"}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </Section>
 
               {/* 9. Add/Manage Other Accounts Modal */}
               {showAddAccountModal && (
