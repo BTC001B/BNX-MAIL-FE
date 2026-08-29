@@ -10,6 +10,13 @@
 @tailwind utilities;
 
 @layer base {
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
   body {
     @apply antialiased text-slate-900 bg-background-light transition-colors duration-300;
   }

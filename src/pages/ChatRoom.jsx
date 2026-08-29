@@ -189,11 +189,9 @@ const ChatRoom = () => {
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
-      // Use scrollTop to strictly contain scrolling inside this div
-      // avoiding layout shifts that scrollIntoView sometimes triggers
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-    } else {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    } else if (messagesEndRef.current?.parentElement) {
+      messagesEndRef.current.parentElement.scrollTop = messagesEndRef.current.parentElement.scrollHeight;
     }
   };
 

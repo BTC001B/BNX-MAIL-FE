@@ -192,7 +192,7 @@ const AppContent = () => {
   const rootStyle = { backgroundColor: theme.bg };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden relative" style={rootStyle}>
+    <div className="flex flex-col h-screen h-[100dvh] max-h-screen overflow-hidden relative" style={rootStyle}>
       {/* Premium Background: Blurred Cover + Contained Image */}
       {backgroundImage && (
         <>
@@ -221,7 +221,7 @@ const AppContent = () => {
           />
         </>
       )}
-      <div className="relative z-[1] flex flex-col flex-1 overflow-hidden">
+      <div className="relative z-[1] flex flex-col flex-1 min-h-0 h-full max-h-full overflow-hidden">
         <NavBar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -233,7 +233,7 @@ const AppContent = () => {
           onOpenNotes={() => setShowNotesManager(v => !v)}
         />
 
-        <div className="flex-1 flex overflow-hidden relative">
+        <div className="flex-1 min-h-0 flex overflow-hidden relative">
           {isMobileSidebarOpen && (
             <div
               className="fixed inset-0 bg-black/40 z-50 md:hidden"
@@ -249,7 +249,7 @@ const AppContent = () => {
           />
 
           <main
-            className="flex-1 overflow-hidden mr-0 mb-0 mt-0 flex flex-col transition-all duration-300 rounded-t-2xl shadow-sm"
+            className="flex-1 min-h-0 overflow-hidden mr-0 mb-0 mt-0 flex flex-col transition-all duration-300 rounded-t-2xl shadow-sm"
             style={{
               backgroundColor: backgroundImage
                 ? (theme.mode === "dark" ? "rgba(31, 41, 55, 0.45)" : "rgba(255, 255, 255, 0.45)")
