@@ -107,12 +107,24 @@ const Settings = () => {
   const [density, setDensity] = useState("Default");
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [biometricsEnabled, setBiometricsEnabled] = useState(true);
-  const [language, setLanguage] = useState("en_US");
+  const [language, setLanguage] = useState(() => localStorage.getItem("bnx_setting_language") || "en_US");
+  const [spellingCheck, setSpellingCheck] = useState(() => localStorage.getItem("bnx_setting_spellingCheck") !== "false");
+  const [grammarCheck, setGrammarCheck] = useState(() => localStorage.getItem("bnx_setting_grammarCheck") !== "false");
+  const [autoCorrect, setAutoCorrect] = useState(() => localStorage.getItem("bnx_setting_autoCorrect") !== "false");
+  const [writingSuggestions, setWritingSuggestions] = useState(() => localStorage.getItem("bnx_setting_writingSuggestions") !== "false");
+  const [desktopNotifications, setDesktopNotifications] = useState(() => localStorage.getItem("bnx_setting_desktopNotifications") !== "false");
+  const [conversationView, setConversationView] = useState(() => localStorage.getItem("bnx_setting_conversationView") !== "false");
+  const [defaultFontFamily, setDefaultFontFamily] = useState(() => localStorage.getItem("bnx_setting_fontFamily") || "Arial");
+  const [defaultFontSize, setDefaultFontSize] = useState(() => localStorage.getItem("bnx_setting_fontSizeText") || "Normal");
+  const [defaultTextColor, setDefaultTextColor] = useState(() => localStorage.getItem("bnx_setting_textColor") || "#000000");
 
   // Client-only preference states
   const [signatures, setSignatures] = useState([]);
   const [editingSignatureId, setEditingSignatureId] = useState(null);
-  const [undoSendDelay, setUndoSendDelay] = useState(0);
+  const [undoSendDelay, setUndoSendDelay] = useState(() => {
+    const saved = localStorage.getItem("bnx_setting_undoSendDelay");
+    return saved !== null ? Number(saved) : 0;
+  });
   const [readingPaneMode, setReadingPaneMode] = useState("no_split");
   const [bulkMailEnabled, setBulkMailEnabled] = useState(() => localStorage.getItem("bnx_bulk_mail_filter") !== "false");
   const [notificationEnabled, setNotificationEnabled] = useState(() => localStorage.getItem("bnx_notification_filter") !== "false");
@@ -168,8 +180,37 @@ const Settings = () => {
         setLocalEmailsPerPage(emailsPerPage);
         setTwoFactorEnabled(d.twoFactorEnabled ?? false);
         setBiometricsEnabled(d.biometricsEnabled ?? true);
-        setLanguage(d.language || "en_US");
-        setUndoSendDelay(d.undoSendDelay || 0);
+        const lang = d.language || localStorage.getItem("bnx_setting_language") || "en_US";
+        setLanguage(lang);
+        if (d.spellingCheck !== undefined || localStorage.getItem("bnx_setting_spellingCheck") !== null) {
+          setSpellingCheck(d.spellingCheck ?? (localStorage.getItem("bnx_setting_spellingCheck") !== "false"));
+        }
+        if (d.grammarCheck !== undefined || localStorage.getItem("bnx_setting_grammarCheck") !== null) {
+          setGrammarCheck(d.grammarCheck ?? (localStorage.getItem("bnx_setting_grammarCheck") !== "false"));
+        }
+        if (d.autoCorrect !== undefined || localStorage.getItem("bnx_setting_autoCorrect") !== null) {
+          setAutoCorrect(d.autoCorrect ?? (localStorage.getItem("bnx_setting_autoCorrect") !== "false"));
+        }
+        if (d.writingSuggestions !== undefined || localStorage.getItem("bnx_setting_writingSuggestions") !== null) {
+          setWritingSuggestions(d.writingSuggestions ?? (localStorage.getItem("bnx_setting_writingSuggestions") !== "false"));
+        }
+        if (d.desktopNotifications !== undefined || localStorage.getItem("bnx_setting_desktopNotifications") !== null) {
+          setDesktopNotifications(d.desktopNotifications ?? (localStorage.getItem("bnx_setting_desktopNotifications") !== "false"));
+        }
+        if (d.conversationView !== undefined || localStorage.getItem("bnx_setting_conversationView") !== null) {
+          setConversationView(d.conversationView ?? (localStorage.getItem("bnx_setting_conversationView") !== "false"));
+        }
+        if (d.defaultFontFamily || localStorage.getItem("bnx_setting_fontFamily")) {
+          setDefaultFontFamily(d.defaultFontFamily || localStorage.getItem("bnx_setting_fontFamily"));
+        }
+        if (d.defaultFontSize || localStorage.getItem("bnx_setting_fontSizeText")) {
+          setDefaultFontSize(d.defaultFontSize || localStorage.getItem("bnx_setting_fontSizeText"));
+        }
+        if (d.defaultTextColor || localStorage.getItem("bnx_setting_textColor")) {
+          setDefaultTextColor(d.defaultTextColor || localStorage.getItem("bnx_setting_textColor"));
+        }
+        const delay = d.undoSendDelay ?? Number(localStorage.getItem("bnx_setting_undoSendDelay") || 0);
+        setUndoSendDelay(delay);
         if (d.bulkMailEnabled !== undefined && d.bulkMailEnabled !== null) {
           setBulkMailEnabled(d.bulkMailEnabled);
           localStorage.setItem("bnx_bulk_mail_filter", d.bulkMailEnabled ? "true" : "false");
@@ -512,16 +553,39 @@ const Settings = () => {
     if (user?.email) {
       setLoading(true);
       try {
-        const ok = await saveBackendSettings({ undoSendDelay, bulkMailEnabled, notificationEnabled });
+        localStorage.setItem("bnx_setting_language", language);
+        localStorage.setItem("bnx_setting_spellingCheck", spellingCheck ? "true" : "false");
+        localStorage.setItem("bnx_setting_grammarCheck", grammarCheck ? "true" : "false");
+        localStorage.setItem("bnx_setting_autoCorrect", autoCorrect ? "true" : "false");
+        localStorage.setItem("bnx_setting_writingSuggestions", writingSuggestions ? "true" : "false");
+        localStorage.setItem("bnx_setting_desktopNotifications", desktopNotifications ? "true" : "false");
+        localStorage.setItem("bnx_setting_conversationView", conversationView ? "true" : "false");
+        localStorage.setItem("bnx_setting_fontFamily", defaultFontFamily);
+        localStorage.setItem("bnx_setting_fontSizeText", defaultFontSize);
+        localStorage.setItem("bnx_setting_textColor", defaultTextColor);
+        localStorage.setItem("bnx_setting_undoSendDelay", String(undoSendDelay));
+        localStorage.setItem("bnx_bulk_mail_filter", bulkMailEnabled ? "true" : "false");
+        localStorage.setItem("bnx_notification_filter", notificationEnabled ? "true" : "false");
+
+        const ok = await saveBackendSettings({ 
+          undoSendDelay, 
+          bulkMailEnabled, 
+          notificationEnabled,
+          language,
+          spellingCheck,
+          grammarCheck,
+          autoCorrect,
+          writingSuggestions,
+          desktopNotifications,
+          conversationView,
+          defaultFontFamily,
+          defaultFontSize,
+          defaultTextColor
+        });
 
         // Save all signatures to ensure any name or content changes are persisted
         for (const sig of signatures) {
           await signatureAPI.updateSignature(sig.id, { name: sig.name, content: sig.content });
-        }
-
-        if (ok) {
-          localStorage.setItem("bnx_bulk_mail_filter", bulkMailEnabled ? "true" : "false");
-          localStorage.setItem("bnx_notification_filter", notificationEnabled ? "true" : "false");
         }
       } catch (err) {
         toast.error("Failed to sync composing preferences", { id: "settings-save-toast", duration: 3000 });
@@ -667,12 +731,127 @@ const Settings = () => {
           {/* composing Tab */}
           {activeTab === "composing" && (
             <Section title="General & Composing Settings" theme={theme}>
-              <form onSubmit={handleSaveComposingSettings} className="flex flex-col gap-6 max-w-2xl">
-                {/* Composing Section Wrapper - Shifted slightly left */}
-                <div className="relative -left-2 flex flex-col gap-4">
-                  {/* Signatures */}
+              <form onSubmit={handleSaveComposingSettings} className="flex flex-col gap-8 max-w-2xl">
+                
+                {/* 1. Language & Input Tools */}
+                <div className="flex flex-col gap-5">
+                  <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Language & Input Tools</h4>
+                  
+                  {/* Language */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Display Language</label>
+                    <select
+                      value={language}
+                      onChange={e => setLanguage(e.target.value)}
+                      className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
+                      style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                    >
+                      <option value="en_US">English (US)</option>
+                      <option value="en_GB">English (UK)</option>
+                      <option value="es_ES">Spanish (Español)</option>
+                      <option value="fr_FR">French (Français)</option>
+                      <option value="de_DE">German (Deutsch)</option>
+                      <option value="ja_JP">Japanese (日本語)</option>
+                      <option value="zh_CN">Chinese (简体中文)</option>
+                      <option value="hi_IN">Hindi (हिन्दी)</option>
+                    </select>
+                    <span className="text-xs text-gray-500">BNXmail display language preference.</span>
+                  </div>
+
+                  {/* Spelling, Grammar, Auto-correct, Writing Suggestions */}
+                  <div className="flex flex-col gap-3 border-t pt-4" style={{ borderColor: theme.border }}>
+                    <ToggleRow label="Enable Spelling Check" checked={spellingCheck} onChange={setSpellingCheck} theme={theme} />
+                    <ToggleRow label="Enable Grammar Check" checked={grammarCheck} onChange={setGrammarCheck} theme={theme} />
+                    <ToggleRow label="Enable Auto-correct" checked={autoCorrect} onChange={setAutoCorrect} theme={theme} />
+                    <ToggleRow label="Enable Writing Suggestions (Smart Compose)" checked={writingSuggestions} onChange={setWritingSuggestions} theme={theme} />
+                  </div>
+                </div>
+
+                {/* 2. Mail View & Notifications */}
+                <div className="flex flex-col gap-5 border-t pt-6" style={{ borderColor: theme.border }}>
+                  <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Mail View & Notifications</h4>
+                  <ToggleRow label="Desktop Notifications for New Emails" checked={desktopNotifications} onChange={setDesktopNotifications} theme={theme} />
+                  <ToggleRow label="Conversation View (Group emails by thread)" checked={conversationView} onChange={setConversationView} theme={theme} />
+
+                  {/* Undo Send */}
+                  <div className="flex flex-col gap-2 mt-2">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Undo Send Delay</label>
+                    <select
+                      value={undoSendDelay}
+                      onChange={e => setUndoSendDelay(Number(e.target.value))}
+                      className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
+                      style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                    >
+                      <option value={0}>Disabled (Send instantly)</option>
+                      <option value={5}>5 seconds</option>
+                      <option value={10}>10 seconds</option>
+                      <option value={20}>20 seconds</option>
+                      <option value={30}>30 seconds</option>
+                    </select>
+                    <span className="text-xs text-gray-500">Grace period to cancel or undo sent emails.</span>
+                  </div>
+                </div>
+
+                {/* 3. Default Text Style */}
+                <div className="flex flex-col gap-4 border-t pt-6" style={{ borderColor: theme.border }}>
+                  <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Default Text Style</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Font Family</span>
+                      <select
+                        value={defaultFontFamily}
+                        onChange={e => setDefaultFontFamily(e.target.value)}
+                        className="w-full p-2.5 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
+                        style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                      >
+                        <option value="Arial">Arial</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Tahoma">Tahoma</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Trebuchet MS">Trebuchet MS</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Roboto">Roboto</option>
+                        <option value="Courier New">Courier New</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Font Size</span>
+                      <select
+                        value={defaultFontSize}
+                        onChange={e => setDefaultFontSize(e.target.value)}
+                        className="w-full p-2.5 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
+                        style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                      >
+                        <option value="Small">Small</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Large">Large</option>
+                        <option value="Huge">Huge</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Text Color:</span>
+                    <input
+                      type="color"
+                      value={defaultTextColor}
+                      onChange={e => setDefaultTextColor(e.target.value)}
+                      className="w-8 h-8 rounded-lg cursor-pointer border-0 bg-transparent shrink-0 outline-none"
+                    />
+                    <span
+                      className="px-3 py-1.5 text-xs rounded-lg border font-medium bg-white dark:bg-gray-800"
+                      style={{ fontFamily: defaultFontFamily, color: defaultTextColor, borderColor: theme.border }}
+                    >
+                      Sample Default Text Style Preview
+                    </span>
+                  </div>
+                </div>
+
+                {/* 4. Signatures Section */}
+                <div className="flex flex-col gap-4 border-t pt-6" style={{ borderColor: theme.border }}>
                   <div className="flex items-center justify-between">
-                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Email Signatures</label>
+                    <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email Signatures</h4>
                     <button
                       type="button"
                       onClick={addSignature}
@@ -683,7 +862,7 @@ const Settings = () => {
                   </div>
 
                   {signatures.length === 0 ? (
-                    <p className="text-sm text-gray-500 italic">No signatures created. Click 'Add Signature' to create one.</p>
+                    <p className="text-sm text-gray-500 italic">No signatures created. Click '+ Add Signature' to create one.</p>
                   ) : (
                     <div className="flex flex-col gap-4">
                       {/* Select Signature Tabs */}
@@ -748,28 +927,7 @@ const Settings = () => {
                       ))}
                     </div>
                   )}
-                  <span className="text-xs text-gray-500 mt-2">The default signature will be automatically inserted into new compose frames.</span>
-                </div>
-
-                {/* General Section Wrapper - Shifted slightly up */}
-                <div className="relative -top-2 flex flex-col gap-6">
-                  {/* Undo Send */}
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Undo Send Delay</label>
-                    <select
-                      value={undoSendDelay}
-                      onChange={e => setUndoSendDelay(Number(e.target.value))}
-                      className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
-                      style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
-                    >
-                      <option value={0}>Disabled (Send instantly)</option>
-                      <option value={5}>5 seconds</option>
-                      <option value={10}>10 seconds</option>
-                      <option value={20}>20 seconds</option>
-                      <option value={30}>30 seconds</option>
-                    </select>
-                    <span className="text-xs text-gray-500">Sets the grace window to cancel/undo emails after pressing send.</span>
-                  </div>
+                  <span className="text-xs text-gray-500">The default signature will be automatically inserted into new compose frames.</span>
                 </div>
 
                 <button
