@@ -157,6 +157,28 @@ const Settings = () => {
   const [resendTimer, setResendTimer] = useState(0);
   const otpInputRefs = useRef([]);
 
+  const getMaskedContact = (val, type) => {
+    if (!val) return "";
+    const str = String(val).trim();
+    if (type === "email" || str.includes("@")) {
+      const parts = str.split("@");
+      if (parts.length < 2) return str;
+      const user = parts[0];
+      const domain = parts[1];
+      const maskedUser = user.length <= 2
+        ? user.charAt(0) + "*"
+        : user.charAt(0) + "*".repeat(user.length - 2) + user.charAt(user.length - 1);
+      return `${maskedUser}@${domain}`;
+    } else {
+      const digits = str.replace(/\D/g, "");
+      if (digits.length < 4) return str;
+      if (digits.length === 10) {
+        return `${digits.slice(0, 2)}******${digits.slice(8)}`;
+      }
+      return `${digits.slice(0, 2)}${"*".repeat(digits.length - 4)}${digits.slice(-2)}`;
+    }
+  };
+
   // Countdown timer effect for OTP resend
   useEffect(() => {
     let timer;
@@ -173,8 +195,9 @@ const Settings = () => {
     setResendTimer(30);
     setShowOtpModal(true);
 
-    const targetVal = target === "email" ? recoveryInfo.recoveryEmail : recoveryInfo.phoneNumber;
-    toast.success(`Verification OTP (${code}) sent to ${targetVal}`, { id: "settings-save-toast", duration: 7000 });
+    const rawContact = target === "email" ? recoveryInfo.recoveryEmail?.trim() : recoveryInfo.phoneNumber?.trim();
+    const maskedContact = getMaskedContact(rawContact, target);
+    toast.success(`Verification code sent to ${maskedContact}`, { id: "settings-save-toast", duration: 5000 });
   };
 
   const handleStartOtpVerification = (e) => {
@@ -216,16 +239,21 @@ const Settings = () => {
     }
 
     if (entered === generatedOtp || entered.length === 6) {
+      const rawContact = otpTarget === "email" ? recoveryInfo.recoveryEmail?.trim() : recoveryInfo.phoneNumber?.trim();
+      const maskedContact = getMaskedContact(rawContact, otpTarget);
+
       if (otpTarget === "email" || otpTarget === "both") {
         setIsRecoveryEmailVerified(true);
       }
       if (otpTarget === "phone" || otpTarget === "both") {
         setIsRecoveryPhoneVerified(true);
       }
-      toast.success(
-        otpTarget === "email" ? "Recovery Email Verified Successfully! ✓" : "Recovery Phone Verified Successfully! ✓",
-        { id: "settings-save-toast", duration: 4000 }
-      );
+
+      const successMsg = otpTarget === "email"
+        ? `Recovery Email (${maskedContact}) Verified Successfully! ✓`
+        : `Recovery Phone (${maskedContact}) Verified Successfully! ✓`;
+
+      toast.success(successMsg, { id: "settings-save-toast", duration: 4000 });
       setShowOtpModal(false);
     } else {
       toast.error("Invalid OTP code. Please try again.", { id: "settings-save-toast" });
@@ -1137,7 +1165,10 @@ const Settings = () => {
                       <p className="text-xs text-gray-500">
                         Enter the 6-digit verification code sent to{" "}
                         <span className="font-bold" style={{ color: theme.text }}>
-                          {otpTarget === "email" ? recoveryInfo.recoveryEmail : recoveryInfo.phoneNumber}
+                          {getMaskedContact(
+                            otpTarget === "email" ? recoveryInfo.recoveryEmail : recoveryInfo.phoneNumber,
+                            otpTarget
+                          )}
                         </span>
                       </p>
                     </div>
