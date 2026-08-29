@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useMail } from "../context/MailContext";
 import { MdSettings, MdEmail, MdLogout, MdLightMode, MdDarkMode, MdNotifications, MdCheckCircle, MdManageAccounts, MdPersonAdd, MdPhotoCamera, MdMenu, MdAdd, MdApps, MdOutlineNoteAlt } from "react-icons/md";
-import { userAPI } from "../services/api";
+import { userAPI, casboxAPI, chatAPI } from "../services/api";
 import toast from "react-hot-toast";
 // import logo from "../assets/bnx.jpeg";
 
@@ -17,7 +17,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
   const location = useLocation();
   const { user, logout, logoutAll, switchAccount, getSessions } = useAuth();
   const { theme, currentThemeName, changeTheme, backgroundImage } = useTheme();
-  const { openCompose } = useMail();
+  const { openCompose, emails } = useMail();
   const isPrimary = user?.isPrimary || user?.mailboxes?.find(m => m.email === user.email)?.isPrimary;
 
   const currentTab = location.pathname.startsWith('/colab') || location.pathname.startsWith('/chat') || location.pathname.startsWith('/casbox') ? 'chat'
@@ -31,6 +31,71 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const [showAppLauncher, setShowAppLauncher] = useState(false);
+
+  const [allCasboxMessages, setAllCasboxMessages] = useState([]);
+  const [allChatRooms, setAllChatRooms] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const searchContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (user?.email && searchQuery.trim().length > 0) {
+      casboxAPI.getAllMessages()
+        .then(res => {
+          if (res.data) setAllCasboxMessages(res.data);
+        })
+        .catch(err => console.error("Search fetch casbox messages error:", err));
+
+      chatAPI.getUserChats(user.email)
+        .then(res => {
+          if (res.data) setAllChatRooms(Array.isArray(res.data) ? res.data : (res.data.data || []));
+        })
+        .catch(err => console.error("Search fetch chat rooms error:", err));
+    }
+  }, [searchQuery, user?.email]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowSearchResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const queryVal = searchQuery.trim().toLowerCase();
+
+  const matchingEmails = queryVal
+    ? (emails || []).filter(e => 
+        e.subject?.toLowerCase().includes(queryVal) ||
+        e.from?.toLowerCase().includes(queryVal) ||
+        e.senderEmail?.toLowerCase().includes(queryVal) ||
+        e.to?.toLowerCase().includes(queryVal) ||
+        e.recipientEmail?.toLowerCase().includes(queryVal) ||
+        e.body?.toLowerCase().includes(queryVal) ||
+        e.textPlain?.toLowerCase().includes(queryVal)
+      ).slice(0, 5)
+    : [];
+
+  const matchingCasbox = queryVal
+    ? allCasboxMessages.filter(m => 
+        m.body?.toLowerCase().includes(queryVal) ||
+        m.senderEmail?.toLowerCase().includes(queryVal) ||
+        m.receiverEmail?.toLowerCase().includes(queryVal) ||
+        m.subject?.toLowerCase().includes(queryVal)
+      ).slice(0, 5)
+    : [];
+
+  const matchingChats = queryVal
+    ? allChatRooms.filter(c => {
+        const chatPartner = c.memberEmails?.find(e => e !== user?.email) || "";
+        const chatName = c.type === 'DIRECT' ? chatPartner?.split('@')[0] : (c.name || `Chat #${c.id}`);
+        return (
+          chatName.toLowerCase().includes(queryVal) ||
+          c.memberEmails?.some(email => email.toLowerCase().includes(queryVal))
+        );
+      }).slice(0, 5)
+    : [];
   const fileInputRef = useRef(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
@@ -164,12 +229,16 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
         <div className="flex items-center justify-end gap-1 sm:gap-3 md:flex-1 shrink-0">
 
           {/* SEARCH */}
-          <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-[260px] mr-2">
+          <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-[260px] mr-2" ref={searchContainerRef}>
             <div className="relative group w-full">
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setShowSearchResults(true)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowSearchResults(true);
+                }}
                 placeholder="Search..."
                 className="w-full px-4 py-2 pl-10 rounded-full text-[13px] placeholder:text-white/60 bg-white/10 hover:bg-white/20 focus:bg-white focus:text-gray-900 text-white focus:shadow-sm border border-transparent outline-none transition-all duration-200"
               />
@@ -181,6 +250,99 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
+
+              {showSearchResults && searchQuery.trim().length > 0 && (
+                <div 
+                  className="absolute left-0 right-0 mt-2 bg-white dark:bg-gray-800 border shadow-2xl rounded-2xl p-3 max-h-96 overflow-y-auto z-[999] w-[320px] max-w-[400px]"
+                  style={{ borderColor: theme.border || '#e2e8f0' }}
+                >
+                  {/* Matching Emails */}
+                  {matchingEmails.length > 0 && (
+                    <div className="mb-3">
+                      <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5 px-2 select-none">
+                        Emails
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        {matchingEmails.map(e => (
+                          <div
+                            key={e.uid}
+                            onClick={() => {
+                              setSearchQuery(e.subject);
+                              setShowSearchResults(false);
+                              navigate("/all-mail");
+                            }}
+                            className="flex flex-col p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer text-left transition-colors"
+                          >
+                            <span className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">{e.subject}</span>
+                            <span className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{e.from}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Matching Casbox Messages */}
+                  {matchingCasbox.length > 0 && (
+                    <div className="mb-3">
+                      <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5 px-2 select-none">
+                        Casbox Chat
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        {matchingCasbox.map(m => {
+                          const contactEmail = m.senderEmail === user?.email ? m.receiverEmail : m.senderEmail;
+                          return (
+                            <div
+                              key={m.id}
+                              onClick={() => {
+                                setShowSearchResults(false);
+                                navigate("/casbox", { state: { preselectContact: contactEmail } });
+                              }}
+                              className="flex flex-col p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer text-left transition-colors"
+                            >
+                              <span className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">{contactEmail.split('@')[0]}</span>
+                              <span className="text-[10px] text-gray-500 dark:text-gray-450 truncate italic">"{m.body}"</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Matching Colab Chats */}
+                  {matchingChats.length > 0 && (
+                    <div className="mb-1">
+                      <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5 px-2 select-none">
+                        Colab Rooms
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        {matchingChats.map(c => {
+                          const chatPartner = c.memberEmails?.find(e => e !== user?.email) || "";
+                          const chatName = c.type === 'DIRECT' ? chatPartner?.split('@')[0] : (c.name || `Chat #${c.id}`);
+                          return (
+                            <div
+                              key={c.id}
+                              onClick={() => {
+                                setShowSearchResults(false);
+                                navigate(`/chat/${c.id}`, { state: { chat: c } });
+                              }}
+                              className="flex flex-col p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer text-left transition-colors"
+                            >
+                              <span className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">{chatName}</span>
+                              <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-widest font-bold">{c.type}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {matchingEmails.length === 0 && matchingCasbox.length === 0 && matchingChats.length === 0 && (
+                    <div className="text-xs text-gray-400 dark:text-gray-600 text-center py-4 select-none">
+                      No matching results found
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </form>
 

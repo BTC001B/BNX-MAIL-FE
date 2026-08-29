@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
 import { useSocket } from "../context/SocketContext";
@@ -77,6 +78,7 @@ const POPULAR_EMOJIS = [
 
 const Casbox = () => {
   const { theme, readingPaneMode } = useTheme();
+  const location = useLocation();
   const { user } = useAuth();
   const { stompClient, isConnected } = useSocket();
   const { openCompose, emails } = useMail();
@@ -169,6 +171,27 @@ const Casbox = () => {
     };
     fetchSettings();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.preselectContact && messages.length > 0) {
+      const contactEmail = location.state.preselectContact;
+      const matchingMsg = messages.find(m => m.senderEmail === contactEmail || m.receiverEmail === contactEmail);
+      if (matchingMsg) {
+        handleSelectMessage(matchingMsg);
+      } else {
+        // Create a dummy message structure to open the thread
+        handleSelectMessage({
+          senderEmail: user?.email,
+          receiverEmail: contactEmail,
+          subject: "Casbox Message",
+          body: "",
+          id: -1
+        });
+      }
+      // Clear location state after processing
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, messages, user?.email]);
 
   useEffect(() => {
     const contacts = new Set();
