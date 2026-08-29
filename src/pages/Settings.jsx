@@ -66,6 +66,7 @@ const Settings = () => {
   } = useTheme();
 
   const bgFileRef = useRef(null);
+  const savingRef = useRef(false);
   const [customBgUrl, setCustomBgUrl] = useState("");
   const [selectedWallpaper, setSelectedWallpaper] = useState(backgroundImage);
 
@@ -195,17 +196,20 @@ const Settings = () => {
   };
 
   const saveBackendSettings = async (updateData) => {
+    if (savingRef.current) return false;
     try {
+      savingRef.current = true;
       setLoading(true);
       const res = await userAPI.updateSettings(updateData);
       if (res.data?.success) {
-        toast.success("Settings saved to cloud");
+        toast.success("Settings saved to cloud", { id: "settings-save-toast", duration: 3000 });
         return true;
       }
     } catch (err) {
-      toast.error("Failed to sync settings with server");
+      toast.error("Failed to sync settings with server", { id: "settings-save-toast", duration: 3000 });
     } finally {
       setLoading(false);
+      savingRef.current = false;
     }
     return false;
   };
@@ -504,6 +508,7 @@ const Settings = () => {
 
   const handleSaveComposingSettings = async (e) => {
     e.preventDefault();
+    if (savingRef.current) return;
     if (user?.email) {
       setLoading(true);
       try {
@@ -517,10 +522,9 @@ const Settings = () => {
         if (ok) {
           localStorage.setItem("bnx_bulk_mail_filter", bulkMailEnabled ? "true" : "false");
           localStorage.setItem("bnx_notification_filter", notificationEnabled ? "true" : "false");
-          toast.success("Composing & Signature preferences saved to cloud");
         }
       } catch (err) {
-        toast.error("Failed to sync composing preferences");
+        toast.error("Failed to sync composing preferences", { id: "settings-save-toast", duration: 3000 });
       } finally {
         setLoading(false);
       }
@@ -529,6 +533,7 @@ const Settings = () => {
 
   const handleSaveNotificationSettings = async (e) => {
     e.preventDefault();
+    if (savingRef.current) return;
     await saveBackendSettings({
       inboxNotifications,
       sentNotifications,
@@ -544,6 +549,7 @@ const Settings = () => {
 
   const handleSaveAppearanceSettings = async (e) => {
     e.preventDefault();
+    if (savingRef.current) return;
 
     updateCustomAccentColor(accentColor);
     updateCustomFontSize(fontSize);
@@ -570,16 +576,17 @@ const Settings = () => {
 
   const handleSaveSecuritySettings = async (e) => {
     e.preventDefault();
+    if (savingRef.current) return;
     if (!jobTitle || !jobTitle.trim()) {
-      toast.error("Job Title is required");
+      toast.error("Job Title is required", { id: "settings-save-toast", duration: 3000 });
       return;
     }
     if (!location || !location.trim()) {
-      toast.error("Location is required");
+      toast.error("Location is required", { id: "settings-save-toast", duration: 3000 });
       return;
     }
     if (!phoneNumber || !phoneNumber.trim()) {
-      toast.error("Phone Contact is required");
+      toast.error("Phone Contact is required", { id: "settings-save-toast", duration: 3000 });
       return;
     }
     await saveBackendSettings({
@@ -1047,7 +1054,7 @@ const Settings = () => {
                         if (customBgUrl.trim()) {
                           setSelectedWallpaper(customBgUrl.trim());
                           setCustomBgUrl("");
-                          toast.success("Custom background selected (click Save Layout Settings to apply)");
+                          toast.success("Custom background selected (click Save Layout Settings to apply)", { id: "wallpaper-toast", duration: 3000 });
                         }
                       }}
                       className="px-5 py-3 rounded-xl text-sm font-medium text-white cursor-pointer hover:opacity-90 active:scale-95 transition-all shrink-0 shadow-sm"
@@ -1067,13 +1074,13 @@ const Settings = () => {
                       const file = e.target.files?.[0];
                       if (!file) return;
                       if (file.size > 5 * 1024 * 1024) {
-                        toast.error("Image must be under 5MB");
+                        toast.error("Image must be under 5MB", { id: "wallpaper-toast", duration: 3000 });
                         return;
                       }
                       const reader = new FileReader();
                       reader.onload = (ev) => {
                         setSelectedWallpaper(ev.target.result);
-                        toast.success("Background image uploaded and selected (click Save Layout Settings to apply)");
+                        toast.success("Background image uploaded and selected (click Save Layout Settings to apply)", { id: "wallpaper-toast", duration: 3000 });
                       };
                       reader.readAsDataURL(file);
                       if (bgFileRef.current) bgFileRef.current.value = "";
@@ -1093,7 +1100,7 @@ const Settings = () => {
                       onClick={() => {
                         setSelectedWallpaper(null);
                         clearBackgroundImage();
-                        toast.success("Background reset to default");
+                        toast.success("Background reset to default", { id: "wallpaper-toast", duration: 3000 });
                       }}
                       className="w-fit px-5 py-2.5 rounded-xl text-sm font-medium border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-sm"
                       style={{ borderColor: theme.border, color: theme.text }}
