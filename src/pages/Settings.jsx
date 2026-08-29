@@ -746,14 +746,12 @@ const Settings = () => {
                       className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
                       style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                     >
-                      <option value="en_US">English (US)</option>
-                      <option value="en_GB">English (UK)</option>
-                      <option value="es_ES">Spanish (Español)</option>
-                      <option value="fr_FR">French (Français)</option>
-                      <option value="de_DE">German (Deutsch)</option>
-                      <option value="ja_JP">Japanese (日本語)</option>
-                      <option value="zh_CN">Chinese (简体中文)</option>
+                      <option value="en_US">English</option>
                       <option value="hi_IN">Hindi (हिन्दी)</option>
+                      <option value="ta_IN">Tamil (தமிழ்)</option>
+                      <option value="te_IN">Telugu (తెలుగు)</option>
+                      <option value="ml_IN">Malayalam (മലയാളം)</option>
+                      <option value="kn_IN">Kannada (ಕನ್ನಡ)</option>
                     </select>
                     <span className="text-xs text-gray-500">BNXmail display language preference.</span>
                   </div>
