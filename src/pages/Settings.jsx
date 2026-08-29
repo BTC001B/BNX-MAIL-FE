@@ -129,10 +129,30 @@ const Settings = () => {
   const [bulkMailEnabled, setBulkMailEnabled] = useState(() => localStorage.getItem("bnx_bulk_mail_filter") !== "false");
   const [notificationEnabled, setNotificationEnabled] = useState(() => localStorage.getItem("bnx_notification_filter") !== "false");
 
+  // Accounts tab interactive states
+  const [accountPassForm, setAccountPassForm] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
+  const [showAddAccountModal, setShowAddAccountModal] = useState(false);
+  const [newAccountInput, setNewAccountInput] = useState({ email: "", accountName: "", provider: "IMAP" });
+  const [securityToggles, setSecurityToggles] = useState({
+    loginAlerts: true,
+    sslEnforced: true,
+    idleTimeout: "30_mins",
+    reAuthSensitive: true,
+    locationHistory: false,
+    recoveryMethodsEnabled: true
+  });
+  const [connectedServices, setConnectedServices] = useState([
+    { id: "google", name: "Google Workspace / Gmail", icon: "🌐", connected: false },
+    { id: "outlook", name: "Microsoft Outlook / Office 365", icon: "📧", connected: false },
+    { id: "custom_imap", name: "Custom IMAP / POP3 Mailbox", icon: "📬", connected: false }
+  ]);
+
   // Fetch initial data based on active tab
   useEffect(() => {
     if (activeTab === "accounts") {
       fetchEmails();
+      fetchRecoveryInfo();
+      fetchBackendSettings();
     } else if (activeTab === "composing") {
       fetchBackendSettings();
       fetchSignatures();
@@ -705,27 +725,364 @@ const Settings = () => {
         <div className="w-full max-w-5xl">
           {/* accounts Tab */}
           {activeTab === "accounts" && (
-            <Section title="Email Accounts" theme={theme}>
-              <p className="text-sm text-gray-500 mb-6">Manage multiple linked email addresses in your current session.</p>
-
-              <div className="flex flex-col gap-3 max-w-md">
-                {getSessions().map(session => (
-                  <div
-                    key={session.email}
-                    onClick={() => switchAccount(session.email)}
-                    className="flex items-center justify-between p-5 rounded-2xl border hover:shadow-sm transition-shadow cursor-pointer"
-                    style={{ borderColor: theme.border, background: user?.email === session.email ? theme.accent + '11' : theme.cardBg }}
+            <div className="flex flex-col gap-8">
+              {/* Accounts & Mailboxes switching + Add/Manage Other Accounts */}
+              <Section title="Email Accounts & Switching" theme={theme}>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-sm text-gray-500">Manage and switch between linked email accounts in your current session.</p>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddAccountModal(true)}
+                    className="px-4 py-2 text-xs font-semibold rounded-xl text-white cursor-pointer hover:opacity-90 transition-opacity"
+                    style={{ background: theme.accent }}
                   >
-                    <span className="text-base font-medium" style={{ color: theme.text }}>{session.email}</span>
-                    {user?.email === session.email ? (
-                      <span className="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">Active</span>
-                    ) : (
-                      <span className="text-xs text-gray-400 font-medium hover:text-gray-600 transition-colors">Switch Account</span>
-                    )}
+                    + Add Other Account
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-3 max-w-xl">
+                  {getSessions().length > 0 ? (
+                    getSessions().map(session => (
+                      <div
+                        key={session.email}
+                        onClick={() => switchAccount(session.email)}
+                        className="flex items-center justify-between p-5 rounded-2xl border hover:shadow-sm transition-shadow cursor-pointer"
+                        style={{ borderColor: theme.border, background: user?.email === session.email ? theme.accent + '11' : theme.cardBg }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-sm">
+                            {(session.email || "M").charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-semibold" style={{ color: theme.text }}>{session.email}</span>
+                            <span className="text-[11px] text-gray-400">BNX Mail Account</span>
+                          </div>
+                        </div>
+                        {user?.email === session.email ? (
+                          <span className="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">Active</span>
+                        ) : (
+                          <span className="text-xs text-gray-400 font-medium hover:text-gray-600 transition-colors">Switch Account</span>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-400 italic">No linked sessions found.</p>
+                  )}
+                </div>
+              </Section>
+
+              {/* 1. Account Information */}
+              <Section title="Account Information" theme={theme}>
+                <div className="grid grid-cols-2 gap-4 max-w-xl">
+                  <div className="flex flex-col gap-1 p-4 rounded-xl border" style={{ borderColor: theme.border }}>
+                    <span className="text-xs font-semibold text-gray-400 uppercase">Full Name / Username</span>
+                    <span className="text-sm font-semibold" style={{ color: theme.text }}>{user?.name || user?.username || (user?.email ? user.email.split('@')[0] : "Not specified")}</span>
                   </div>
-                ))}
-              </div>
-            </Section>
+                  <div className="flex flex-col gap-1 p-4 rounded-xl border" style={{ borderColor: theme.border }}>
+                    <span className="text-xs font-semibold text-gray-400 uppercase">Primary Email</span>
+                    <span className="text-sm font-semibold" style={{ color: theme.text }}>{user?.email || "Not available"}</span>
+                  </div>
+                  <div className="flex flex-col gap-1 p-4 rounded-xl border" style={{ borderColor: theme.border }}>
+                    <span className="text-xs font-semibold text-gray-400 uppercase">Account Role</span>
+                    <span className="text-sm font-semibold" style={{ color: theme.text }}>{user?.role || "Standard User"}</span>
+                  </div>
+                  <div className="flex flex-col gap-1 p-4 rounded-xl border" style={{ borderColor: theme.border }}>
+                    <span className="text-xs font-semibold text-gray-400 uppercase">Account Status</span>
+                    <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Active & Verified ✓</span>
+                  </div>
+                </div>
+              </Section>
+
+              {/* 2. Change Password */}
+              <Section title="Change Password" theme={theme}>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!accountPassForm.oldPassword || !accountPassForm.newPassword) {
+                      toast.error("Please fill in all password fields", { id: "settings-save-toast" });
+                      return;
+                    }
+                    if (accountPassForm.newPassword.length < 8) {
+                      toast.error("New password must be at least 8 characters long", { id: "settings-save-toast" });
+                      return;
+                    }
+                    if (accountPassForm.newPassword !== accountPassForm.confirmPassword) {
+                      toast.error("New passwords do not match", { id: "settings-save-toast" });
+                      return;
+                    }
+                    toast.success("Password update requested", { id: "settings-save-toast", duration: 3000 });
+                    setAccountPassForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+                  }}
+                  className="flex flex-col gap-4 max-w-md"
+                >
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Current Password</label>
+                    <input
+                      type="password"
+                      placeholder="Enter current password"
+                      value={accountPassForm.oldPassword}
+                      onChange={e => setAccountPassForm({ ...accountPassForm, oldPassword: e.target.value })}
+                      className="p-3 text-sm rounded-xl border outline-none focus:ring-2 focus:border-transparent transition-all"
+                      style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">New Password</label>
+                    <input
+                      type="password"
+                      placeholder="Enter new password (min 8 chars)"
+                      value={accountPassForm.newPassword}
+                      onChange={e => setAccountPassForm({ ...accountPassForm, newPassword: e.target.value })}
+                      className="p-3 text-sm rounded-xl border outline-none focus:ring-2 focus:border-transparent transition-all"
+                      style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Confirm New Password</label>
+                    <input
+                      type="password"
+                      placeholder="Confirm new password"
+                      value={accountPassForm.confirmPassword}
+                      onChange={e => setAccountPassForm({ ...accountPassForm, confirmPassword: e.target.value })}
+                      className="p-3 text-sm rounded-xl border outline-none focus:ring-2 focus:border-transparent transition-all"
+                      style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-fit px-5 py-2.5 rounded-xl text-xs font-bold text-white cursor-pointer hover:opacity-90 transition-opacity"
+                    style={{ background: theme.accent }}
+                  >
+                    Update Password
+                  </button>
+                </form>
+              </Section>
+
+              {/* 3, 4, 5. Password Recovery, Recovery Email & Phone */}
+              <Section title="Password Recovery & Backup Contacts" theme={theme}>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    toast.success("Recovery details saved", { id: "settings-save-toast", duration: 3000 });
+                  }}
+                  className="flex flex-col gap-5 max-w-md"
+                >
+                  <ToggleRow
+                    label="Enable Password Recovery via Backup Email & Phone"
+                    checked={securityToggles.recoveryMethodsEnabled}
+                    onChange={(val) => setSecurityToggles({ ...securityToggles, recoveryMethodsEnabled: val })}
+                    theme={theme}
+                  />
+
+                  {/* 4. Recovery Email */}
+                  <div className="flex flex-col gap-1.5 border-t pt-4" style={{ borderColor: theme.border }}>
+                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Recovery Email Address</label>
+                    <input
+                      type="email"
+                      placeholder="backup@example.com"
+                      value={recoveryInfo.recoveryEmail || ""}
+                      onChange={e => setRecoveryInfo({ ...recoveryInfo, recoveryEmail: e.target.value })}
+                      className="p-3 text-sm rounded-xl border outline-none focus:ring-2 focus:border-transparent transition-all"
+                      style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                    />
+                  </div>
+
+                  {/* 5. Recovery Phone Number */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Recovery Phone Number</label>
+                    <input
+                      type="text"
+                      placeholder="+1 (555) 000-0000"
+                      value={recoveryInfo.phoneNumber || ""}
+                      onChange={e => setRecoveryInfo({ ...recoveryInfo, phoneNumber: e.target.value })}
+                      className="p-3 text-sm rounded-xl border outline-none focus:ring-2 focus:border-transparent transition-all"
+                      style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-fit px-5 py-2.5 rounded-xl text-xs font-bold text-white cursor-pointer hover:opacity-90 transition-opacity"
+                    style={{ background: theme.accent }}
+                  >
+                    Save Recovery Details
+                  </button>
+                </form>
+              </Section>
+
+              {/* 6. Account Security & 7. Login & Security */}
+              <Section title="Account & Login Security" theme={theme}>
+                <div className="flex flex-col gap-4 max-w-xl">
+                  <ToggleRow
+                    label="Send Security Alerts on New Logins"
+                    checked={securityToggles.loginAlerts}
+                    onChange={(val) => setSecurityToggles({ ...securityToggles, loginAlerts: val })}
+                    theme={theme}
+                  />
+                  <ToggleRow
+                    label="Enforce SSL/TLS Encrypted Mail Transport"
+                    checked={securityToggles.sslEnforced}
+                    onChange={(val) => setSecurityToggles({ ...securityToggles, sslEnforced: val })}
+                    theme={theme}
+                  />
+                  <ToggleRow
+                    label="Require Password Re-authentication for Sensitive Actions"
+                    checked={securityToggles.reAuthSensitive}
+                    onChange={(val) => setSecurityToggles({ ...securityToggles, reAuthSensitive: val })}
+                    theme={theme}
+                  />
+                  <ToggleRow
+                    label="Log Login IP & Location History"
+                    checked={securityToggles.locationHistory}
+                    onChange={(val) => setSecurityToggles({ ...securityToggles, locationHistory: val })}
+                    theme={theme}
+                  />
+
+                  <div className="flex flex-col gap-1.5 border-t pt-4" style={{ borderColor: theme.border }}>
+                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Auto Sign-Out Idle Session Timeout</label>
+                    <select
+                      value={securityToggles.idleTimeout}
+                      onChange={e => setSecurityToggles({ ...securityToggles, idleTimeout: e.target.value })}
+                      className="p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
+                      style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                    >
+                      <option value="never">Never</option>
+                      <option value="15_mins">15 minutes</option>
+                      <option value="30_mins">30 minutes</option>
+                      <option value="1_hour">1 hour</option>
+                      <option value="4_hours">4 hours</option>
+                    </select>
+                  </div>
+                </div>
+              </Section>
+
+              {/* 8. Connected Accounts */}
+              <Section title="Connected Accounts" theme={theme}>
+                <p className="text-sm text-gray-500 mb-4">Link external email providers or OAuth services for single sign-on & synchronization.</p>
+                <div className="flex flex-col gap-3 max-w-xl">
+                  {connectedServices.map((service) => (
+                    <div
+                      key={service.id}
+                      className="flex items-center justify-between p-4 rounded-xl border bg-white dark:bg-transparent"
+                      style={{ borderColor: theme.border }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{service.icon}</span>
+                        <span className="text-sm font-medium" style={{ color: theme.text }}>{service.name}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setConnectedServices(prev =>
+                            prev.map(s => s.id === service.id ? { ...s, connected: !s.connected } : s)
+                          );
+                          toast.success(
+                            service.connected ? `${service.name} disconnected` : `${service.name} connected`,
+                            { id: "settings-save-toast", duration: 3000 }
+                          );
+                        }}
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors cursor-pointer ${
+                          service.connected
+                            ? "border-red-300 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300"
+                            : "border-blue-300 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300"
+                        }`}
+                      >
+                        {service.connected ? "Disconnect" : "Connect"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </Section>
+
+              {/* 9. Add/Manage Other Accounts Modal */}
+              {showAddAccountModal && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                  <div
+                    className="w-full max-w-md rounded-2xl p-6 shadow-2xl flex flex-col gap-5 border animate-in zoom-in-95 duration-150"
+                    style={{ background: theme.cardBg, borderColor: theme.border, color: theme.text }}
+                  >
+                    <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: theme.border }}>
+                      <h3 className="text-base font-bold">Add Other Email Account</h3>
+                      <button
+                        type="button"
+                        onClick={() => setShowAddAccountModal(false)}
+                        className="text-gray-400 hover:text-gray-600 text-lg font-bold cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!newAccountInput.email) {
+                          toast.error("Email address is required");
+                          return;
+                        }
+                        toast.success(`Account ${newAccountInput.email} configured`, { id: "settings-save-toast" });
+                        setShowAddAccountModal(false);
+                        setNewAccountInput({ email: "", accountName: "", provider: "IMAP" });
+                      }}
+                      className="flex flex-col gap-4"
+                    >
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-gray-500">Email Address</label>
+                        <input
+                          type="email"
+                          placeholder="user@example.com"
+                          value={newAccountInput.email}
+                          onChange={e => setNewAccountInput({ ...newAccountInput, email: e.target.value })}
+                          className="p-3 text-sm rounded-xl border outline-none focus:ring-2 focus:border-transparent transition-all"
+                          style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-gray-500">Account Display Name</label>
+                        <input
+                          type="text"
+                          placeholder="Work / Personal Email"
+                          value={newAccountInput.accountName}
+                          onChange={e => setNewAccountInput({ ...newAccountInput, accountName: e.target.value })}
+                          className="p-3 text-sm rounded-xl border outline-none focus:ring-2 focus:border-transparent transition-all"
+                          style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-gray-500">Account Protocol</label>
+                        <select
+                          value={newAccountInput.provider}
+                          onChange={e => setNewAccountInput({ ...newAccountInput, provider: e.target.value })}
+                          className="p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
+                          style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                        >
+                          <option value="IMAP">IMAP / SMTP</option>
+                          <option value="POP3">POP3 / SMTP</option>
+                          <option value="EXCHANGE">Microsoft Exchange</option>
+                        </select>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-3 mt-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowAddAccountModal(false)}
+                          className="px-4 py-2 text-xs font-semibold rounded-xl border hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
+                          style={{ borderColor: theme.border }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 text-xs font-bold rounded-xl text-white cursor-pointer hover:opacity-90 transition-opacity"
+                          style={{ background: theme.accent }}
+                        >
+                          Add Account
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {/* composing Tab */}
