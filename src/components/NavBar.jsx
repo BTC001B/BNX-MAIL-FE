@@ -134,7 +134,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
 
           {/* COMPOSE (Hidden on mobile/tablet, shown as floating button instead) */}
           <button
-            onClick={() => openCompose()}
+            onClick={() => openCompose(currentTab === 'chat' ? { mode: 'casbox' } : null)}
             className="hidden lg:flex items-center gap-2.5 px-5 py-2 rounded-full font-semibold shadow-sm transition-all hover:shadow-md hover:scale-[1.02] active:scale-[0.98] bg-white dark:bg-[#303134] border border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-200 ml-12"
           >
             <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: theme.accent || "#135bec" }}>
@@ -384,7 +384,7 @@ const NavBar = ({ searchQuery, setSearchQuery, onOpenMenu, onToggleDesktopSideba
 
       {/* Floating Action Button (Mobile/Tablet Only) */}
       <button
-        onClick={() => openCompose()}
+        onClick={() => openCompose(currentTab === 'chat' ? { mode: 'casbox' } : null)}
         className="lg:hidden fixed bottom-6 right-6 z-[60] flex items-center justify-center w-14 h-14 rounded-2xl shadow-lg transition-transform hover:scale-105 active:scale-95 text-white"
         style={{ background: theme.accent || "#135bec" }}
       >

@@ -61,10 +61,12 @@ const FloatingCompose = () => {
 
   const [composeMode, setComposeMode] = useState("email"); // "email" or "casbox"
 
-  // Sync mode if opened with data
+  // Sync mode if opened with data or if currently on chat page
   useEffect(() => {
       if (composeData?.mode) {
           setComposeMode(composeData.mode);
+      } else if (typeof window !== 'undefined' && (window.location.pathname.startsWith('/colab') || window.location.pathname.startsWith('/chat') || window.location.pathname.startsWith('/casbox'))) {
+          setComposeMode("casbox");
       } else {
           setComposeMode("email");
       }
@@ -447,15 +449,15 @@ const FloatingCompose = () => {
     }
 
     if (composeMode === "casbox") {
-        if (!formData.body) {
-           setError("Message body is required");
+        if (!formData.body && attachments.length === 0) {
+           setError("Message text or attachment is required");
            sendingRef.current = false;
            setSending(false);
            return;
         }
         try {
             // Strip HTML but preserve newlines for casbox
-            let rawHtml = formData.body;
+            let rawHtml = formData.body || "";
             // Replace common block elements and breaks with newlines
             rawHtml = rawHtml.replace(/<br\s*[\/]?>/gi, '\n')
                              .replace(/<\/p>/gi, '\n')
@@ -465,15 +467,19 @@ const FloatingCompose = () => {
             // Decode HTML entities
             const doc = new DOMParser().parseFromString(rawHtml, 'text/html');
             const plainText = doc.documentElement.textContent.trim();
-            
-            await casboxAPI.sendMessage({
-                receiverEmail: formData.to,
-                subject: formData.subject,
-                body: plainText,
+            const bodyToSend = plainText || (formData.body ? formData.body.replace(/<[^>]+>/g, '').trim() : "");
+
+            const res = await casboxAPI.sendMessage({
+                receiverEmail: formData.to.trim(),
+                subject: formData.subject || "Casbox Message",
+                body: bodyToSend,
                 attachmentsJson: attachments.length > 0 ? JSON.stringify(attachments) : null
             });
             toast.success("Casbox Message sent.");
             closeCompose();
+            window.dispatchEvent(new CustomEvent('casbox_message_sent', { 
+                detail: { receiverEmail: formData.to.trim(), message: res.data } 
+            }));
         } catch(err) {
             setError(err.response?.data?.message || "Failed to send casbox message");
             toast.error("Failed to send message");

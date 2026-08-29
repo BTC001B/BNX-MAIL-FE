@@ -289,14 +289,22 @@ const Casbox = () => {
   useEffect(() => {
     fetchMessages();
 
-    // Background auto-polling for new casbox messages every 30 seconds
+    // Background auto-polling for new casbox messages every 10 seconds
     const interval = setInterval(() => {
       if (!document.hidden) {
         fetchMessages(true);
       }
     }, 10000);
 
-    return () => clearInterval(interval);
+    const handleCasboxMessageSent = (e) => {
+      fetchMessages(true);
+    };
+    window.addEventListener('casbox_message_sent', handleCasboxMessageSent);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('casbox_message_sent', handleCasboxMessageSent);
+    };
   }, []);
 
   useEffect(() => {
