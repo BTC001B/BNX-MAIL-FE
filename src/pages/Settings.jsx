@@ -1079,14 +1079,28 @@ const Settings = () => {
                       if (bgFileRef.current) bgFileRef.current.value = "";
                     }}
                   />
-                  <button
-                    type="button"
-                    onClick={() => bgFileRef.current?.click()}
-                    className="w-fit px-5 py-2.5 rounded-xl text-sm font-medium border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-sm"
-                    style={{ borderColor: theme.border, color: theme.text }}
-                  >
-                    📁 Upload from device
-                  </button>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => bgFileRef.current?.click()}
+                      className="w-fit px-5 py-2.5 rounded-xl text-sm font-medium border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-sm"
+                      style={{ borderColor: theme.border, color: theme.text }}
+                    >
+                      📁 Upload from device
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedWallpaper(null);
+                        clearBackgroundImage();
+                        toast.success("Background reset to default");
+                      }}
+                      className="w-fit px-5 py-2.5 rounded-xl text-sm font-medium border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-sm"
+                      style={{ borderColor: theme.border, color: theme.text }}
+                    >
+                      ↺ Reset to Default
+                    </button>
+                  </div>
                 </div>
 
                 {/* Reading Pane */}
