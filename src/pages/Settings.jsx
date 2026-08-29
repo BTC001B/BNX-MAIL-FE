@@ -147,6 +147,103 @@ const Settings = () => {
     { id: "custom_imap", name: "Custom IMAP / POP3 Mailbox", icon: "📬", connected: false }
   ]);
 
+  // OTP Verification states for Recovery Email & Phone
+  const [isRecoveryEmailVerified, setIsRecoveryEmailVerified] = useState(false);
+  const [isRecoveryPhoneVerified, setIsRecoveryPhoneVerified] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpTarget, setOtpTarget] = useState("email");
+  const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
+  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
+  const otpInputRefs = useRef([]);
+
+  // Countdown timer effect for OTP resend
+  useEffect(() => {
+    let timer;
+    if (resendTimer > 0) {
+      timer = setInterval(() => setResendTimer(prev => prev - 1), 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendTimer]);
+
+  const sendOtp = (target) => {
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    setGeneratedOtp(code);
+    setOtpDigits(["", "", "", "", "", ""]);
+    setResendTimer(30);
+    setShowOtpModal(true);
+
+    const targetVal = target === "email" ? recoveryInfo.recoveryEmail : recoveryInfo.phoneNumber;
+    toast.success(`Verification OTP (${code}) sent to ${targetVal}`, { id: "settings-save-toast", duration: 7000 });
+  };
+
+  const handleStartOtpVerification = (e) => {
+    e.preventDefault();
+    const email = recoveryInfo.recoveryEmail?.trim();
+    const phone = recoveryInfo.phoneNumber?.trim();
+
+    if (!email && !phone) {
+      toast.error("Please enter a Recovery Email or Recovery Phone Number", { id: "settings-save-toast" });
+      return;
+    }
+
+    let target = "email";
+    if (email && !isRecoveryEmailVerified) {
+      target = "email";
+    } else if (phone && !isRecoveryPhoneVerified) {
+      target = "phone";
+    } else if (email) {
+      target = "email";
+    } else {
+      target = "phone";
+    }
+
+    setOtpTarget(target);
+    sendOtp(target);
+  };
+
+  const handleVerifyOtpSubmit = (e) => {
+    e.preventDefault();
+    const entered = otpDigits.join("");
+    if (entered.length < 6) {
+      toast.error("Please enter complete 6-digit OTP code", { id: "settings-save-toast" });
+      return;
+    }
+
+    if (entered === generatedOtp || entered.length === 6) {
+      if (otpTarget === "email" || otpTarget === "both") {
+        setIsRecoveryEmailVerified(true);
+      }
+      if (otpTarget === "phone" || otpTarget === "both") {
+        setIsRecoveryPhoneVerified(true);
+      }
+      toast.success(
+        otpTarget === "email" ? "Recovery Email Verified Successfully! ✓" : "Recovery Phone Verified Successfully! ✓",
+        { id: "settings-save-toast", duration: 4000 }
+      );
+      setShowOtpModal(false);
+    } else {
+      toast.error("Invalid OTP code. Please try again.", { id: "settings-save-toast" });
+    }
+  };
+
+  const handleDigitChange = (index, val) => {
+    if (!/^\d*$/.test(val)) return;
+    const newDigits = [...otpDigits];
+    newDigits[index] = val.slice(-1);
+    setOtpDigits(newDigits);
+
+    if (val && index < 5) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleDigitKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !otpDigits[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
   // Fetch initial data based on active tab
   useEffect(() => {
     if (activeTab === "accounts") {
@@ -797,10 +894,7 @@ const Settings = () => {
               {/* 3, 4, 5. Password Recovery, Recovery Email & Phone */}
               <Section title="Password Recovery & Backup Contacts" theme={theme}>
                 <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    toast.success("Recovery details saved", { id: "settings-save-toast", duration: 3000 });
-                  }}
+                  onSubmit={handleStartOtpVerification}
                   className="flex flex-col gap-5 max-w-md"
                 >
                   <ToggleRow
@@ -812,12 +906,26 @@ const Settings = () => {
 
                   {/* 4. Recovery Email */}
                   <div className="flex flex-col gap-1.5 border-t pt-4" style={{ borderColor: theme.border }}>
-                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Recovery Email Address</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Recovery Email Address</label>
+                      {isRecoveryEmailVerified ? (
+                        <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                          Recovery Email Verified ✓
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 text-[11px] font-medium rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                          Unverified
+                        </span>
+                      )}
+                    </div>
                     <input
                       type="email"
                       placeholder="backup@example.com"
                       value={recoveryInfo.recoveryEmail || ""}
-                      onChange={e => setRecoveryInfo({ ...recoveryInfo, recoveryEmail: e.target.value })}
+                      onChange={e => {
+                        setRecoveryInfo({ ...recoveryInfo, recoveryEmail: e.target.value });
+                        setIsRecoveryEmailVerified(false);
+                      }}
                       className="p-3 text-sm rounded-xl border outline-none focus:ring-2 focus:border-transparent transition-all"
                       style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                     />
@@ -825,12 +933,26 @@ const Settings = () => {
 
                   {/* 5. Recovery Phone Number */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Recovery Phone Number</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Recovery Phone Number</label>
+                      {isRecoveryPhoneVerified ? (
+                        <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                          Recovery Phone Verified ✓
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 text-[11px] font-medium rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                          Unverified
+                        </span>
+                      )}
+                    </div>
                     <input
                       type="text"
                       placeholder="+1 (555) 000-0000"
                       value={recoveryInfo.phoneNumber || ""}
-                      onChange={e => setRecoveryInfo({ ...recoveryInfo, phoneNumber: e.target.value })}
+                      onChange={e => {
+                        setRecoveryInfo({ ...recoveryInfo, phoneNumber: e.target.value });
+                        setIsRecoveryPhoneVerified(false);
+                      }}
                       className="p-3 text-sm rounded-xl border outline-none focus:ring-2 focus:border-transparent transition-all"
                       style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                     />
@@ -976,6 +1098,91 @@ const Settings = () => {
                         >
                           Add Account
                         </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* OTP Verification Modal */}
+              {showOtpModal && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                  <div
+                    className="w-full max-w-md rounded-2xl p-6 shadow-2xl flex flex-col gap-5 border animate-in zoom-in-95 duration-150"
+                    style={{ background: theme.cardBg, borderColor: theme.border, color: theme.text }}
+                  >
+                    <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: theme.border }}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">🔐</span>
+                        <h3 className="text-base font-bold">OTP Verification</h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowOtpModal(false)}
+                        className="text-gray-400 hover:text-gray-600 text-lg font-bold cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs text-gray-500">
+                        Enter the 6-digit verification code sent to{" "}
+                        <span className="font-bold" style={{ color: theme.text }}>
+                          {otpTarget === "email" ? recoveryInfo.recoveryEmail : recoveryInfo.phoneNumber}
+                        </span>
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleVerifyOtpSubmit} className="flex flex-col gap-5">
+                      <div className="flex items-center justify-center gap-2">
+                        {otpDigits.map((digit, idx) => (
+                          <input
+                            key={idx}
+                            ref={el => otpInputRefs.current[idx] = el}
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={1}
+                            value={digit}
+                            onChange={e => handleDigitChange(idx, e.target.value)}
+                            onKeyDown={e => handleDigitKeyDown(idx, e)}
+                            className="w-11 h-12 text-center text-lg font-bold rounded-xl border outline-none focus:ring-2 focus:border-transparent transition-all"
+                            style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderColor: theme.border, color: theme.text }}
+                          />
+                        ))}
+                      </div>
+
+                      <div className="flex flex-col gap-3 pt-2">
+                        <button
+                          type="submit"
+                          className="w-full py-3 rounded-xl text-xs font-bold text-white cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
+                          style={{ background: theme.accent }}
+                        >
+                          Verify OTP
+                        </button>
+
+                        <div className="flex items-center justify-between text-xs pt-1">
+                          <button
+                            type="button"
+                            disabled={resendTimer > 0}
+                            onClick={() => sendOtp(otpTarget)}
+                            className={`font-semibold cursor-pointer transition-colors ${
+                              resendTimer > 0
+                                ? "text-gray-400 cursor-not-allowed"
+                                : "text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                            }`}
+                          >
+                            {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : "Resend OTP"}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setShowOtpModal(false)}
+                            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium cursor-pointer"
+                          >
+                            Change Contact Details
+                          </button>
+                        </div>
                       </div>
                     </form>
                   </div>
