@@ -36,6 +36,21 @@ const AllMail = ({ searchQuery }) => {
 
   const activeLabel = labels.find(l => l.id.toString() === labelId);
 
+  // Filter states
+  const [showTime, setShowTime] = useState(false);
+  const [showFrom, setShowFrom] = useState(false);
+  const [showTo, setShowTo] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+
+  const [filterFrom, setFilterFrom] = useState("");
+  const [filterTo, setFilterTo] = useState("");
+  const [filterDate, setFilterDate] = useState("");
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
+  const [filterHasAttachment, setFilterHasAttachment] = useState(null);
+  const [filterReadStatus, setFilterReadStatus] = useState("all");
+  const [filterStarred, setFilterStarred] = useState(null);
+
   const visibleEmails = emails.filter((e) => {
     // 1. Search Query
     if (searchQuery) {
@@ -129,21 +144,6 @@ const AllMail = ({ searchQuery }) => {
 
     return true;
   });
-
-  // Filter states
-  const [showTime, setShowTime] = useState(false);
-  const [showFrom, setShowFrom] = useState(false);
-  const [showTo, setShowTo] = useState(false);
-  const [showMore, setShowMore] = useState(false);
-
-  const [filterFrom, setFilterFrom] = useState("");
-  const [filterTo, setFilterTo] = useState("");
-  const [filterDate, setFilterDate] = useState("");
-  const [customStartDate, setCustomStartDate] = useState("");
-  const [customEndDate, setCustomEndDate] = useState("");
-  const [filterHasAttachment, setFilterHasAttachment] = useState(null);
-  const [filterReadStatus, setFilterReadStatus] = useState("all");
-  const [filterStarred, setFilterStarred] = useState(null);
 
   useEffect(() => {
     if (labelId) {
