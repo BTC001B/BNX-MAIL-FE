@@ -533,7 +533,7 @@ const ChatRoom = () => {
     <div className="flex flex-col h-full bg-transparent overflow-hidden">
       {/* Action Toolbar */}
       <div
-        className="flex items-center justify-between px-4 sm:px-6 py-2 border-b shrink-0 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md printable-conversation-no-print"
+        className="flex items-center justify-between px-4 sm:px-6 py-2 border-b shrink-0 relative z-20 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md printable-conversation-no-print"
         style={{ borderColor: theme.border || 'rgba(229,231,235,0.5)' }}
       >
         <div className="flex items-center gap-1 sm:gap-2">
@@ -639,7 +639,7 @@ const ChatRoom = () => {
       </div>
 
       {/* HEADER */}
-      <div className="p-4 border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between bg-white/40 dark:bg-gray-900/40 backdrop-blur-md sticky top-0 z-10 printable-conversation-no-print">
+      <div className="p-4 border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between bg-white/40 dark:bg-gray-900/40 backdrop-blur-md shrink-0 relative z-10 printable-conversation-no-print">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => {

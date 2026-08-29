@@ -680,7 +680,7 @@ const Casbox = () => {
       <div className="flex flex-col h-full bg-white dark:bg-[#121212] border-l border-gray-100 dark:border-gray-800 overflow-hidden">
         {/* Action Toolbar */}
         <div
-          className="flex items-center justify-between px-4 sm:px-6 py-2 border-b shrink-0 bg-white dark:bg-[#121212]"
+          className="flex items-center justify-between px-4 sm:px-6 py-2 border-b shrink-0 relative z-20 bg-white dark:bg-[#121212]"
           style={{ borderColor: theme?.border || '#e2e8f0' }}
         >
           <div className="flex items-center gap-1 sm:gap-2">
@@ -766,7 +766,7 @@ const Casbox = () => {
 
         {/* Header */}
         <div
-          className="px-6 py-4 border-b flex items-center justify-between bg-white dark:bg-[#121212] shrink-0"
+          className="px-6 py-4 border-b flex items-center justify-between bg-white dark:bg-[#121212] shrink-0 relative z-10"
           style={{ borderColor: theme?.border || '#e2e8f0' }}
         >
           <div className="flex items-center gap-3">
