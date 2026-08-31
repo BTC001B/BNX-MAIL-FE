@@ -1260,8 +1260,8 @@ const Settings = () => {
             <Section theme={theme}>
               <form onSubmit={handleSaveComposingSettings} className="flex flex-col gap-6 w-full">
                 
-                {/* Display Language Selection (Top) */}
-                <div className="flex flex-col gap-2 pb-2">
+                {/* Display Language Selection (Very Top of Card) */}
+                <div className="flex flex-col gap-2 pb-3">
                   <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Display Language</label>
                   <select
                     value={language}
@@ -1280,7 +1280,7 @@ const Settings = () => {
                 </div>
 
                 {/* Input Toggles */}
-                <div className="flex flex-col space-y-1 border-t pt-4" style={{ borderColor: theme.border }}>
+                <div className="flex flex-col space-y-1 border-t pt-5" style={{ borderColor: theme.border }}>
                   <ToggleRow label={t("settings.spelling_check", "Enable Spelling Check")} checked={spellingCheck} onChange={setSpellingCheck} theme={theme} />
                   <ToggleRow label={t("settings.grammar_check", "Enable Grammar Check")} checked={grammarCheck} onChange={setGrammarCheck} theme={theme} />
                   <ToggleRow label={t("settings.auto_correct", "Enable Auto-correct")} checked={autoCorrect} onChange={setAutoCorrect} theme={theme} />
