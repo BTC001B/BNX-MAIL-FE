@@ -1452,24 +1452,13 @@ const Settings = () => {
                   <span className="text-xs text-gray-500">The default signature will be automatically inserted into new compose frames.</span>
                 </div>
 
-                {/* Bottom Action Buttons */}
-                <div className="flex items-center gap-3 mt-4 pt-2">
-                  <button
-                    type="submit"
-                    className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-sm"
-                    style={{ background: theme.accent }}
-                  >
-                    {t("common.save_preferences", "Save Preferences")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fetchBackendSettings()}
-                    className="px-6 py-2.5 rounded-xl text-sm font-semibold border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all"
-                    style={{ borderColor: theme.border, color: theme.text }}
-                  >
-                    {t("common.cancel", "Cancel")}
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  className="w-fit mt-4 px-6 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-sm"
+                  style={{ background: theme.accent }}
+                >
+                  {t("common.save_preferences", "Save Preferences")}
+                </button>
               </form>
             </Section>
           )}
