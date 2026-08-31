@@ -290,7 +290,7 @@ const StorageManagement = () => {
       <div className="flex-1 max-w-5xl mx-auto w-full px-6 py-10 space-y-8">
         {/* Page Header Titles */}
         <div className="flex flex-col gap-2">
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Storage Management</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t("storage.title", "Storage Management")}</h1>
           <p className="text-xs sm:text-sm" style={{ color: theme.subText }}>
             View and manage storage usage across your applications.
           </p>
@@ -336,14 +336,14 @@ const StorageManagement = () => {
               <StorageCard name="Cliks" logo={cliksLogo} />
             </div>
 
-            {/* Upgrade Storage Plans Section */}
+            {/* {t("storage.upgrade", "Upgrade Storage")} Plans Section */}
             <div 
               className="p-8 rounded-3xl border flex flex-col gap-6 shadow-sm bg-white/40 dark:bg-gray-900/40 backdrop-blur-md"
               style={{ borderColor: theme.border }}
             >
               {/* Header */}
               <div>
-                <h2 className="text-xl font-extrabold tracking-tight">Upgrade Storage Plans</h2>
+                <h2 className="text-xl font-extrabold tracking-tight">{t("storage.upgrade", "Upgrade Storage")} Plans</h2>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Choose a plan that fits your storage and feature requirements.</p>
               </div>
 

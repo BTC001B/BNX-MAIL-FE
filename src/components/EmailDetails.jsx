@@ -52,6 +52,7 @@ import logo from "../assets/bnx-remove.png";
 import html2pdf from "html2pdf.js";
 
 const getMimeType = (fileName) => {
+  const { t } = useTranslation();
   const ext = fileName.split('.').pop().toLowerCase();
   switch (ext) {
     case 'pdf': return 'application/pdf';
@@ -1131,7 +1132,7 @@ const EmailDetails = ({
                   className="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/10 flex items-center gap-3 cursor-pointer text-red-600 dark:text-red-400 transition-colors"
                 >
                   <MdDelete size={18} />
-                  <span className="text-sm font-medium">Delete</span>
+                  <span className="text-sm font-medium">{t("email_details.delete", "Delete")}</span>
                 </button>
                 <button
                   onClick={async () => {
@@ -1175,7 +1176,7 @@ const EmailDetails = ({
                   className="w-full text-left px-4 py-2 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] flex items-center gap-3 cursor-pointer text-gray-700 dark:text-gray-200 transition-colors"
                 >
                   <MdPrint size={18} className="text-gray-500" />
-                  <span className="text-sm font-medium">Print</span>
+                  <span className="text-sm font-medium">{t("email_details.print", "Print")}</span>
                 </button>
                 <button
                   onClick={handleDownloadMessage}

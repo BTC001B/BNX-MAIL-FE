@@ -43,6 +43,7 @@ const quillModules = {
 };
 
 const FloatingCompose = () => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const { user } = useAuth();
   const { 

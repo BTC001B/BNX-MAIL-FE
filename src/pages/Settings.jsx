@@ -25,7 +25,7 @@ import {
   MdAdd,
   MdClose
 } from "react-icons/md";
-import { emailAPI, authAPI, userAPI, signatureAPI } from "../services/api";
+import { emailAPI, authAPI, userAPI, signatureAPI, settingsAPI } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { useTheme, PRESET_BACKGROUNDS } from "../context/ThemeContext";
 import { useTranslation, normalizeLang } from "../context/LanguageContext";
@@ -1285,10 +1285,10 @@ const Settings = () => {
 
                   {/* Spelling, Grammar, Auto-correct, Writing Suggestions */}
                   <div className="flex flex-col gap-3 border-t pt-4" style={{ borderColor: theme.border }}>
-                    <ToggleRow label="Enable Spelling Check" checked={spellingCheck} onChange={setSpellingCheck} theme={theme} />
-                    <ToggleRow label="Enable Grammar Check" checked={grammarCheck} onChange={setGrammarCheck} theme={theme} />
-                    <ToggleRow label="Enable Auto-correct" checked={autoCorrect} onChange={setAutoCorrect} theme={theme} />
-                    <ToggleRow label="Enable Writing Suggestions (Smart Compose)" checked={writingSuggestions} onChange={setWritingSuggestions} theme={theme} />
+                    <ToggleRow label={t("settings.spelling_check", "Enable Spelling Check")} checked={spellingCheck} onChange={setSpellingCheck} theme={theme} />
+                    <ToggleRow label={t("settings.grammar_check", "Enable Grammar Check")} checked={grammarCheck} onChange={setGrammarCheck} theme={theme} />
+                    <ToggleRow label={t("settings.auto_correct", "Enable Auto-correct")} checked={autoCorrect} onChange={setAutoCorrect} theme={theme} />
+                    <ToggleRow label={t("settings.writing_suggestions", "Enable Writing Suggestions (Smart Compose)")} checked={writingSuggestions} onChange={setWritingSuggestions} theme={theme} />
                   </div>
                 </div>
 
@@ -1460,7 +1460,7 @@ const Settings = () => {
                   className="w-fit mt-2 px-6 py-3 rounded-xl text-sm font-medium text-white cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-sm"
                   style={{ background: theme.accent }}
                 >
-                  Save Preferences
+                  {t("common.save_preferences", "Save Preferences")}
                 </button>
               </form>
             </Section>

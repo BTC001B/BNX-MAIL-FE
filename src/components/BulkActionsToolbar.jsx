@@ -279,7 +279,7 @@ const BulkActionsToolbar = ({
           <button
             onClick={handleBulkSpam}
             className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-xl transition-all cursor-pointer text-gray-600 dark:text-gray-300 flex items-center justify-center"
-            title="Report Spam"
+            title={t("bulk_actions.report_spam", "Report Spam")}
           >
             <MdReport size={19} />
           </button>
