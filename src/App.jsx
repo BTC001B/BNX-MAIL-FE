@@ -7,6 +7,7 @@ import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { MailProvider } from "./context/MailContext";
 import { SocketProvider } from "./context/SocketContext";
 import { SignupProvider } from "./context/SignupContext";
+import { LanguageProvider } from "./context/LanguageContext";
 
 /* Layout */
 import NavBar from "./components/NavBar";
@@ -374,6 +375,7 @@ const AppContent = () => {
 const App = () => (
   <ThemeProvider>
     <AuthProvider>
+    <LanguageProvider>
       <MailProvider>
         <SocketProvider>
           <SignupProvider>
@@ -432,6 +434,7 @@ const App = () => (
           </SignupProvider>
         </SocketProvider>
       </MailProvider>
+      </LanguageProvider>
     </AuthProvider>
   </ThemeProvider>
 );

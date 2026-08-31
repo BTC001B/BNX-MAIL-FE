@@ -4,11 +4,13 @@ import { SIDEBAR_ITEMS } from "../Data/constants";
 import { useTheme } from "../context/ThemeContext";
 import { useMail } from "../context/MailContext";
 import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "../context/LanguageContext";
 import { chatAPI } from "../services/api";
 import StorageWidget from './StorageWidget';
 import { MdLabel, MdAdd, MdClose, MdCheck, MdDelete, MdExpandMore, MdExpandLess, MdHelpOutline, MdContactSupport, MdSettings, MdMoreVert, MdEdit, MdGroup, MdChat, MdCloudUpload, MdOutlineNoteAlt } from "react-icons/md";
 
 const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile, onOpenNotes }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, backgroundImage, sidebarPreferences } = useTheme();
@@ -50,6 +52,33 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile, onOpenNotes }) =>
   const [newLabel, setNewLabel] = useState({ name: "", color: "#135bec", parentId: "" });
   const [editingLabel, setEditingLabel] = useState(null);
   const labelMenuRef = useRef(null);
+
+  const getItemLabel = (name) => {
+    switch (name) {
+      case 'All Inbox': return t('sidebar.all_inbox', 'All Inbox');
+      case 'Inbox': return t('sidebar.inbox', 'Inbox');
+      case 'Analytics': return t('sidebar.analytics', 'Analytics');
+      case 'Starred': return t('sidebar.starred', 'Starred');
+      case 'Sent': return t('sidebar.sent', 'Sent');
+      case 'Drafts': return t('sidebar.drafts', 'Drafts');
+      case 'Snoozed': return t('sidebar.snoozed', 'Snoozed');
+      case 'Scheduled': return t('sidebar.scheduled', 'Scheduled');
+      case 'Archive': return t('sidebar.archive', 'Archive');
+      case 'Spam': return t('sidebar.spam', 'Spam');
+      case 'Trash': return t('sidebar.trash', 'Trash');
+      case 'Unread': return t('sidebar.unread', 'Unread');
+      case 'Mail Backup': return t('sidebar.mail_backup', 'Mail Backup');
+      case 'Groups': return t('sidebar.groups', 'Groups');
+      case 'Chat Room': return t('sidebar.chat_room', 'Chat Room');
+      case 'Casbox': return t('sidebar.casbox', 'Casbox');
+      case 'Vault': return t('sidebar.vault', 'Vault');
+      case 'Storage Management': return t('sidebar.storage_management', 'Storage Management');
+      case 'Subscriptions': return t('sidebar.subscriptions', 'Subscriptions');
+      case 'Settings': return t('sidebar.settings', 'Settings');
+      case 'Support & Help': return t('sidebar.support', 'Support & Help');
+      default: return name;
+    }
+  };
 
   useEffect(() => {
     const handleOpenLabelModal = (e) => {
@@ -139,7 +168,7 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile, onOpenNotes }) =>
 
                 return (
                   <button
-                    key={item.name}
+                    key={getItemLabel(item.name)}
                     onClick={() => handleNavigation(item.path)}
                     className={`w-[calc(100%-16px)] mx-2 my-0.5 flex items-center justify-between pl-4 pr-3 py-1 rounded-full transition-all duration-200 group cursor-pointer btn-collapse shrink-0
                       ${isActive
@@ -156,7 +185,7 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile, onOpenNotes }) =>
                       <span className={`text-[18px] transition-transform duration-200 ${isActive ? "scale-105" : "group-hover:scale-105"}`}>
                         {item.icon}
                       </span>
-                      <span className="text-sm tracking-wide hide-on-collapse">{item.name}</span>
+                      <span className="text-sm tracking-wide hide-on-collapse">{getItemLabel(item.name)}</span>
                     </div>
 
                     {count > 0 && (
@@ -238,7 +267,7 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile, onOpenNotes }) =>
 
                       return (
                         <button
-                          key={item.name}
+                          key={getItemLabel(item.name)}
                           onClick={() => handleNavigation(item.path)}
                           className={`w-[calc(100%-16px)] mx-2 my-0.5 flex items-center justify-between pl-4 pr-3 py-1 rounded-full transition-all duration-200 group cursor-pointer btn-collapse
                     ${isActive
@@ -255,7 +284,7 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile, onOpenNotes }) =>
                             <span className={`text-[18px] transition-transform duration-200 ${isActive ? "scale-105" : "group-hover:scale-105"}`}>
                               {item.icon}
                             </span>
-                            <span className="text-sm tracking-wide hide-on-collapse">{item.name}</span>
+                            <span className="text-sm tracking-wide hide-on-collapse">{getItemLabel(item.name)}</span>
                           </div>
 
                           {count > 0 && (

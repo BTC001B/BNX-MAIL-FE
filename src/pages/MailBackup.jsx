@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { mailBackupAPI } from "../services/mailBackupApi";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "../context/LanguageContext";
 import { MdBackup, MdAttachFile, MdKeyboardArrowLeft, MdKeyboardArrowRight, MdRefresh, MdSecurity } from "react-icons/md";
 import toast from "react-hot-toast";
 
 const MailBackup = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { theme } = useTheme();
   const { user } = useAuth();

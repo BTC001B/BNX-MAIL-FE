@@ -17,6 +17,7 @@ import { mailAPI, api, userAPI, signatureAPI, casboxAPI } from "../services/api"
 import { useTheme } from "../context/ThemeContext";
 import { useMail } from "../context/MailContext";
 import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "../context/LanguageContext";
 import { DEFAULT_TEMPLATES } from "../pages/Templates";
 import toast from "react-hot-toast";
 import ReactQuill, { Quill } from "react-quill";

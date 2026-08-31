@@ -52,6 +52,7 @@ const quillModules = {
 };
 
 const Settings = () => {
+  const { t, applyLanguage, currentLanguage } = useTranslation();
   const navigate = useNavigate();
   const { user, getSessions, switchAccount } = useAuth();
   const {
@@ -704,6 +705,7 @@ const Settings = () => {
       setLoading(true);
       try {
         localStorage.setItem("bnx_setting_language", language);
+        await applyLanguage(language);
         localStorage.setItem("bnx_setting_spellingCheck", spellingCheck ? "true" : "false");
         localStorage.setItem("bnx_setting_grammarCheck", grammarCheck ? "true" : "false");
         localStorage.setItem("bnx_setting_autoCorrect", autoCorrect ? "true" : "false");
@@ -1242,12 +1244,12 @@ const Settings = () => {
                       className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
                       style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                     >
-                      <option value="en_US">English</option>
-                      <option value="hi_IN">Hindi (हिन्दी)</option>
-                      <option value="ta_IN">Tamil (தமிழ்)</option>
-                      <option value="te_IN">Telugu (తెలుగు)</option>
-                      <option value="ml_IN">Malayalam (മലയാളം)</option>
-                      <option value="kn_IN">Kannada (ಕನ್ನಡ)</option>
+                      <option value="en">English</option>
+                      <option value="ta">Tamil (தமிழ்)</option>
+                      <option value="hi">Hindi (हिन्दी)</option>
+                      <option value="te">Telugu (తెలుగు)</option>
+                      <option value="ml">Malayalam (മലയാളം)</option>
+                      <option value="kn">Kannada (ಕನ್ನಡ)</option>
                     </select>
                     <span className="text-xs text-gray-500">BNXmail display language preference.</span>
                   </div>

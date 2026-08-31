@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 import { mailAPI } from '../services/api';
 import StorageCard from '../components/StorageCard';
 import beta2 from '../assets/beta2.png';
@@ -7,6 +8,7 @@ import cliksBusinessLogo from '../assets/cliks-business.png';
 import cliksLogo from '../assets/cliks.png';
 
 const StorageManagement = () => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const [selectedApp, setSelectedApp] = useState(null);
   const [storageData, setStorageData] = useState(null);

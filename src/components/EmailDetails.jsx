@@ -45,6 +45,7 @@ import {
 import { useMail } from "../context/MailContext";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useTranslation } from "../context/LanguageContext";
 import { mailAPI, reportAPI } from "../services/api";
 import toast from "react-hot-toast";
 import logo from "../assets/bnx-remove.png";
@@ -1113,14 +1114,14 @@ const EmailDetails = ({
                   className="w-full text-left px-4 py-2 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] flex items-center gap-3 cursor-pointer text-gray-700 dark:text-gray-200 transition-colors"
                 >
                   <MdReply size={18} className="text-gray-500" />
-                  <span className="text-sm font-medium">Reply</span>
+                  <span className="text-sm font-medium">{t("common.reply", "Reply")}</span>
                 </button>
                 <button
                   onClick={() => { onForward?.(email); setShowMoreOptions(false); }}
                   className="w-full text-left px-4 py-2 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] flex items-center gap-3 cursor-pointer text-gray-700 dark:text-gray-200 transition-colors"
                 >
                   <MdForward size={18} className="text-gray-500" />
-                  <span className="text-sm font-medium">Forward</span>
+                  <span className="text-sm font-medium">{t("common.forward", "Forward")}</span>
                 </button>
                 
                 <div className="border-t border-gray-100 dark:border-neutral-800 my-1"></div>

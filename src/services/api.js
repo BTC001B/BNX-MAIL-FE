@@ -369,3 +369,9 @@ export const casboxAPI = {
 export const reportAPI = {
     submitReport: (data) => api.post('/api/reports', data),
 };
+
+// Settings APIs
+export const settingsAPI = {
+    getLanguage: () => api.get(API_ENDPOINTS.SETTINGS?.LANGUAGE || '/api/settings/language'),
+    updateLanguage: (language) => api.put(API_ENDPOINTS.SETTINGS?.LANGUAGE || '/api/settings/language', { language }),
+};
