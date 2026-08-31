@@ -394,11 +394,12 @@ const Settings = () => {
       savingRef.current = true;
       setLoading(true);
       const res = await userAPI.updateSettings(updateData);
-      if (res.data?.success) {
+      if (res.status === 200 || res.status === 204 || res.data?.success || res.data?.status === 'success') {
         toast.success("Settings saved to cloud", { id: "settings-save-toast", duration: 3000 });
         return true;
       }
     } catch (err) {
+      console.error("Save backend settings error:", err);
       toast.error("Failed to sync settings with server", { id: "settings-save-toast", duration: 3000 });
     } finally {
       setLoading(false);
@@ -707,7 +708,10 @@ const Settings = () => {
       try {
         const targetLang = normalizeLang(language);
 
-        const ok = await saveBackendSettings({ 
+        // Apply new language globally to application UI & localStorage & backend language endpoint
+        await applyLanguage(targetLang);
+
+        await saveBackendSettings({ 
           undoSendDelay, 
           bulkMailEnabled, 
           notificationEnabled,
@@ -723,26 +727,23 @@ const Settings = () => {
           defaultTextColor
         });
 
-        if (ok) {
-          localStorage.setItem("bnx_setting_language", targetLang);
-          await applyLanguage(targetLang);
-          localStorage.setItem("bnx_setting_spellingCheck", spellingCheck ? "true" : "false");
-          localStorage.setItem("bnx_setting_grammarCheck", grammarCheck ? "true" : "false");
-          localStorage.setItem("bnx_setting_autoCorrect", autoCorrect ? "true" : "false");
-          localStorage.setItem("bnx_setting_writingSuggestions", writingSuggestions ? "true" : "false");
-          localStorage.setItem("bnx_setting_desktopNotifications", desktopNotifications ? "true" : "false");
-          localStorage.setItem("bnx_setting_conversationView", conversationView ? "true" : "false");
-          localStorage.setItem("bnx_setting_fontFamily", defaultFontFamily);
-          localStorage.setItem("bnx_setting_fontSizeText", defaultFontSize);
-          localStorage.setItem("bnx_setting_textColor", defaultTextColor);
-          localStorage.setItem("bnx_setting_undoSendDelay", String(undoSendDelay));
-          localStorage.setItem("bnx_bulk_mail_filter", bulkMailEnabled ? "true" : "false");
-          localStorage.setItem("bnx_notification_filter", notificationEnabled ? "true" : "false");
+        localStorage.setItem("bnx_setting_language", targetLang);
+        localStorage.setItem("bnx_setting_spellingCheck", spellingCheck ? "true" : "false");
+        localStorage.setItem("bnx_setting_grammarCheck", grammarCheck ? "true" : "false");
+        localStorage.setItem("bnx_setting_autoCorrect", autoCorrect ? "true" : "false");
+        localStorage.setItem("bnx_setting_writingSuggestions", writingSuggestions ? "true" : "false");
+        localStorage.setItem("bnx_setting_desktopNotifications", desktopNotifications ? "true" : "false");
+        localStorage.setItem("bnx_setting_conversationView", conversationView ? "true" : "false");
+        localStorage.setItem("bnx_setting_fontFamily", defaultFontFamily);
+        localStorage.setItem("bnx_setting_fontSizeText", defaultFontSize);
+        localStorage.setItem("bnx_setting_textColor", defaultTextColor);
+        localStorage.setItem("bnx_setting_undoSendDelay", String(undoSendDelay));
+        localStorage.setItem("bnx_bulk_mail_filter", bulkMailEnabled ? "true" : "false");
+        localStorage.setItem("bnx_notification_filter", notificationEnabled ? "true" : "false");
 
-          // Save all signatures to ensure any name or content changes are persisted
-          for (const sig of signatures) {
-            await signatureAPI.updateSignature(sig.id, { name: sig.name, content: sig.content });
-          }
+        // Save all signatures to ensure any name or content changes are persisted
+        for (const sig of signatures) {
+          await signatureAPI.updateSignature(sig.id, { name: sig.name, content: sig.content });
         }
       } catch (err) {
         toast.error("Failed to sync composing preferences", { id: "settings-save-toast", duration: 3000 });
