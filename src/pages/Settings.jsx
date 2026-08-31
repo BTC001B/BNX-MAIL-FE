@@ -1257,46 +1257,49 @@ const Settings = () => {
 
           {/* composing Tab */}
           {activeTab === "composing" && (
-            <Section theme={theme}>
-              <form onSubmit={handleSaveComposingSettings} className="flex flex-col gap-6 max-w-3xl">
+            <Section title="General & Composing Settings" theme={theme}>
+              <form onSubmit={handleSaveComposingSettings} className="flex flex-col gap-8 max-w-2xl">
                 
-                {/* 1. Input & Language Tools Toggles */}
-                <div className="flex flex-col space-y-1">
-                  <ToggleRow label={t("settings.spelling_check", "Enable Spelling Check")} checked={spellingCheck} onChange={setSpellingCheck} theme={theme} />
-                  <ToggleRow label={t("settings.grammar_check", "Enable Grammar Check")} checked={grammarCheck} onChange={setGrammarCheck} theme={theme} />
-                  <ToggleRow label={t("settings.auto_correct", "Enable Auto-correct")} checked={autoCorrect} onChange={setAutoCorrect} theme={theme} />
-                  <ToggleRow label={t("settings.writing_suggestions", "Enable Writing Suggestions (Smart Compose)")} checked={writingSuggestions} onChange={setWritingSuggestions} theme={theme} />
-                </div>
+                {/* 1. Language & Input Tools */}
+                <div className="flex flex-col gap-5">
+                  <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Language & Input Tools</h4>
+                  
+                  {/* Language */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Display Language</label>
+                    <select
+                      value={language}
+                      onChange={e => setLanguage(e.target.value)}
+                      className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
+                      style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
+                    >
+                      <option value="en">English</option>
+                      <option value="ta">Tamil (தமிழ்)</option>
+                      <option value="hi">Hindi (हिन्दी)</option>
+                      <option value="te">Telugu (తెలుగు)</option>
+                      <option value="ml">Malayalam (മലയാളം)</option>
+                      <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                    </select>
+                    <span className="text-xs text-gray-500">BNXmail display language preference.</span>
+                  </div>
 
-                {/* Language Selection */}
-                <div className="flex flex-col gap-2 pt-2">
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Display Language</label>
-                  <select
-                    value={language}
-                    onChange={e => setLanguage(e.target.value)}
-                    className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
-                    style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
-                  >
-                    <option value="en">English</option>
-                    <option value="ta">Tamil (தமிழ்)</option>
-                    <option value="hi">Hindi (हिन्दी)</option>
-                    <option value="te">Telugu (తెలుగు)</option>
-                    <option value="ml">Malayalam (മലയാളം)</option>
-                    <option value="kn">Kannada (ಕನ್ನಡ)</option>
-                  </select>
-                  <span className="text-xs text-gray-500">BNXmail display language preference.</span>
+                  {/* Spelling, Grammar, Auto-correct, Writing Suggestions */}
+                  <div className="flex flex-col gap-3 border-t pt-4" style={{ borderColor: theme.border }}>
+                    <ToggleRow label={t("settings.spelling_check", "Enable Spelling Check")} checked={spellingCheck} onChange={setSpellingCheck} theme={theme} />
+                    <ToggleRow label={t("settings.grammar_check", "Enable Grammar Check")} checked={grammarCheck} onChange={setGrammarCheck} theme={theme} />
+                    <ToggleRow label={t("settings.auto_correct", "Enable Auto-correct")} checked={autoCorrect} onChange={setAutoCorrect} theme={theme} />
+                    <ToggleRow label={t("settings.writing_suggestions", "Enable Writing Suggestions (Smart Compose)")} checked={writingSuggestions} onChange={setWritingSuggestions} theme={theme} />
+                  </div>
                 </div>
 
                 {/* 2. Mail View & Notifications */}
-                <div className="flex flex-col gap-4 border-t pt-6 mt-2" style={{ borderColor: theme.border }}>
-                  <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Mail View & Notifications</h4>
-                  <div className="flex flex-col space-y-1">
-                    <ToggleRow label="Desktop Notifications for New Emails" checked={desktopNotifications} onChange={setDesktopNotifications} theme={theme} />
-                    <ToggleRow label="Conversation View (Group emails by thread)" checked={conversationView} onChange={setConversationView} theme={theme} />
-                  </div>
+                <div className="flex flex-col gap-5 border-t pt-6" style={{ borderColor: theme.border }}>
+                  <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Mail View & Notifications</h4>
+                  <ToggleRow label="Desktop Notifications for New Emails" checked={desktopNotifications} onChange={setDesktopNotifications} theme={theme} />
+                  <ToggleRow label="Conversation View (Group emails by thread)" checked={conversationView} onChange={setConversationView} theme={theme} />
 
                   {/* Undo Send */}
-                  <div className="flex flex-col gap-2 mt-4">
+                  <div className="flex flex-col gap-2 mt-2">
                     <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Undo Send Delay</label>
                     <select
                       value={undoSendDelay}
@@ -1315,15 +1318,15 @@ const Settings = () => {
                 </div>
 
                 {/* 3. Default Text Style */}
-                <div className="flex flex-col gap-4 border-t pt-6 mt-2" style={{ borderColor: theme.border }}>
-                  <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Default Text Style</h4>
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="flex flex-col gap-2">
-                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Font Family</span>
+                <div className="flex flex-col gap-4 border-t pt-6" style={{ borderColor: theme.border }}>
+                  <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Default Text Style</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Font Family</span>
                       <select
                         value={defaultFontFamily}
                         onChange={e => setDefaultFontFamily(e.target.value)}
-                        className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
+                        className="w-full p-2.5 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
                         style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                       >
                         <option value="Arial">Arial</option>
@@ -1337,12 +1340,12 @@ const Settings = () => {
                       </select>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Font Size</span>
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Font Size</span>
                       <select
                         value={defaultFontSize}
                         onChange={e => setDefaultFontSize(e.target.value)}
-                        className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
+                        className="w-full p-2.5 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
                         style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                       >
                         <option value="Small">Small</option>
@@ -1353,7 +1356,7 @@ const Settings = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 mt-2">
+                  <div className="flex items-center gap-3 mt-1">
                     <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Text Color:</span>
                     <input
                       type="color"
@@ -1371,9 +1374,9 @@ const Settings = () => {
                 </div>
 
                 {/* 4. Signatures Section */}
-                <div className="flex flex-col gap-4 border-t pt-6 mt-2" style={{ borderColor: theme.border }}>
+                <div className="flex flex-col gap-4 border-t pt-6" style={{ borderColor: theme.border }}>
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Email Signatures</h4>
+                    <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email Signatures</h4>
                     <button
                       type="button"
                       onClick={addSignature}
@@ -1454,7 +1457,7 @@ const Settings = () => {
 
                 <button
                   type="submit"
-                  className="w-fit mt-4 px-6 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-sm"
+                  className="w-fit mt-2 px-6 py-3 rounded-xl text-sm font-medium text-white cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-sm"
                   style={{ background: theme.accent }}
                 >
                   {t("common.save_preferences", "Save Preferences")}
