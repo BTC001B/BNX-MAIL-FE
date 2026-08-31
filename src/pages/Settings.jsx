@@ -1014,12 +1014,6 @@ const Settings = () => {
                     theme={theme}
                   />
                   <ToggleRow
-                    label="Enforce SSL/TLS Encrypted Mail Transport"
-                    checked={securityToggles.sslEnforced}
-                    onChange={(val) => setSecurityToggles({ ...securityToggles, sslEnforced: val })}
-                    theme={theme}
-                  />
-                  <ToggleRow
                     label="Require Password Re-authentication for Sensitive Actions"
                     checked={securityToggles.reAuthSensitive}
                     onChange={(val) => setSecurityToggles({ ...securityToggles, reAuthSensitive: val })}
