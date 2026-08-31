@@ -28,6 +28,7 @@ import {
 import { emailAPI, authAPI, userAPI, signatureAPI } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { useTheme, PRESET_BACKGROUNDS } from "../context/ThemeContext";
+import { useTranslation } from "../context/LanguageContext";
 import toast from "react-hot-toast";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
