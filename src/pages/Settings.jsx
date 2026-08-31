@@ -1260,16 +1260,8 @@ const Settings = () => {
             <Section theme={theme}>
               <form onSubmit={handleSaveComposingSettings} className="flex flex-col gap-6 w-full">
                 
-                {/* 1. Input Toggles */}
-                <div className="flex flex-col space-y-1">
-                  <ToggleRow label={t("settings.spelling_check", "Enable Spelling Check")} checked={spellingCheck} onChange={setSpellingCheck} theme={theme} />
-                  <ToggleRow label={t("settings.grammar_check", "Enable Grammar Check")} checked={grammarCheck} onChange={setGrammarCheck} theme={theme} />
-                  <ToggleRow label={t("settings.auto_correct", "Enable Auto-correct")} checked={autoCorrect} onChange={setAutoCorrect} theme={theme} />
-                  <ToggleRow label={t("settings.writing_suggestions", "Enable Writing Suggestions (Smart Compose)")} checked={writingSuggestions} onChange={setWritingSuggestions} theme={theme} />
-                </div>
-
-                {/* Display Language Selection */}
-                <div className="flex flex-col gap-2 pt-2">
+                {/* Display Language Selection (Top) */}
+                <div className="flex flex-col gap-2 pb-2">
                   <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Display Language</label>
                   <select
                     value={language}
@@ -1285,6 +1277,14 @@ const Settings = () => {
                     <option value="kn">Kannada (ಕನ್ನಡ)</option>
                   </select>
                   <span className="text-xs text-gray-500">BNXmail display language preference.</span>
+                </div>
+
+                {/* Input Toggles */}
+                <div className="flex flex-col space-y-1 border-t pt-4" style={{ borderColor: theme.border }}>
+                  <ToggleRow label={t("settings.spelling_check", "Enable Spelling Check")} checked={spellingCheck} onChange={setSpellingCheck} theme={theme} />
+                  <ToggleRow label={t("settings.grammar_check", "Enable Grammar Check")} checked={grammarCheck} onChange={setGrammarCheck} theme={theme} />
+                  <ToggleRow label={t("settings.auto_correct", "Enable Auto-correct")} checked={autoCorrect} onChange={setAutoCorrect} theme={theme} />
+                  <ToggleRow label={t("settings.writing_suggestions", "Enable Writing Suggestions (Smart Compose)")} checked={writingSuggestions} onChange={setWritingSuggestions} theme={theme} />
                 </div>
 
                 {/* 2. Mail View & Notifications */}
