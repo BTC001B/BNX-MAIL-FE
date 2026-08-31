@@ -1457,7 +1457,7 @@ const Settings = () => {
 
                 <button
                   type="submit"
-                  className="w-fit mt-2 px-6 py-3 rounded-xl text-sm font-medium text-white cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-sm"
+                  className="w-fit mt-4 px-6 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-sm"
                   style={{ background: theme.accent }}
                 >
                   {t("common.save_preferences", "Save Preferences")}
@@ -2065,7 +2065,7 @@ const Section = ({ title, children, theme }) => (
 );
 
 const ToggleRow = ({ label, checked, onChange, theme }) => (
-  <div className="flex items-center justify-between py-2.5">
+  <div className="flex items-center justify-between py-3">
     <span className="text-sm font-medium" style={{ color: theme.text }}>{label}</span>
     <button
       type="button"
