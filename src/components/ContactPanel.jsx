@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useState } from 'react';
 import { useQuery, useMutation, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Search, Plus, X, User, Phone, Mail, Briefcase, AlertCircle } from 'lucide-react';
@@ -15,6 +16,7 @@ const queryClient = new QueryClient({
 const API_BASE = import.meta.env.VITE_CONTACT_API_BASE_URL || 'https://api.bit-tool.com/api/contacts';
 
 const getAppColor = (appName) => {
+  const { t } = useTranslation();
   const lower = (appName || '').toLowerCase();
   if (lower.includes('cliks')) return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300';
   if (lower.includes('bnx') || lower.includes('mail')) return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300';

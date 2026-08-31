@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useEffect, useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -6,6 +7,7 @@ import { MdCloudUpload, MdDownload, MdDelete, MdInsertDriveFile, MdImage, MdPict
 import toast from "react-hot-toast";
 
 const Vault = () => {
+  const { t } = useTranslation();
     const { user } = useAuth();
     const { theme } = useTheme();
     const [files, setFiles] = useState([]);

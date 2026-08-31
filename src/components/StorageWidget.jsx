@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useState, useEffect } from 'react';
 import { mailAPI } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
@@ -36,6 +37,7 @@ const StorageWidget = ({ isDesktopOpen }) => {
   }, []);
 
   const formatSize = (bytes) => {
+  const { t } = useTranslation();
     if (bytes === 0) return '0 B';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];

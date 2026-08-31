@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useEffect, useState } from "react";
 import { useMail } from "../context/MailContext";
 import { MdDelete } from "react-icons/md";
@@ -17,6 +18,7 @@ const Trash = ({ searchQuery }) => {
 
   const [selectedIds, setSelectedIds] = useState(new Set());
   const handleToggleSelect = (uid) => {
+  const { t } = useTranslation();
     const strUid = String(uid);
     setSelectedIds((prev) => {
       const next = new Set(prev);

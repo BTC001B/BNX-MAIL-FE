@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useState, useRef } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { 
@@ -17,6 +18,7 @@ import {
 import toast from "react-hot-toast";
 
 const Support = () => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
 
   // Element Refs for smooth scrolling navigation

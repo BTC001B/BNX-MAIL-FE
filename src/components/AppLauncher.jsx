@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useState } from "react";
 import { MdClose, MdEdit, MdAutoAwesome, MdRocketLaunch } from "react-icons/md";
 import bnxLogo from "../assets/bnx-remove.png";
@@ -54,6 +55,7 @@ const AppLauncher = ({ onClose, onToggleBitToolSidebar, onEdit }) => {
     .filter(Boolean);
 
   const handleAppClick = (app) => {
+  const { t } = useTranslation();
     const appName = app.name;
     const updatedNames = [appName, ...recentNames.filter(name => name !== appName)].slice(0, 3);
     setRecentNames(updatedNames);

@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useState, useEffect } from 'react';
 import {
   MdChevronLeft,
@@ -12,6 +13,7 @@ import {
 const CALENDAR_API_BASE = import.meta.env.VITE_APP_CALENDAR_API;
 
 export default function CalendarPanel() {
+  const { t } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   

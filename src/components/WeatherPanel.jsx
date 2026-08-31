@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useState, useEffect } from 'react';
 import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MapPin, Sun, Moon, Wind, Droplets, Loader2, AlertCircle, CloudSun, Sunrise, Sunset, Thermometer } from 'lucide-react';
@@ -33,6 +34,7 @@ const fetchLocationName = async (lat, lon) => {
 };
 
 const WeatherPanelInner = () => {
+  const { t } = useTranslation();
     const [location, setLocation] = useState(null);
     const [geoError, setGeoError] = useState(null);
     const [isRequestingLocation, setIsRequestingLocation] = useState(false);

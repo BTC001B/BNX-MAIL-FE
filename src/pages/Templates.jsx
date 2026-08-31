@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
@@ -106,6 +107,7 @@ const quillModules = {
 };
 
 const getBodyPreview = (html) => {
+  const { t } = useTranslation();
   if (!html) return "";
   try {
     const tempDiv = document.createElement("div");

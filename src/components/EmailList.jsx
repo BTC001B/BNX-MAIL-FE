@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useState } from "react";
 import { MdArchive, MdUnarchive, MdDelete, MdStar, MdStarBorder, MdAccessTime, MdWbSunny, MdNightsStay, MdToday, MdEvent, MdUpdate, MdDateRange, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { useAuth } from "../context/AuthContext";
@@ -33,6 +34,7 @@ const EmailList = ({
   const displayedEmails = emails;
 
   const getSnoozeOptions = () => {
+  const { t } = useTranslation();
     const now = new Date();
 
     // Later today: 6 PM today (or +3 hours if past 5 PM)

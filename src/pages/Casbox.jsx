@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
@@ -11,6 +12,7 @@ import ReadingPaneLayout from "../components/ReadingPaneLayout";
 import logo from "../assets/bnx-remove.png";
 
 const getMimeType = (fileName) => {
+  const { t } = useTranslation();
   const ext = fileName?.split('.').pop().toLowerCase() || '';
   switch (ext) {
     case 'pdf': return 'application/pdf';

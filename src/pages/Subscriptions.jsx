@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useState, useEffect } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { mailAPI } from "../services/api";
@@ -12,6 +13,7 @@ import {
 import toast from "react-hot-toast";
 
 const Subscriptions = () => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [senders, setSenders] = useState([]);

@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMail } from "../context/MailContext";
@@ -20,6 +21,7 @@ import ReadingPaneLayout from "../components/ReadingPaneLayout";
 import toast from "react-hot-toast";
 
 const getSourceGroup = (email) => {
+  const { t } = useTranslation();
   const fromStr = email.from || email.senderEmail || "";
   let name = "";
   let emailAddr = "";

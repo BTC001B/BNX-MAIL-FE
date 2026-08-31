@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useEffect, useState } from "react";
 import { useMail } from "../context/MailContext";
 import EmailList from "../components/EmailList";
@@ -16,6 +17,7 @@ const Archive = ({ searchQuery }) => {
 
   const [selectedIds, setSelectedIds] = useState(new Set());
   const handleToggleSelect = (uid) => {
+  const { t } = useTranslation();
     const strUid = String(uid);
     setSelectedIds((prev) => {
       const next = new Set(prev);

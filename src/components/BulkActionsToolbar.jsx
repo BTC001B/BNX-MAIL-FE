@@ -1,3 +1,4 @@
+import { useTranslation } from "../context/LanguageContext";
 import React, { useState, useRef, useEffect } from "react";
 import { useMail } from "../context/MailContext";
 import { useTheme } from "../context/ThemeContext";
@@ -50,6 +51,7 @@ const BulkActionsToolbar = ({
   // Close menus on click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
+  const { t } = useTranslation();
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setShowMoreMenu(false);
         setShowSnoozeSub(false);
