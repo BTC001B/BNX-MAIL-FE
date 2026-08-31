@@ -311,6 +311,18 @@ const Settings = () => {
     try {
       setLoading(true);
       const res = await userAPI.getSettings();
+      try {
+        const compRes = await settingsAPI.getComposing();
+        if (compRes.data) {
+          const cd = compRes.data;
+          if (cd.spellingCheckEnabled !== undefined) setSpellingCheck(cd.spellingCheckEnabled);
+          if (cd.grammarCheckEnabled !== undefined) setGrammarCheck(cd.grammarCheckEnabled);
+          if (cd.autoCorrectEnabled !== undefined) setAutoCorrect(cd.autoCorrectEnabled);
+          if (cd.smartComposeEnabled !== undefined) setWritingSuggestions(cd.smartComposeEnabled);
+        }
+      } catch (err) {
+        console.warn("Error fetching composing preferences:", err);
+      }
       if (res.data?.success) {
         const d = res.data.data;
         setPhoneNumber(d.phoneNumber || "");
@@ -710,6 +722,17 @@ const Settings = () => {
 
         // Apply new language globally to application UI & localStorage & backend language endpoint
         await applyLanguage(targetLang);
+
+        try {
+          await settingsAPI.updateComposing({
+            spellingCheckEnabled: spellingCheck,
+            grammarCheckEnabled: grammarCheck,
+            autoCorrectEnabled: autoCorrect,
+            smartComposeEnabled: writingSuggestions
+          });
+        } catch (err) {
+          console.warn("Failed to save composing preferences to endpoint:", err);
+        }
 
         await saveBackendSettings({ 
           undoSendDelay, 
