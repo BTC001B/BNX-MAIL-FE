@@ -882,8 +882,8 @@ const Settings = () => {
       </aside>
 
       {/* Settings Options Pane */}
-      <main className="flex-1 pt-5 pb-10 px-10 overflow-y-auto hidden-scrollbar flex justify-center">
-        <div className="w-full max-w-5xl">
+      <main className="flex-1 pt-5 pb-10 pl-6 pr-8 overflow-y-auto hidden-scrollbar flex justify-start">
+        <div className="w-full max-w-4xl">
           {/* accounts Tab */}
           {activeTab === "accounts" && (
             <div className="flex flex-col gap-8">
