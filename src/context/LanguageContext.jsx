@@ -9,7 +9,7 @@ import kn from '../locales/kn.json';
 
 const translations = { en, ta, hi, te, ml, kn };
 
-const normalizeLang = (code) => {
+export const normalizeLang = (code) => {
   if (!code) return 'en';
   const c = code.toLowerCase();
   if (c.startsWith('ta')) return 'ta';

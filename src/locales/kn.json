@@ -5,7 +5,7 @@
     "analytics": "ವಿಶ್ಲೇಷಣೆ",
     "starred": "ಸ್ಟಾರ್ ಮಾಡಿದವು",
     "sent": "ಕಳುಹಿಸಿದವು",
-    "drafts": "ಕರಡುಗಳು (Drafts)",
+    "drafts": "ಕರಡುಗಳು",
     "snoozed": "ಮುಂದೂಡಲ್ಪಟ್ಟವು",
     "scheduled": "ನಿಗದಿತ ಇಮೇಲ್‌ಗಳು",
     "archive": "ಆರ್ಕೈವ್",
@@ -25,16 +25,16 @@
     "terms": "ಸೇವಾ ನಿಯಮಗಳು"
   },
   "navbar": {
-    "search_placeholder": "ಮೇಲ್ ಹುಡುಕಿ...",
-    "product_launcher": "ಆಪ್ ಲಾಂಚರ್",
-    "apps": "ಆಪ್‌ಗಳು ಮತ್ತು ಸೇವೆಗಳು",
+    "search_placeholder": "ಇಮೇಲ್ ಹುಡುಕಿ...",
+    "product_launcher": "ಉತ್ಪನ್ನ ಉಡಾವಣಾ",
+    "apps": "ಅಪ್ಲಿಕೇಶನ್‌ಗಳು ಮತ್ತು ಸೇವೆಗಳು",
     "profile": "ಪ್ರೊಫೈಲ್",
-    "logout": "ಲಾಗ್ ಔಟ್",
+    "logout": "ಲಾಗ್‌ಔಟ್",
     "light_mode": "ಲೈಟ್ ಮೋಡ್",
     "dark_mode": "ಡಾರ್ಕ್ ಮೋಡ್"
   },
   "common": {
-    "compose": "ರಚಿಸಿ (Compose)",
+    "compose": "ರಚಿಸಿ",
     "new_message": "ಹೊಸ ಸಂದೇಶ",
     "save": "ಉಳಿಸಿ",
     "save_preferences": "ಆದ್ಯತೆಗಳನ್ನು ಉಳಿಸಿ",

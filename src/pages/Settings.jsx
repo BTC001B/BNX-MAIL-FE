@@ -28,7 +28,7 @@ import {
 import { emailAPI, authAPI, userAPI, signatureAPI } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { useTheme, PRESET_BACKGROUNDS } from "../context/ThemeContext";
-import { useTranslation } from "../context/LanguageContext";
+import { useTranslation, normalizeLang } from "../context/LanguageContext";
 import toast from "react-hot-toast";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -109,7 +109,7 @@ const Settings = () => {
   const [density, setDensity] = useState("Default");
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [biometricsEnabled, setBiometricsEnabled] = useState(true);
-  const [language, setLanguage] = useState(() => localStorage.getItem("bnx_setting_language") || "en_US");
+  const [language, setLanguage] = useState(() => normalizeLang(localStorage.getItem("bnx_setting_language") || "en"));
   const [spellingCheck, setSpellingCheck] = useState(() => localStorage.getItem("bnx_setting_spellingCheck") !== "false");
   const [grammarCheck, setGrammarCheck] = useState(() => localStorage.getItem("bnx_setting_grammarCheck") !== "false");
   const [autoCorrect, setAutoCorrect] = useState(() => localStorage.getItem("bnx_setting_autoCorrect") !== "false");
@@ -332,7 +332,7 @@ const Settings = () => {
         setLocalEmailsPerPage(emailsPerPage);
         setTwoFactorEnabled(d.twoFactorEnabled ?? false);
         setBiometricsEnabled(d.biometricsEnabled ?? true);
-        const lang = d.language || localStorage.getItem("bnx_setting_language") || "en_US";
+        const lang = normalizeLang(d.language || localStorage.getItem("bnx_setting_language") || "en");
         setLanguage(lang);
         if (d.spellingCheck !== undefined || localStorage.getItem("bnx_setting_spellingCheck") !== null) {
           setSpellingCheck(d.spellingCheck ?? (localStorage.getItem("bnx_setting_spellingCheck") !== "false"));
@@ -705,26 +705,13 @@ const Settings = () => {
     if (user?.email) {
       setLoading(true);
       try {
-        localStorage.setItem("bnx_setting_language", language);
-        await applyLanguage(language);
-        localStorage.setItem("bnx_setting_spellingCheck", spellingCheck ? "true" : "false");
-        localStorage.setItem("bnx_setting_grammarCheck", grammarCheck ? "true" : "false");
-        localStorage.setItem("bnx_setting_autoCorrect", autoCorrect ? "true" : "false");
-        localStorage.setItem("bnx_setting_writingSuggestions", writingSuggestions ? "true" : "false");
-        localStorage.setItem("bnx_setting_desktopNotifications", desktopNotifications ? "true" : "false");
-        localStorage.setItem("bnx_setting_conversationView", conversationView ? "true" : "false");
-        localStorage.setItem("bnx_setting_fontFamily", defaultFontFamily);
-        localStorage.setItem("bnx_setting_fontSizeText", defaultFontSize);
-        localStorage.setItem("bnx_setting_textColor", defaultTextColor);
-        localStorage.setItem("bnx_setting_undoSendDelay", String(undoSendDelay));
-        localStorage.setItem("bnx_bulk_mail_filter", bulkMailEnabled ? "true" : "false");
-        localStorage.setItem("bnx_notification_filter", notificationEnabled ? "true" : "false");
+        const targetLang = normalizeLang(language);
 
         const ok = await saveBackendSettings({ 
           undoSendDelay, 
           bulkMailEnabled, 
           notificationEnabled,
-          language,
+          language: targetLang,
           spellingCheck,
           grammarCheck,
           autoCorrect,
@@ -736,9 +723,26 @@ const Settings = () => {
           defaultTextColor
         });
 
-        // Save all signatures to ensure any name or content changes are persisted
-        for (const sig of signatures) {
-          await signatureAPI.updateSignature(sig.id, { name: sig.name, content: sig.content });
+        if (ok) {
+          localStorage.setItem("bnx_setting_language", targetLang);
+          await applyLanguage(targetLang);
+          localStorage.setItem("bnx_setting_spellingCheck", spellingCheck ? "true" : "false");
+          localStorage.setItem("bnx_setting_grammarCheck", grammarCheck ? "true" : "false");
+          localStorage.setItem("bnx_setting_autoCorrect", autoCorrect ? "true" : "false");
+          localStorage.setItem("bnx_setting_writingSuggestions", writingSuggestions ? "true" : "false");
+          localStorage.setItem("bnx_setting_desktopNotifications", desktopNotifications ? "true" : "false");
+          localStorage.setItem("bnx_setting_conversationView", conversationView ? "true" : "false");
+          localStorage.setItem("bnx_setting_fontFamily", defaultFontFamily);
+          localStorage.setItem("bnx_setting_fontSizeText", defaultFontSize);
+          localStorage.setItem("bnx_setting_textColor", defaultTextColor);
+          localStorage.setItem("bnx_setting_undoSendDelay", String(undoSendDelay));
+          localStorage.setItem("bnx_bulk_mail_filter", bulkMailEnabled ? "true" : "false");
+          localStorage.setItem("bnx_notification_filter", notificationEnabled ? "true" : "false");
+
+          // Save all signatures to ensure any name or content changes are persisted
+          for (const sig of signatures) {
+            await signatureAPI.updateSignature(sig.id, { name: sig.name, content: sig.content });
+          }
         }
       } catch (err) {
         toast.error("Failed to sync composing preferences", { id: "settings-save-toast", duration: 3000 });

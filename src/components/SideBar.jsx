@@ -181,11 +181,11 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile, onOpenNotes }) =>
                       fontWeight: isActive ? 400 : 300,
                     }}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className={`text-[18px] transition-transform duration-200 ${isActive ? "scale-105" : "group-hover:scale-105"}`}>
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <span className={`text-[18px] shrink-0 transition-transform duration-200 ${isActive ? "scale-105" : "group-hover:scale-105"}`}>
                         {item.icon}
                       </span>
-                      <span className="text-sm tracking-wide hide-on-collapse">{getItemLabel(item.name)}</span>
+                      <span className="text-sm tracking-wide truncate whitespace-nowrap hide-on-collapse">{getItemLabel(item.name)}</span>
                     </div>
 
                     {count > 0 && (
@@ -280,11 +280,11 @@ const SideBar = ({ isDesktopOpen, isMobileOpen, onCloseMobile, onOpenNotes }) =>
                             fontWeight: isActive ? 400 : 300,
                           }}
                         >
-                          <div className="flex items-center gap-3">
-                            <span className={`text-[18px] transition-transform duration-200 ${isActive ? "scale-105" : "group-hover:scale-105"}`}>
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <span className={`text-[18px] shrink-0 transition-transform duration-200 ${isActive ? "scale-105" : "group-hover:scale-105"}`}>
                               {item.icon}
                             </span>
-                            <span className="text-sm tracking-wide hide-on-collapse">{getItemLabel(item.name)}</span>
+                            <span className="text-sm tracking-wide truncate whitespace-nowrap hide-on-collapse">{getItemLabel(item.name)}</span>
                           </div>
 
                           {count > 0 && (
