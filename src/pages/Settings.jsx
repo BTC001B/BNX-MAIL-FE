@@ -894,17 +894,17 @@ const Settings = () => {
     <div className="flex h-full overflow-hidden" style={{ background: theme.bg }}>
       {/* Side Tabs Bar */}
       <aside
-        className="w-72 border-r p-6 flex flex-col gap-2 shrink-0"
+        className="w-72 border-r p-4 md:p-5 flex flex-col gap-1.5 shrink-0"
         style={{ background: theme.cardBg, borderColor: theme.border }}
       >
         <button
           onClick={() => navigate("/inbox")}
-          className="text-sm font-semibold mb-6 hover:underline text-left cursor-pointer flex items-center gap-1.5 transition-colors hover:text-primary"
+          className="text-sm font-semibold mb-3 hover:underline text-left cursor-pointer flex items-center gap-1.5 transition-colors hover:text-primary"
           style={{ color: theme.accent }}
         >
-          ΓåÉ Back to Inbox
+          ← Back to Inbox
         </button>
-        <h2 className="text-2xl font-bold mb-6 px-2" style={{ color: theme.text }}>Settings</h2>
+        <h2 className="text-2xl font-bold mb-4 px-2" style={{ color: theme.text }}>Settings</h2>
 
         {tabs.map(tab => (
           <SideTab
@@ -919,8 +919,8 @@ const Settings = () => {
       </aside>
 
       {/* Settings Options Pane */}
-      <main className="flex-1 p-6 overflow-y-auto hidden-scrollbar flex justify-start">
-        <div className="w-full max-w-5xl">
+      <main className="flex-1 p-4 md:p-5 overflow-y-auto hidden-scrollbar flex justify-start">
+        <div className="w-full">
           {/* accounts Tab */}
           {activeTab === "accounts" && (
             <div className="flex flex-col gap-8">
@@ -2088,11 +2088,11 @@ const SideTab = ({ icon, label, active, onClick, theme }) => (
 
 const Section = ({ title, children, theme }) => (
   <div
-    className="w-full p-8 rounded-3xl border shadow-sm mb-8"
+    className="w-full p-5 md:p-6 rounded-2xl md:rounded-3xl border shadow-sm mb-6"
     style={{ background: theme.cardBg, borderColor: theme.border, color: theme.text }}
   >
     {title && (
-      <h3 className="text-xl font-bold border-b pb-4 mb-6 flex items-center gap-2" style={{ borderColor: theme.border }}>
+      <h3 className="text-xl font-bold border-b pb-3 mb-4 flex items-center gap-2" style={{ borderColor: theme.border }}>
         {title}
       </h3>
     )}
