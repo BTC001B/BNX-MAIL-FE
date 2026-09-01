@@ -391,6 +391,8 @@ const Settings = () => {
               localStorage.setItem("bnx_setting_textColor", ts.textColor);
             }
           }
+        } catch (err) {
+          console.warn("Error fetching text style preferences:", err);
         }
         const delay = d.undoSendDelay ?? Number(localStorage.getItem("bnx_setting_undoSendDelay") || 0);
         setUndoSendDelay(delay);
