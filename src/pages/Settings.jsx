@@ -923,7 +923,7 @@ const Settings = () => {
         <div className="w-full">
           {/* accounts Tab */}
           {activeTab === "accounts" && (
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-4 md:gap-5">
               {/* Accounts & Mailboxes switching + Add/Manage Other Accounts */}
               <Section title="Email Accounts & Switching" theme={theme}>
                 <div className="flex items-center justify-between mb-4">
@@ -1981,7 +1981,7 @@ const Settings = () => {
 
           {/* sessions Tab */}
           {activeTab === "sessions" && (
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-4 md:gap-5">
               <Section title="Active Device Sessions" theme={theme}>
                 <p className="text-sm text-gray-500 mb-6">Below are the devices currently logged into your account.</p>
                 <div className="flex flex-col gap-4">
@@ -2088,7 +2088,7 @@ const SideTab = ({ icon, label, active, onClick, theme }) => (
 
 const Section = ({ title, children, theme }) => (
   <div
-    className="w-full p-5 md:p-6 rounded-2xl md:rounded-3xl border shadow-sm mb-6"
+    className="w-full p-5 md:p-6 rounded-2xl md:rounded-3xl border shadow-sm"
     style={{ background: theme.cardBg, borderColor: theme.border, color: theme.text }}
   >
     {title && (
