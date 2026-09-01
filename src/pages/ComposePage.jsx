@@ -5,7 +5,36 @@ import { mailAPI } from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 import { DEFAULT_TEMPLATES } from "./Templates";
 
+
+const getFontFamilyCss = (font) => {
+  switch (font) {
+    case 'Arial': return 'Arial, sans-serif';
+    case 'Georgia': return 'Georgia, serif';
+    case 'Tahoma': return 'Tahoma, sans-serif';
+    case 'Times New Roman': return "'Times New Roman', Times, serif";
+    case 'Trebuchet MS': return "'Trebuchet MS', sans-serif";
+    case 'Verdana': return 'Verdana, sans-serif';
+    case 'Courier New': return "'Courier New', Courier, monospace";
+    case 'Calibri': return 'Calibri, sans-serif';
+    default: return font ? `${font}, sans-serif` : 'Arial, sans-serif';
+  }
+};
+
+const getFontSizeCss = (size) => {
+  switch (size) {
+    case 'Small': return '14px';
+    case 'Normal': return '16px';
+    case 'Large': return '18px';
+    case 'Extra Large':
+    case 'Huge': return '24px';
+    default: return '16px';
+  }
+};
+
 const ComposePage = () => {
+  const [defaultFontFamily] = useState(() => localStorage.getItem("bnx_setting_fontFamily") || "Arial");
+  const [defaultFontSize] = useState(() => localStorage.getItem("bnx_setting_fontSizeText") || "Normal");
+  const [defaultTextColor] = useState(() => localStorage.getItem("bnx_setting_textColor") || "#000000");
   const navigate = useNavigate();
   const location = useLocation();
   const { theme } = useTheme();
@@ -348,6 +377,11 @@ const ComposePage = () => {
                 value={formData.body}
                 onChange={handleChange}
                 placeholder="Type your message…"
+                style={{
+                  fontFamily: getFontFamilyCss(defaultFontFamily),
+                  fontSize: getFontSizeCss(defaultFontSize),
+                  color: defaultTextColor || undefined
+                }}
                 className="w-full flex-1 resize-none outline-none p-4 rounded-xl mt-4 min-h-[200px] glass-input text-gray-800 dark:text-gray-100 placeholder:text-gray-400 text-base"
               />
             </div>

@@ -13,7 +13,7 @@ import {
   MdReply,
   MdArrowDropDown
 } from "react-icons/md";
-import { mailAPI, api, userAPI, signatureAPI, casboxAPI } from "../services/api";
+import { mailAPI, api, userAPI, signatureAPI, casboxAPI, settingsAPI } from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 import { useMail } from "../context/MailContext";
 import { useAuth } from "../context/AuthContext";
@@ -41,6 +41,35 @@ const quillModules = {
     modules: ['Resize', 'DisplaySize', 'Toolbar']
   }
 };
+
+
+// Helper CSS mappers for Default Text Style
+const getFontFamilyCss = (font) => {
+  switch (font) {
+    case 'Arial': return 'Arial, sans-serif';
+    case 'Georgia': return 'Georgia, serif';
+    case 'Tahoma': return 'Tahoma, sans-serif';
+    case 'Times New Roman': return "'Times New Roman', Times, serif";
+    case 'Trebuchet MS': return "'Trebuchet MS', sans-serif";
+    case 'Verdana': return 'Verdana, sans-serif';
+    case 'Courier New': return "'Courier New', Courier, monospace";
+    case 'Calibri': return 'Calibri, sans-serif';
+    default: return font ? `${font}, sans-serif` : 'Arial, sans-serif';
+  }
+};
+
+const getFontSizeCss = (size) => {
+  switch (size) {
+    case 'Small': return '14px';
+    case 'Normal': return '16px';
+    case 'Large': return '18px';
+    case 'Extra Large':
+    case 'Huge': return '24px';
+    default: return '16px';
+  }
+};
+
+const getTextColorCss = (color) => color || '#000000';
 
 const FloatingCompose = () => {
   const { t } = useTranslation();
@@ -96,6 +125,10 @@ const FloatingCompose = () => {
   const [signatures, setSignatures] = useState([]);
   const [showSignaturesMenu, setShowSignaturesMenu] = useState(false);
   const [undoSendDelay, setUndoSendDelay] = useState(0);
+  const [defaultFontFamily, setDefaultFontFamily] = useState(() => localStorage.getItem("bnx_setting_fontFamily") || "Arial");
+  const [defaultFontSize, setDefaultFontSize] = useState(() => localStorage.getItem("bnx_setting_fontSizeText") || "Normal");
+  const [defaultTextColor, setDefaultTextColor] = useState(() => localStorage.getItem("bnx_setting_textColor") || "#000000");
+
   const signatureInjectedRef = useRef(false);
 
   const [draftId, setDraftId] = useState(null);
@@ -782,6 +815,20 @@ const FloatingCompose = () => {
             }
           `}</style>
         )}
+        
+        <style>{`
+          .compose-quill .ql-editor {
+            font-family: ${getFontFamilyCss(defaultFontFamily)} !important;
+            font-size: ${getFontSizeCss(defaultFontSize)} !important;
+            color: ${getTextColorCss(defaultTextColor)} !important;
+          }
+          .compose-quill .ql-editor p {
+            font-family: inherit;
+            font-size: inherit;
+            color: inherit;
+          }
+        `}</style>
+
         {/* HEADER / DRAG HANDLE */}
         {isReply ? (
           <div
