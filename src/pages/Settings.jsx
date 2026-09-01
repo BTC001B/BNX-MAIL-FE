@@ -144,9 +144,9 @@ const Settings = () => {
     recoveryMethodsEnabled: true
   });
   const [connectedServices, setConnectedServices] = useState([
-    { id: "google", name: "Google Workspace / Gmail", icon: "🌐", connected: false },
-    { id: "outlook", name: "Microsoft Outlook / Office 365", icon: "📧", connected: false },
-    { id: "custom_imap", name: "Custom IMAP / POP3 Mailbox", icon: "📬", connected: false }
+    { id: "google", name: "Google Workspace / Gmail", icon: "≡ƒîÉ", connected: false },
+    { id: "outlook", name: "Microsoft Outlook / Office 365", icon: "≡ƒôº", connected: false },
+    { id: "custom_imap", name: "Custom IMAP / POP3 Mailbox", icon: "≡ƒô¼", connected: false }
   ]);
 
   // OTP Verification states for Recovery Email & Phone
@@ -252,8 +252,8 @@ const Settings = () => {
       }
 
       const successMsg = otpTarget === "email"
-        ? `Recovery Email (${maskedContact}) Verified Successfully! ✓`
-        : `Recovery Phone (${maskedContact}) Verified Successfully! ✓`;
+        ? `Recovery Email (${maskedContact}) Verified Successfully! Γ£ô`
+        : `Recovery Phone (${maskedContact}) Verified Successfully! Γ£ô`;
 
       toast.success(successMsg, { id: "settings-save-toast", duration: 4000 });
       setShowOtpModal(false);
@@ -902,7 +902,7 @@ const Settings = () => {
           className="text-sm font-semibold mb-6 hover:underline text-left cursor-pointer flex items-center gap-1.5 transition-colors hover:text-primary"
           style={{ color: theme.accent }}
         >
-          ← Back to Inbox
+          ΓåÉ Back to Inbox
         </button>
         <h2 className="text-2xl font-bold mb-6 px-2" style={{ color: theme.text }}>Settings</h2>
 
@@ -919,8 +919,8 @@ const Settings = () => {
       </aside>
 
       {/* Settings Options Pane */}
-      <main className="flex-1 pt-5 pb-10 pl-6 pr-8 overflow-y-auto hidden-scrollbar flex justify-start">
-        <div className="w-full max-w-4xl">
+      <main className="flex-1 p-6 md:p-8 overflow-y-auto hidden-scrollbar flex justify-start">
+        <div className="w-full">
           {/* accounts Tab */}
           {activeTab === "accounts" && (
             <div className="flex flex-col gap-8">
@@ -986,7 +986,7 @@ const Settings = () => {
                   </div>
                   <div className="flex flex-col gap-1 p-4 rounded-xl border" style={{ borderColor: theme.border }}>
                     <span className="text-xs font-semibold text-gray-400 uppercase">Account Status</span>
-                    <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Active & Verified ✓</span>
+                    <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Active & Verified Γ£ô</span>
                   </div>
                 </div>
               </Section>
@@ -1011,7 +1011,7 @@ const Settings = () => {
                       <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Recovery Email Address</label>
                       {isRecoveryEmailVerified ? (
                         <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
-                          Recovery Email Verified ✓
+                          Recovery Email Verified Γ£ô
                         </span>
                       ) : (
                         <span className="px-2.5 py-0.5 text-[11px] font-medium rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
@@ -1038,7 +1038,7 @@ const Settings = () => {
                       <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Recovery Phone Number</label>
                       {isRecoveryPhoneVerified ? (
                         <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
-                          Recovery Phone Verified ✓
+                          Recovery Phone Verified Γ£ô
                         </span>
                       ) : (
                         <span className="px-2.5 py-0.5 text-[11px] font-medium rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
@@ -1127,7 +1127,7 @@ const Settings = () => {
                         onClick={() => setShowAddAccountModal(false)}
                         className="text-gray-400 hover:text-gray-600 text-lg font-bold cursor-pointer"
                       >
-                        ✕
+                        Γ£ò
                       </button>
                     </div>
 
@@ -1211,7 +1211,7 @@ const Settings = () => {
                   >
                     <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: theme.border }}>
                       <div className="flex items-center gap-2">
-                        <span className="text-xl">🔐</span>
+                        <span className="text-xl">≡ƒöÉ</span>
                         <h3 className="text-base font-bold">OTP Verification</h3>
                       </div>
                       <button
@@ -1219,7 +1219,7 @@ const Settings = () => {
                         onClick={() => setShowOtpModal(false)}
                         className="text-gray-400 hover:text-gray-600 text-lg font-bold cursor-pointer"
                       >
-                        ✕
+                        Γ£ò
                       </button>
                     </div>
 
@@ -1307,11 +1307,11 @@ const Settings = () => {
                     style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                   >
                     <option value="en">English</option>
-                    <option value="ta">Tamil (தமிழ்)</option>
-                    <option value="hi">Hindi (हिन्दी)</option>
-                    <option value="te">Telugu (తెలుగు)</option>
-                    <option value="ml">Malayalam (മലയാളം)</option>
-                    <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                    <option value="ta">Tamil (α«ñα««α«┐α«┤α»ì)</option>
+                    <option value="hi">Hindi (αñ╣αñ┐αñ¿αÑìαñªαÑÇ)</option>
+                    <option value="te">Telugu (α░ñα▒åα░▓α▒üα░ùα▒ü)</option>
+                    <option value="ml">Malayalam (α┤«α┤▓α┤»α┤╛α┤│α┤é)</option>
+                    <option value="kn">Kannada (α▓òα▓¿α│ìα▓¿α▓í)</option>
                   </select>
                   <span className="text-xs text-gray-500">BNXmail display language preference.</span>
                 </div>
@@ -1456,7 +1456,7 @@ const Settings = () => {
                               onClick={() => setDefaultSignature(sig.id)}
                               className={`text-xs px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${sig.isDefault ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10"}`}
                             >
-                              {sig.isDefault ? "Default ✓" : "Set Default"}
+                              {sig.isDefault ? "Default Γ£ô" : "Set Default"}
                             </button>
                             <button
                               type="button"
@@ -1469,7 +1469,7 @@ const Settings = () => {
                               className="text-red-500 hover:text-red-700 px-2 py-1 cursor-pointer font-bold"
                               title="Delete Signature"
                             >
-                              ×
+                              ├ù
                             </button>
                           </div>
                           <div className="bg-white text-black rounded-md overflow-hidden border">
@@ -1531,7 +1531,7 @@ const Settings = () => {
           {/* notifications Tab */}
           {activeTab === "notifications" && (
             <Section title="Notification Preferences & Quiet Hours" theme={theme}>
-              <form onSubmit={handleSaveNotificationSettings} className="flex flex-col gap-8 max-w-2xl">
+              <form onSubmit={handleSaveNotificationSettings} className="flex flex-col gap-8 w-full">
                 {/* Notifications triggers */}
                 <div className="flex flex-col gap-4">
                   <h4 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Folders & Subscriptions</h4>
@@ -1592,7 +1592,7 @@ const Settings = () => {
           {/* appearance Tab */}
           {activeTab === "appearance" && (
             <Section title="Appearance & Interface Customization" theme={theme}>
-              <form onSubmit={handleSaveAppearanceSettings} className="flex flex-col gap-8 max-w-3xl">
+              <form onSubmit={handleSaveAppearanceSettings} className="flex flex-col gap-8 w-full">
                 {/* Density */}
                 <div className="flex flex-col gap-3">
                   <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Mail Density View</label>
@@ -1810,7 +1810,7 @@ const Settings = () => {
                       className="w-fit px-5 py-2.5 rounded-xl text-sm font-medium border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-sm"
                       style={{ borderColor: theme.border, color: theme.text }}
                     >
-                      📁 Upload from device
+                      ≡ƒôü Upload from device
                     </button>
                     <button
                       type="button"
@@ -1822,7 +1822,7 @@ const Settings = () => {
                       className="w-fit px-5 py-2.5 rounded-xl text-sm font-medium border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-sm"
                       style={{ borderColor: theme.border, color: theme.text }}
                     >
-                      ↺ Reset to Default
+                      Γå║ Reset to Default
                     </button>
                   </div>
                 </div>
@@ -1863,7 +1863,7 @@ const Settings = () => {
           {/* security Tab */}
           {activeTab === "security" && (
             <Section title="Security & Account Recovery" theme={theme}>
-              <div className="flex flex-col gap-8 max-w-2xl">
+              <div className="flex flex-col gap-8 w-full">
                 {/* Details and 2FA */}
                 <form onSubmit={handleSaveSecuritySettings} className="flex flex-col gap-5">
                   <h4 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Profile Information</h4>
@@ -2001,7 +2001,7 @@ const Settings = () => {
                                 <span className="px-2 py-0.5 rounded text-[10px] font-bold text-white bg-green-500 uppercase tracking-wider">This device</span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-500">{s.ipAddress} — {device.browser}</p>
+                            <p className="text-sm text-gray-500">{s.ipAddress} ΓÇö {device.browser}</p>
                             <p className="text-xs text-gray-400 mt-1">Logged in: {new Date(s.createdAt).toLocaleString()}</p>
                           </div>
                         </div>
@@ -2032,7 +2032,7 @@ const Settings = () => {
                         </div>
                         <div className="flex flex-col gap-0.5">
                           <span className="text-base font-semibold" style={{ color: theme.text }}>{s.appName}</span>
-                          <p className="text-sm text-gray-500">{s.ipAddress} — Basic Profile Access</p>
+                          <p className="text-sm text-gray-500">{s.ipAddress} ΓÇö Basic Profile Access</p>
                           <p className="text-xs text-gray-400 mt-1">Authorized: {new Date(s.loggedInAt).toLocaleString()}</p>
                         </div>
                       </div>
@@ -2088,7 +2088,7 @@ const SideTab = ({ icon, label, active, onClick, theme }) => (
 
 const Section = ({ title, children, theme }) => (
   <div
-    className="max-w-4xl p-8 rounded-3xl border shadow-sm mb-8"
+    className="w-full p-8 rounded-3xl border shadow-sm mb-8"
     style={{ background: theme.cardBg, borderColor: theme.border, color: theme.text }}
   >
     <h3 className="text-xl font-bold border-b pb-4 mb-6 flex items-center gap-2" style={{ borderColor: theme.border }}>
@@ -2113,3 +2113,4 @@ const ToggleRow = ({ label, checked, onChange, theme }) => (
 );
 
 export default Settings;
+
