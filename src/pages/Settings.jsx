@@ -1307,11 +1307,11 @@ const Settings = () => {
                     style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                   >
                     <option value="en">English</option>
-                    <option value="ta">Tamil (α«ñα««α«┐α«┤α»ì)</option>
-                    <option value="hi">Hindi (αñ╣αñ┐αñ¿αÑìαñªαÑÇ)</option>
-                    <option value="te">Telugu (α░ñα▒åα░▓α▒üα░ùα▒ü)</option>
-                    <option value="ml">Malayalam (α┤«α┤▓α┤»α┤╛α┤│α┤é)</option>
-                    <option value="kn">Kannada (α▓òα▓¿α│ìα▓¿α▓í)</option>
+                    <option value="ta">Tamil (தமிழ்)</option>
+                    <option value="hi">Hindi (हिंदी)</option>
+                    <option value="te">Telugu (తెలుగు)</option>
+                    <option value="ml">Malayalam (മലയാളം)</option>
+                    <option value="kn">Kannada (ಕನ್ನಡ)</option>
                   </select>
                   <span className="text-xs text-gray-500">BNXmail display language preference.</span>
                 </div>
