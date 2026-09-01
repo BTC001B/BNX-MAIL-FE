@@ -373,6 +373,25 @@ const Settings = () => {
         if (d.defaultTextColor || localStorage.getItem("bnx_setting_textColor")) {
           setDefaultTextColor(d.defaultTextColor || localStorage.getItem("bnx_setting_textColor"));
         }
+
+        try {
+          const textStyleRes = await settingsAPI.getTextStyle();
+          if (textStyleRes && textStyleRes.data) {
+            const ts = textStyleRes.data;
+            if (ts.fontFamily) {
+              setDefaultFontFamily(ts.fontFamily);
+              localStorage.setItem("bnx_setting_fontFamily", ts.fontFamily);
+            }
+            if (ts.fontSize) {
+              setDefaultFontSize(ts.fontSize);
+              localStorage.setItem("bnx_setting_fontSizeText", ts.fontSize);
+            }
+            if (ts.textColor) {
+              setDefaultTextColor(ts.textColor);
+              localStorage.setItem("bnx_setting_textColor", ts.textColor);
+            }
+          }
+        }
         const delay = d.undoSendDelay ?? Number(localStorage.getItem("bnx_setting_undoSendDelay") || 0);
         setUndoSendDelay(delay);
         if (d.bulkMailEnabled !== undefined && d.bulkMailEnabled !== null) {
@@ -760,6 +779,15 @@ const Settings = () => {
         localStorage.setItem("bnx_setting_fontFamily", defaultFontFamily);
         localStorage.setItem("bnx_setting_fontSizeText", defaultFontSize);
         localStorage.setItem("bnx_setting_textColor", defaultTextColor);
+        try {
+          await settingsAPI.updateTextStyle({
+            fontFamily: defaultFontFamily,
+            fontSize: defaultFontSize,
+            textColor: defaultTextColor
+          });
+        } catch (tsErr) {
+          console.warn("Failed to sync default text style to backend:", tsErr);
+        }
         localStorage.setItem("bnx_setting_undoSendDelay", String(undoSendDelay));
         localStorage.setItem("bnx_bulk_mail_filter", bulkMailEnabled ? "true" : "false");
         localStorage.setItem("bnx_notification_filter", notificationEnabled ? "true" : "false");
