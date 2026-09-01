@@ -919,8 +919,8 @@ const Settings = () => {
       </aside>
 
       {/* Settings Options Pane */}
-      <main className="flex-1 p-6 md:p-8 overflow-y-auto hidden-scrollbar flex justify-start">
-        <div className="w-full">
+      <main className="flex-1 p-6 overflow-y-auto hidden-scrollbar flex justify-start">
+        <div className="w-full max-w-5xl">
           {/* accounts Tab */}
           {activeTab === "accounts" && (
             <div className="flex flex-col gap-8">
@@ -1294,7 +1294,7 @@ const Settings = () => {
 
           {/* composing Tab */}
           {activeTab === "composing" && (
-            <Section theme={theme}>
+            <Section title="General & Composing" theme={theme}>
               <form onSubmit={handleSaveComposingSettings} className="flex flex-col gap-6 w-full">
                 
                 {/* Display Language Selection (Very Top of Card) */}
@@ -2091,9 +2091,11 @@ const Section = ({ title, children, theme }) => (
     className="w-full p-8 rounded-3xl border shadow-sm mb-8"
     style={{ background: theme.cardBg, borderColor: theme.border, color: theme.text }}
   >
-    <h3 className="text-xl font-bold border-b pb-4 mb-6 flex items-center gap-2" style={{ borderColor: theme.border }}>
-      {title}
-    </h3>
+    {title && (
+      <h3 className="text-xl font-bold border-b pb-4 mb-6 flex items-center gap-2" style={{ borderColor: theme.border }}>
+        {title}
+      </h3>
+    )}
     {children}
   </div>
 );
