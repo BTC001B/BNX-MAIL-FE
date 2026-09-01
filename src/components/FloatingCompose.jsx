@@ -26,6 +26,16 @@ import ImageResize from 'quill-image-resize-module-react';
 
 // For quill-image-resize-module-react
 window.Quill = Quill;
+
+// Register Font & Size attributors in Quill
+const Font = Quill.import('attributors/style/font');
+Font.whitelist = ['Arial', 'Calibri', 'Times New Roman', 'Georgia', 'Verdana', 'Courier New', 'Tahoma', 'Trebuchet MS', 'Roboto'];
+Quill.register(Font, true);
+
+const Size = Quill.import('attributors/style/size');
+Size.whitelist = ['14px', '16px', '18px', '24px'];
+Quill.register(Size, true);
+
 Quill.register('modules/imageResize', ImageResize);
 
 const quillModules = {
@@ -45,21 +55,26 @@ const quillModules = {
 
 // Helper CSS mappers for Default Text Style
 const getFontFamilyCss = (font) => {
-  switch (font) {
+  if (!font) return 'Arial, sans-serif';
+  const trimmed = font.trim();
+  switch (trimmed) {
     case 'Arial': return 'Arial, sans-serif';
-    case 'Georgia': return 'Georgia, serif';
-    case 'Tahoma': return 'Tahoma, sans-serif';
+    case 'Calibri': return 'Calibri, sans-serif';
     case 'Times New Roman': return "'Times New Roman', Times, serif";
-    case 'Trebuchet MS': return "'Trebuchet MS', sans-serif";
+    case 'Georgia': return 'Georgia, serif';
     case 'Verdana': return 'Verdana, sans-serif';
     case 'Courier New': return "'Courier New', Courier, monospace";
-    case 'Calibri': return 'Calibri, sans-serif';
-    default: return font ? `${font}, sans-serif` : 'Arial, sans-serif';
+    case 'Tahoma': return 'Tahoma, sans-serif';
+    case 'Trebuchet MS': return "'Trebuchet MS', sans-serif";
+    case 'Roboto': return 'Roboto, sans-serif';
+    default: return `'${trimmed}', sans-serif`;
   }
 };
 
 const getFontSizeCss = (size) => {
-  switch (size) {
+  if (!size) return '16px';
+  const trimmed = size.trim();
+  switch (trimmed) {
     case 'Small': return '14px';
     case 'Normal': return '16px';
     case 'Large': return '18px';
@@ -72,6 +87,18 @@ const getFontSizeCss = (size) => {
 const getTextColorCss = (color) => color || '#000000';
 
 const FloatingCompose = () => {
+  useEffect(() => {
+    const handleTextStyleChanged = (e) => {
+      if (e.detail) {
+        if (e.detail.fontFamily) setDefaultFontFamily(e.detail.fontFamily);
+        if (e.detail.fontSize) setDefaultFontSize(e.detail.fontSize);
+        if (e.detail.textColor) setDefaultTextColor(e.detail.textColor);
+      }
+    };
+    window.addEventListener('bnx_text_style_changed', handleTextStyleChanged);
+    return () => window.removeEventListener('bnx_text_style_changed', handleTextStyleChanged);
+  }, []);
+
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { user } = useAuth();
@@ -815,21 +842,26 @@ const FloatingCompose = () => {
             }
           `}</style>
         )}
-        
+
         <style>{`
           .compose-quill .ql-editor {
-            font-family: ${getFontFamilyCss(defaultFontFamily)} !important;
-            font-size: ${getFontSizeCss(defaultFontSize)} !important;
-            color: ${getTextColorCss(defaultTextColor)} !important;
+            font-family: ${getFontFamilyCss(defaultFontFamily)};
+            font-size: ${getFontSizeCss(defaultFontSize)};
+            color: ${getTextColorCss(defaultTextColor)};
           }
-          .compose-quill .ql-editor p {
+          .compose-quill .ql-editor p,
+          .compose-quill .ql-editor div,
+          .compose-quill .ql-editor span:not([style*="font-family"]) {
             font-family: inherit;
-            font-size: inherit;
+          }
+          .compose-quill .ql-editor p,
+          .compose-quill .ql-editor div,
+          .compose-quill .ql-editor span:not([style*="color"]) {
             color: inherit;
           }
         `}</style>
 
-        {/* HEADER / DRAG HANDLE */}
+                {/* HEADER / DRAG HANDLE */}
         {isReply ? (
           <div
             className={`${isMobile ? "" : "compose-drag-handle"} flex items-center justify-between px-4 py-3 cursor-move shrink-0 border-b select-none`}

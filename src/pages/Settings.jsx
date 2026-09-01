@@ -781,6 +781,13 @@ const Settings = () => {
         localStorage.setItem("bnx_setting_fontFamily", defaultFontFamily);
         localStorage.setItem("bnx_setting_fontSizeText", defaultFontSize);
         localStorage.setItem("bnx_setting_textColor", defaultTextColor);
+        window.dispatchEvent(new CustomEvent('bnx_text_style_changed', {
+          detail: {
+            fontFamily: defaultFontFamily,
+            fontSize: defaultFontSize,
+            textColor: defaultTextColor
+          }
+        }));
         try {
           await settingsAPI.updateTextStyle({
             fontFamily: defaultFontFamily,

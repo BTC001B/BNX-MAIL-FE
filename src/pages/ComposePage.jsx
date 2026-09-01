@@ -32,6 +32,18 @@ const getFontSizeCss = (size) => {
 };
 
 const ComposePage = () => {
+  useEffect(() => {
+    const handleTextStyleChanged = (e) => {
+      if (e.detail) {
+        if (e.detail.fontFamily) setDefaultFontFamily(e.detail.fontFamily);
+        if (e.detail.fontSize) setDefaultFontSize(e.detail.fontSize);
+        if (e.detail.textColor) setDefaultTextColor(e.detail.textColor);
+      }
+    };
+    window.addEventListener('bnx_text_style_changed', handleTextStyleChanged);
+    return () => window.removeEventListener('bnx_text_style_changed', handleTextStyleChanged);
+  }, []);
+
   const [defaultFontFamily] = useState(() => localStorage.getItem("bnx_setting_fontFamily") || "Arial");
   const [defaultFontSize] = useState(() => localStorage.getItem("bnx_setting_fontSizeText") || "Normal");
   const [defaultTextColor] = useState(() => localStorage.getItem("bnx_setting_textColor") || "#000000");
