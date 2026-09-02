@@ -52,7 +52,6 @@ import logo from "../assets/bnx-remove.png";
 import html2pdf from "html2pdf.js";
 
 const getMimeType = (fileName) => {
-  const { t } = useTranslation();
   const ext = fileName.split('.').pop().toLowerCase();
   switch (ext) {
     case 'pdf': return 'application/pdf';
@@ -127,6 +126,7 @@ const EmailDetails = ({
 }) => {
   const { theme, readingPaneMode } = useTheme();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { labels, handleRemoveLabel, handleCreateLabel, fetchEmails, currentFolder } = useMail();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
