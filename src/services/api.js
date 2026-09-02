@@ -378,6 +378,9 @@ export const settingsAPI = {
     updateLanguage: (language) => api.put(API_ENDPOINTS.SETTINGS?.LANGUAGE || '/api/settings/language', { language }),
     getTextStyle: () => api.get(API_ENDPOINTS.SETTINGS?.TEXT_STYLE || '/api/settings/text-style'),
     updateTextStyle: (data) => api.put(API_ENDPOINTS.SETTINGS?.TEXT_STYLE || '/api/settings/text-style', data),
+    getWallpaper: () => api.get('/api/settings/wallpaper'),
+    updateWallpaper: (wallpaper) => api.put('/api/settings/wallpaper', { wallpaper }),
+    resetWallpaper: () => api.post('/api/settings/wallpaper/reset'),
 };
 
 // Blocked Contacts API Service

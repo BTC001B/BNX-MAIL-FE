@@ -1,3 +1,4 @@
+import { settingsAPI } from "../services/api";
 import React, {
   createContext,
   useContext,
