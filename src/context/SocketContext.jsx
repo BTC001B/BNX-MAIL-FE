@@ -64,6 +64,11 @@ export const SocketProvider = ({ children }) => {
 
         client.onWebSocketError = (event) => {
             console.error('WebSocket Error:', event);
+            setIsConnected(false);
+        };
+
+        client.onWebSocketClose = () => {
+            setIsConnected(false);
         };
 
         client.onDisconnect = () => {
@@ -101,6 +106,10 @@ export const SocketProvider = ({ children }) => {
 
     const subscribeToChat = (chatId, callback) => {
         if (!stompClient || !isConnected || !stompClient.connected) return null;
+        if (stompClient.webSocket && stompClient.webSocket.readyState !== WebSocket.OPEN) {
+            setIsConnected(false);
+            return null;
+        }
         try {
             // console.log(`📡 Subscribing to /topic/chat/${chatId}`);
             return stompClient.subscribe(`/topic/chat/${chatId}`, (message) => {
@@ -114,7 +123,11 @@ export const SocketProvider = ({ children }) => {
     };
 
     const sendMessage = (chatId, messageContent, attachmentsJson = null) => {
-        if (!stompClient || !isConnected || !user || !stompClient.connected) return;
+        if (!stompClient || !isConnected || !user || !stompClient.connected) return false;
+        if (stompClient.webSocket && stompClient.webSocket.readyState !== WebSocket.OPEN) {
+            setIsConnected(false);
+            return false;
+        }
         
         try {
             const payload = {
@@ -128,8 +141,11 @@ export const SocketProvider = ({ children }) => {
                 destination: '/app/chat.send',
                 body: JSON.stringify(payload)
             });
+            return true;
         } catch (e) {
             console.error("Failed to send message:", e);
+            setIsConnected(false);
+            return false;
         }
     };
 

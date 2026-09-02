@@ -492,10 +492,13 @@ const ChatRoom = () => {
     setSelectedAttachments([]); // Clear after send
     setTimeout(() => scrollToBottom(true), 50);
 
-    // Send via WebSocket
+    // Send via WebSocket with HTTP fallback if socket transmission fails
+    let isSentViaWs = false;
     if (isConnected) {
-      sendMessage(chatId, tempMsg.content, attachmentsJson);
-    } else {
+      isSentViaWs = sendMessage(chatId, tempMsg.content, attachmentsJson) !== false;
+    } 
+    
+    if (!isSentViaWs) {
       chatAPI.sendMessage({
         chatId: parseInt(chatId),
         sender: user.email,
