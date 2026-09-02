@@ -63,6 +63,7 @@ const ChatRoom = () => {
   const [isChatStarred, setIsChatStarred] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreMenuRef = useRef(null);
+  const [hasNewMessagesBelow, setHasNewMessagesBelow] = useState(false);
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef(null);
@@ -225,11 +226,28 @@ const ChatRoom = () => {
     }
   };
 
-  const scrollToBottom = () => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-    } else if (messagesEndRef.current?.parentElement) {
-      messagesEndRef.current.parentElement.scrollTop = messagesEndRef.current.parentElement.scrollHeight;
+  const isUserNearBottom = () => {
+    const container = messagesContainerRef.current || messagesEndRef.current?.parentElement;
+    if (!container) return true;
+    const threshold = 150;
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    return distanceFromBottom <= threshold;
+  };
+
+  const scrollToBottom = (force = false) => {
+    if (force || isUserNearBottom()) {
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      } else if (messagesEndRef.current?.parentElement) {
+        messagesEndRef.current.parentElement.scrollTop = messagesEndRef.current.parentElement.scrollHeight;
+      }
+      setHasNewMessagesBelow(false);
+    }
+  };
+
+  const handleMessagesScroll = () => {
+    if (isUserNearBottom()) {
+      setHasNewMessagesBelow(false);
     }
   };
 
@@ -316,7 +334,7 @@ const ChatRoom = () => {
       toast.error("Failed to load message history");
     } finally {
       setLoading(false);
-      setTimeout(scrollToBottom, 100);
+      setTimeout(() => scrollToBottom(true), 100);
     }
   };
 
@@ -407,6 +425,9 @@ const ChatRoom = () => {
     let subscription = null;
     if (isConnected) {
       subscription = subscribeToChat(chatId, (msg) => {
+        const isMe = msg.sender === user?.email;
+        const nearBottom = isUserNearBottom();
+
         setMessages(prev => {
           if (prev.some(m => m.id === msg.id)) return prev;
 
@@ -424,7 +445,12 @@ const ChatRoom = () => {
 
           return [...prev, msg];
         });
-        setTimeout(scrollToBottom, 50);
+
+        if (isMe || nearBottom) {
+          setTimeout(() => scrollToBottom(true), 50);
+        } else {
+          setHasNewMessagesBelow(true);
+        }
       });
     }
 
@@ -464,7 +490,7 @@ const ChatRoom = () => {
     setMessages(prev => [...prev, tempMsg]);
     setNewMessage("");
     setSelectedAttachments([]); // Clear after send
-    setTimeout(scrollToBottom, 50);
+    setTimeout(() => scrollToBottom(true), 50);
 
     // Send via WebSocket
     if (isConnected) {
@@ -767,92 +793,108 @@ const ChatRoom = () => {
             </div>
           )}
           {/* MESSAGES AREA */}
-          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 hidden-scrollbar bg-white/10 dark:bg-black/10">
-            {loading && messages.length === 0 ? (
-              <div className="flex justify-center p-10">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full opacity-30 text-center">
-                <MdChat size={64} className="mb-4" />
-                <p className="text-lg font-medium">No messages yet</p>
-                <p className="text-sm">Be the first to say hello!</p>
-              </div>
-            ) : (
-              messages.map((msg, idx) => {
-                const isMe = msg.sender === user.email;
-                return (
-                  <div key={msg.id || idx} className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <div className="max-w-[85%] sm:max-w-[75%] flex flex-col items-start">
-                      <span className="text-[10px] font-bold mb-1 ml-2 uppercase opacity-60" style={{ color: theme.subText }}>
-                        {chatName}
-                      </span>
-                      <div className="flex flex-col w-fit">
-                        <div 
-                          className={`px-4 py-2.5 rounded-full shadow-sm relative ${
-                            isMe 
-                              ? 'bg-primary text-white' 
-                              : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700'
-                          }`}
-                        >
-                          <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                          
-                          {/* Attachments Rendering */}
-                          {msg.attachmentsJson && (
-                            <div className="mt-2 flex flex-wrap gap-2">
-                              {(() => {
-                                try {
-                                  const atts = JSON.parse(msg.attachmentsJson);
-                                  return atts.map((att, i) => (
-                                    <div key={i} className="max-w-xs rounded-lg overflow-hidden border border-black/10 dark:border-white/10 shadow-sm bg-black/5 dark:bg-white/5 relative group">
-                                      {att.type.startsWith('image/') ? (
-                                        <a href={att.content} target="_blank" rel="noreferrer" download={att.name}>
-                                          <img src={att.content} alt={att.name} className="max-h-48 w-auto object-contain cursor-pointer hover:opacity-90 transition-opacity" />
-                                        </a>
-                                      ) : (
-                                        <div className="flex items-center gap-3 p-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                                          <div className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg shrink-0">
-                                            <MdPictureAsPdf size={24} />
+          <div className="relative flex-1 min-h-0">
+            <div 
+              ref={messagesContainerRef} 
+              onScroll={handleMessagesScroll}
+              className="h-full overflow-y-auto p-6 space-y-4 hidden-scrollbar bg-white/10 dark:bg-black/10"
+            >
+              {loading && messages.length === 0 ? (
+                <div className="flex justify-center p-10">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full opacity-30 text-center">
+                  <MdChat size={64} className="mb-4" />
+                  <p className="text-lg font-medium">No messages yet</p>
+                  <p className="text-sm">Be the first to say hello!</p>
+                </div>
+              ) : (
+                messages.map((msg, idx) => {
+                  const isMe = msg.sender === user.email;
+                  return (
+                    <div key={msg.id || idx} className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <div className="max-w-[85%] sm:max-w-[75%] flex flex-col items-start">
+                        <span className="text-[10px] font-bold mb-1 ml-2 uppercase opacity-60" style={{ color: theme.subText }}>
+                          {chatName}
+                        </span>
+                        <div className="flex flex-col w-fit">
+                          <div 
+                            className={`px-4 py-2.5 rounded-full shadow-sm relative ${
+                              isMe 
+                                ? 'bg-primary text-white' 
+                                : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700'
+                            }`}
+                          >
+                            <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                            
+                            {/* Attachments Rendering */}
+                            {msg.attachmentsJson && (
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {(() => {
+                                  try {
+                                    const atts = JSON.parse(msg.attachmentsJson);
+                                    return atts.map((att, i) => (
+                                      <div key={i} className="max-w-xs rounded-lg overflow-hidden border border-black/10 dark:border-white/10 shadow-sm bg-black/5 dark:bg-white/5 relative group">
+                                        {att.type.startsWith('image/') ? (
+                                          <a href={att.content} target="_blank" rel="noreferrer" download={att.name}>
+                                            <img src={att.content} alt={att.name} className="max-h-48 w-auto object-contain cursor-pointer hover:opacity-90 transition-opacity" />
+                                          </a>
+                                        ) : (
+                                          <div className="flex items-center gap-3 p-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                                            <div className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg shrink-0">
+                                              <MdPictureAsPdf size={24} />
+                                            </div>
+                                            <div className="flex flex-col min-w-0 flex-1">
+                                              <span className="text-xs font-semibold truncate max-w-[120px]">{att.name}</span>
+                                              <span className="text-[10px] opacity-70">{(att.size / 1024).toFixed(1)} KB</span>
+                                            </div>
+                                            <div className="flex items-center gap-1 shrink-0">
+                                              <a href={att.content} target="_blank" rel="noreferrer" title="View PDF" className="p-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 transition-colors">
+                                                <MdVisibility size={16} />
+                                              </a>
+                                              <a href={att.content} download={att.name} title="Download PDF" className="p-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 transition-colors">
+                                                <MdFileDownload size={16} />
+                                              </a>
+                                            </div>
                                           </div>
-                                          <div className="flex flex-col min-w-0 flex-1">
-                                            <span className="text-xs font-semibold truncate max-w-[120px]">{att.name}</span>
-                                            <span className="text-[10px] opacity-70">{(att.size / 1024).toFixed(1)} KB</span>
-                                          </div>
-                                          <div className="flex items-center gap-1 shrink-0">
-                                            <a href={att.content} target="_blank" rel="noreferrer" title="View PDF" className="p-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 transition-colors">
-                                              <MdVisibility size={16} />
-                                            </a>
-                                            <a href={att.content} download={att.name} title="Download PDF" className="p-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 transition-colors">
-                                              <MdFileDownload size={16} />
-                                            </a>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  ));
-                                } catch (e) {
-                                  return null;
-                                }
-                              })()}
-                            </div>
-                          )}
+                                        )}
+                                      </div>
+                                    ));
+                                  } catch (e) {
+                                    return null;
+                                  }
+                                })()}
+                              </div>
+                            )}
 
-                        </div>
+                          </div>
 
-                        {/* Timestamp outside and below the bubble */}
-                        <div 
-                          className="text-[9px] mt-1 opacity-60 font-medium select-none text-gray-500 dark:text-gray-400 self-end mr-2 text-right"
-                        >
-                          {formatMessageTime(msg.timestamp)}
-                          {msg.isOptimistic && " • sending..."}
+                          {/* Timestamp outside and below the bubble */}
+                          <div 
+                            className="text-[9px] mt-1 opacity-60 font-medium select-none text-gray-500 dark:text-gray-400 self-end mr-2 text-right"
+                          >
+                            {formatMessageTime(msg.timestamp)}
+                            {msg.isOptimistic && " • sending..."}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })
+                  );
+                })
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {hasNewMessagesBelow && (
+              <button
+                onClick={() => scrollToBottom(true)}
+                className="absolute bottom-4 right-6 z-30 px-3.5 py-1.5 rounded-full text-white text-xs font-bold shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer border border-white/20"
+                style={{ backgroundColor: theme?.accent || "#135bec" }}
+              >
+                <MdKeyboardArrowRight className="rotate-90" size={16} /> New Messages
+              </button>
             )}
-            <div ref={messagesEndRef} />
           </div>
 
           {/* INPUT AREA */}
