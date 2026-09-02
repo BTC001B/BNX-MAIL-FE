@@ -15,6 +15,7 @@ import {
   MdVolumeUp,
   MdSettingsBackupRestore,
   MdRefresh,
+  MdFileUpload,
   MdSignalCellularAlt,
   MdPhoneAndroid,
   MdTabletMac,
@@ -1813,10 +1814,10 @@ const Settings = () => {
                     <button
                       type="button"
                       onClick={() => bgFileRef.current?.click()}
-                      className="w-fit px-5 py-2.5 rounded-xl text-sm font-medium border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-sm"
+                      className="w-fit px-5 py-2.5 rounded-xl text-sm font-medium border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-sm flex items-center gap-2"
                       style={{ borderColor: theme.border, color: theme.text }}
                     >
-                      ≡ƒôü Upload from device
+                      <MdFileUpload size={18} /> Upload from device
                     </button>
                     <button
                       type="button"
@@ -1825,10 +1826,10 @@ const Settings = () => {
                         clearBackgroundImage();
                         toast.success("Background reset to default", { id: "wallpaper-toast", duration: 3000 });
                       }}
-                      className="w-fit px-5 py-2.5 rounded-xl text-sm font-medium border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-sm"
+                      className="w-fit px-5 py-2.5 rounded-xl text-sm font-medium border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-sm flex items-center gap-2"
                       style={{ borderColor: theme.border, color: theme.text }}
                     >
-                      Γå║ Reset to Default
+                      <MdRefresh size={18} /> Reset to Default
                     </button>
                   </div>
                 </div>
