@@ -111,11 +111,32 @@ export const SocketProvider = ({ children }) => {
             return null;
         }
         try {
-            // console.log(`📡 Subscribing to /topic/chat/${chatId}`);
-            return stompClient.subscribe(`/topic/chat/${chatId}`, (message) => {
-                const data = JSON.parse(message.body);
-                callback(data);
+            const rawSub = stompClient.subscribe(`/topic/chat/${chatId}`, (message) => {
+                try {
+                    const data = JSON.parse(message.body);
+                    callback(data);
+                } catch (err) {
+                    console.error("Failed to parse socket message JSON:", err);
+                }
             });
+
+            return {
+                id: rawSub?.id,
+                unsubscribe: () => {
+                    try {
+                        if (
+                            stompClient && 
+                            stompClient.connected && 
+                            stompClient.webSocket && 
+                            stompClient.webSocket.readyState === WebSocket.OPEN
+                        ) {
+                            rawSub.unsubscribe();
+                        }
+                    } catch (e) {
+                        // Gracefully swallow unsubscribe error on closed/closing socket
+                    }
+                }
+            };
         } catch (e) {
             console.error("Failed to subscribe to chat:", e);
             return null;
