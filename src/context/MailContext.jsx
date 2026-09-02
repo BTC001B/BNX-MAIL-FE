@@ -723,7 +723,7 @@ export const MailProvider = ({ children }) => {
 
     const handleUnsubscribe = async (senderEmail, silent = false) => {
         try {
-            await mailAPI.unsubscribe(senderEmail);
+            await blockedContactsAPI.blockSender(senderEmail);
             if (!silent) toast.success('Unsubscribed from ' + senderEmail);
         } catch (error) {
             if (!silent) toast.error('Failed to unsubscribe');

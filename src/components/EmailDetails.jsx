@@ -46,7 +46,7 @@ import { useMail } from "../context/MailContext";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useTranslation } from "../context/LanguageContext";
-import { mailAPI, reportAPI } from "../services/api";
+import { mailAPI, reportAPI, blockedContactsAPI } from "../services/api";
 import toast from "react-hot-toast";
 import logo from "../assets/bnx-remove.png";
 import html2pdf from "html2pdf.js";
@@ -152,36 +152,48 @@ const EmailDetails = ({
                         cleanSenderEmail.toLowerCase().includes("noreply") ||
                         cleanSenderEmail.toLowerCase().includes("no-reply");
 
-  const [blockedContacts, setBlockedContacts] = useState(() => {
-    try {
-      const saved = localStorage.getItem("bnxmail_blocked_contacts");
-      return saved ? JSON.parse(saved) : [];
-    } catch (err) {
-      return [];
+    const [showBlockModal, setShowBlockModal] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (normalizedSender) {
+      blockedContactsAPI.checkBlockStatus(normalizedSender)
+        .then(res => {
+          if (isMounted && res.data) {
+            setIsBlocked(!!res.data.blocked);
+          }
+        })
+        .catch(err => {
+          console.error("Failed to check block status from backend", err);
+        });
     }
-  });
+    return () => { isMounted = false; };
+  }, [normalizedSender]);
 
-  const [showBlockModal, setShowBlockModal] = useState(false);
-
-  const isBlocked = normalizedSender ? blockedContacts.includes(normalizedSender) : false;
-
-  const handleToggleBlock = () => {
+  const handleToggleBlock = async () => {
     if (!normalizedSender) return;
-    let updated;
-    if (isBlocked) {
-      updated = blockedContacts.filter((c) => c !== normalizedSender);
-      toast.success("Sender unblocked successfully.");
-    } else {
-      updated = [...blockedContacts, normalizedSender];
-      toast.success("Sender blocked successfully.");
-    }
-    setBlockedContacts(updated);
     try {
-      localStorage.setItem("bnxmail_blocked_contacts", JSON.stringify(updated));
+      if (isBlocked) {
+        toast.loading("Unblocking sender...", { id: "block-toggle" });
+        await blockedContactsAPI.unblockSender(normalizedSender);
+        setIsBlocked(false);
+        toast.success("Sender unblocked successfully.", { id: "block-toggle" });
+      } else {
+        toast.loading("Blocking sender...", { id: "block-toggle" });
+        await blockedContactsAPI.blockSender(normalizedSender);
+        setIsBlocked(true);
+        toast.success("Sender blocked successfully.", { id: "block-toggle" });
+      }
+      if (fetchEmails) {
+        fetchEmails(currentFolder || "inbox");
+      }
     } catch (err) {
-      console.error("Failed to save blocked contacts to localStorage", err);
+      console.error("Failed to toggle block status", err);
+      toast.error("Failed to update block status", { id: "block-toggle" });
+    } finally {
+      setShowBlockModal(false);
     }
-    setShowBlockModal(false);
   };
 
   const handleUnsubscribeClick = async () => {

@@ -1,7 +1,7 @@
 import { useTranslation } from "../context/LanguageContext";
 import React, { useState, useEffect } from "react";
 import { useTheme } from "../context/ThemeContext";
-import { mailAPI } from "../services/api";
+import { mailAPI, blockedContactsAPI } from "../services/api";
 import {
   MdSearch,
   MdNotificationsActive,
@@ -29,8 +29,8 @@ const Subscriptions = () => {
       const emailsList = emailsRes.data?.data?.emails || [];
       
       // 2. Fetch backend blocked senders
-      const blockedRes = await mailAPI.getSubscriptions();
-      const blockedList = blockedRes.data?.data || [];
+      const blockedRes = await blockedContactsAPI.getBlockedContacts();
+      const blockedList = (blockedRes.data?.data || []).map(item => typeof item === "string" ? item : item.email);
       setBlockedSenders(blockedList);
 
       // 3. Extract unique senders
@@ -89,11 +89,14 @@ const Subscriptions = () => {
   };
 
   const handleToggleBlock = async (senderEmail, isBlocked) => {
-    const action = isBlocked ? mailAPI.subscribe : mailAPI.unsubscribe;
-    const toastMessage = isBlocked ? "Subscribed to sender" : "Unsubscribed from sender";
+    const toastMessage = isBlocked ? "Unblocked sender" : "Blocked sender";
     
     try {
-      await action(senderEmail);
+      if (isBlocked) {
+        await blockedContactsAPI.unblockSender(senderEmail);
+      } else {
+        await blockedContactsAPI.blockSender(senderEmail);
+      }
       toast.success(toastMessage);
       
       // Update local state

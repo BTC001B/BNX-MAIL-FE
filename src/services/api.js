@@ -379,3 +379,27 @@ export const settingsAPI = {
     getTextStyle: () => api.get(API_ENDPOINTS.SETTINGS?.TEXT_STYLE || '/api/settings/text-style'),
     updateTextStyle: (data) => api.put(API_ENDPOINTS.SETTINGS?.TEXT_STYLE || '/api/settings/text-style', data),
 };
+
+
+// Blocked Contacts API Service
+export const blockedContactsAPI = {
+  blockSender: async (email) => {
+    const response = await api.post('/blocked-contacts', { email });
+    return response.data;
+  },
+
+  unblockSender: async (email) => {
+    const response = await api.delete(`/blocked-contacts/${encodeURIComponent(email)}`);
+    return response.data;
+  },
+
+  checkBlockStatus: async (email) => {
+    const response = await api.get(`/blocked-contacts/check?email=${encodeURIComponent(email)}`);
+    return response.data;
+  },
+
+  getBlockedContacts: async () => {
+    const response = await api.get('/blocked-contacts');
+    return response.data;
+  }
+};
