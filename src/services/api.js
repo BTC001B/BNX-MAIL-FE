@@ -380,22 +380,21 @@ export const settingsAPI = {
     updateTextStyle: (data) => api.put(API_ENDPOINTS.SETTINGS?.TEXT_STYLE || '/api/settings/text-style', data),
 };
 
-
 // Blocked Contacts API Service
 export const blockedContactsAPI = {
   blockSender: async (email) => {
-    const response = await api.post('/blocked-contacts', { email });
+    const response = await api.post('/api/blocked-contacts', { email });
     return response.data;
   },
 
   unblockSender: async (email) => {
-    const response = await api.delete(`/blocked-contacts/${encodeURIComponent(email)}`);
+    const response = await api.delete(`/api/blocked-contacts/${encodeURIComponent(email)}`);
     return response.data;
   },
 
   checkBlockStatus: async (email) => {
     try {
-      const response = await api.get(`/blocked-contacts/check?email=${encodeURIComponent(email)}`);
+      const response = await api.get(`/api/blocked-contacts/check?email=${encodeURIComponent(email)}`);
       return response.data;
     } catch (err) {
       console.warn("Failed to check block status, returning fallback", err);
@@ -405,7 +404,7 @@ export const blockedContactsAPI = {
 
   getBlockedContacts: async () => {
     try {
-      const response = await api.get('/blocked-contacts');
+      const response = await api.get('/api/blocked-contacts');
       return response.data;
     } catch (err) {
       console.warn("Failed to load blocked contacts, returning empty list fallback", err);
