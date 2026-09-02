@@ -1308,11 +1308,7 @@ const Settings = () => {
                   <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("settings.display_language", "Display Language")}</label>
                   <select
                     value={language}
-                    onChange={e => {
-                      const selectedLang = e.target.value;
-                      setLanguage(selectedLang);
-                      applyLanguage(selectedLang);
-                    }}
+                    onChange={e => setLanguage(e.target.value)}
                     className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
                     style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                   >
