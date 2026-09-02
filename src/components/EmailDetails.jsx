@@ -130,6 +130,17 @@ const EmailDetails = ({
   const { labels, handleRemoveLabel, handleCreateLabel, fetchEmails, currentFolder } = useMail();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  const normalizeEmail = (addr) => {
+    if (!addr) return "";
+    let clean = addr;
+    if (clean.includes("<")) {
+      clean = clean.split("<")[1].split(">")[0];
+    }
+    return clean.trim().toLowerCase();
+  };
+
+  const normalizedSender = normalizeEmail(email?.from);
+
   const cleanSenderEmail = email?.from
     ? (email.from.includes("<")
         ? email.from.split("<")[1].split(">")[0].trim()
@@ -140,6 +151,38 @@ const EmailDetails = ({
                         cleanSenderEmail.toLowerCase().includes("postmaster") || 
                         cleanSenderEmail.toLowerCase().includes("noreply") ||
                         cleanSenderEmail.toLowerCase().includes("no-reply");
+
+  const [blockedContacts, setBlockedContacts] = useState(() => {
+    try {
+      const saved = localStorage.getItem("bnxmail_blocked_contacts");
+      return saved ? JSON.parse(saved) : [];
+    } catch (err) {
+      return [];
+    }
+  });
+
+  const [showBlockModal, setShowBlockModal] = useState(false);
+
+  const isBlocked = normalizedSender ? blockedContacts.includes(normalizedSender) : false;
+
+  const handleToggleBlock = () => {
+    if (!normalizedSender) return;
+    let updated;
+    if (isBlocked) {
+      updated = blockedContacts.filter((c) => c !== normalizedSender);
+      toast.success("Sender unblocked successfully.");
+    } else {
+      updated = [...blockedContacts, normalizedSender];
+      toast.success("Sender blocked successfully.");
+    }
+    setBlockedContacts(updated);
+    try {
+      localStorage.setItem("bnxmail_blocked_contacts", JSON.stringify(updated));
+    } catch (err) {
+      console.error("Failed to save blocked contacts to localStorage", err);
+    }
+    setShowBlockModal(false);
+  };
 
   const handleUnsubscribeClick = async () => {
     if (!cleanSenderEmail) return;
@@ -1165,6 +1208,13 @@ const EmailDetails = ({
                   <span className="text-sm font-medium truncate">Unsubscribe from {cleanSenderEmail || "sender"}</span>
                 </button>
                 <button
+                  onClick={() => { setShowBlockModal(true); setShowMoreOptions(false); }}
+                  className="w-full text-left px-4 py-2 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] flex items-center gap-3 cursor-pointer text-gray-700 dark:text-gray-200 transition-colors"
+                >
+                  <MdBlock size={18} className="text-gray-500 shrink-0" />
+                  <span className="text-sm font-medium">{isBlocked ? "Unblock" : "Block"}</span>
+                </button>
+                <button
                   onClick={() => { setShowReportModal(true); setShowMoreOptions(false); }}
                   className="w-full text-left px-4 py-2 hover:bg-orange-50 dark:hover:bg-orange-900/10 flex items-center gap-3 cursor-pointer text-orange-600 dark:text-orange-400 transition-colors"
                 >
@@ -1268,6 +1318,11 @@ const EmailDetails = ({
                               </>
                             ) : (
                               <span>{m.from}</span>
+                            )}
+                            {blockedContacts.includes(normalizeEmail(m.from)) && (
+                              <span className="text-[10px] font-semibold text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-1.5 py-0.5 rounded transition-all select-none border border-red-200 dark:border-red-800/40">
+                                Blocked
+                              </span>
                             )}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">
@@ -1379,6 +1434,11 @@ const EmailDetails = ({
                       </>
                     ) : (
                       <span>{email.from}</span>
+                    )}
+                    {isBlocked && (
+                      <span className="text-xs font-semibold text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded transition-all select-none border border-red-200 dark:border-red-800/40">
+                        Blocked
+                      </span>
                     )}
                     {cleanSenderEmail && !isSystemEmail && (
                       <button
@@ -1908,6 +1968,48 @@ const EmailDetails = ({
                   className="px-5 py-2 text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 disabled:bg-orange-400 disabled:cursor-not-allowed rounded-lg transition-colors shadow-sm flex items-center cursor-pointer"
                 >
                   {reportLoading ? "Submitting..." : "Submit Report"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+      {/* Block / Unblock Confirmation Modal */}
+      {showBlockModal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col transform transition-all border border-gray-200 dark:border-neutral-800">
+            <div className={`px-6 py-4 border-b flex justify-between items-center ${isBlocked ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-900/30' : 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-900/30'}`}>
+              <h2 className={`text-lg font-bold flex items-center ${isBlocked ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-500'}`}>
+                <MdBlock className="mr-2" size={24} /> {isBlocked ? "Unblock Sender" : "Block Sender"}
+              </h2>
+              <button 
+                onClick={() => setShowBlockModal(false)}
+                className="p-2 text-gray-500 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+              >
+                <MdClose size={20} />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+                Are you sure you want to {isBlocked ? "unblock" : "block"} this sender?
+              </p>
+              
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-neutral-800">
+                <button
+                  onClick={() => setShowBlockModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleToggleBlock}
+                  className={`px-5 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm flex items-center cursor-pointer ${
+                    isBlocked ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700'
+                  }`}
+                >
+                  {isBlocked ? "Unblock" : "Block"}
                 </button>
               </div>
             </div>
