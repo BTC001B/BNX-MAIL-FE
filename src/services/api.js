@@ -394,12 +394,22 @@ export const blockedContactsAPI = {
   },
 
   checkBlockStatus: async (email) => {
-    const response = await api.get(`/blocked-contacts/check?email=${encodeURIComponent(email)}`);
-    return response.data;
+    try {
+      const response = await api.get(`/blocked-contacts/check?email=${encodeURIComponent(email)}`);
+      return response.data;
+    } catch (err) {
+      console.warn("Failed to check block status, returning fallback", err);
+      return { success: true, data: { blocked: false } };
+    }
   },
 
   getBlockedContacts: async () => {
-    const response = await api.get('/blocked-contacts');
-    return response.data;
+    try {
+      const response = await api.get('/blocked-contacts');
+      return response.data;
+    } catch (err) {
+      console.warn("Failed to load blocked contacts, returning empty list fallback", err);
+      return { success: true, data: [] };
+    }
   }
 };
