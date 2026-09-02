@@ -110,6 +110,12 @@ const Settings = () => {
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [biometricsEnabled, setBiometricsEnabled] = useState(true);
   const [language, setLanguage] = useState(() => normalizeLang(localStorage.getItem("bnx_setting_language") || "en"));
+
+  useEffect(() => {
+    if (currentLanguage) {
+      setLanguage(currentLanguage);
+    }
+  }, [currentLanguage]);
   const [spellingCheck, setSpellingCheck] = useState(() => localStorage.getItem("bnx_setting_spellingCheck") !== "false");
   const [grammarCheck, setGrammarCheck] = useState(() => localStorage.getItem("bnx_setting_grammarCheck") !== "false");
   const [autoCorrect, setAutoCorrect] = useState(() => localStorage.getItem("bnx_setting_autoCorrect") !== "false");
@@ -881,13 +887,13 @@ const Settings = () => {
   };
 
   const tabs = [
-    { id: "accounts", label: "Accounts & Mailboxes", icon: <MdEmail size={20} /> },
-    { id: "composing", label: "General & Composing", icon: <MdSettings size={20} /> },
-    { id: "notifications", label: "Notifications & Quiet", icon: <MdNotifications size={20} /> },
-    { id: "appearance", label: "Appearance & Layout", icon: <MdColorLens size={20} /> },
-    { id: "security", label: "Security & Recovery", icon: <MdSecurity size={20} /> },
-    { id: "labels", label: "Labels & Sidebar", icon: <MdFormatPaint size={20} /> },
-    { id: "sessions", label: "Active Sessions & Logs", icon: <MdDevices size={20} /> },
+    { id: "accounts", label: t("settings.accounts_mailboxes", "Accounts & Mailboxes"), icon: <MdEmail size={20} /> },
+    { id: "composing", label: t("settings.general_composing", "General & Composing"), icon: <MdSettings size={20} /> },
+    { id: "notifications", label: t("settings.notifications", "Notifications & Quiet"), icon: <MdNotifications size={20} /> },
+    { id: "appearance", label: t("settings.appearance", "Appearance & Layout"), icon: <MdColorLens size={20} /> },
+    { id: "security", label: t("settings.security_recovery", "Security & Recovery"), icon: <MdSecurity size={20} /> },
+    { id: "labels", label: t("settings.labels_sidebar", "Labels & Sidebar"), icon: <MdFormatPaint size={20} /> },
+    { id: "sessions", label: t("settings.active_sessions", "Active Sessions & Logs"), icon: <MdDevices size={20} /> },
   ];
 
   return (
@@ -902,9 +908,9 @@ const Settings = () => {
           className="text-sm font-semibold mb-3 hover:underline text-left cursor-pointer flex items-center gap-1.5 transition-colors hover:text-primary"
           style={{ color: theme.accent }}
         >
-          ← Back to Inbox
+          ← {t("common.back", "Back")}
         </button>
-        <h2 className="text-2xl font-bold mb-4 px-2" style={{ color: theme.text }}>Settings</h2>
+        <h2 className="text-2xl font-bold mb-4 px-2" style={{ color: theme.text }}>{t("settings.title", "Settings")}</h2>
 
         {tabs.map(tab => (
           <SideTab
@@ -1294,15 +1300,19 @@ const Settings = () => {
 
           {/* composing Tab */}
           {activeTab === "composing" && (
-            <Section title="General & Composing" theme={theme}>
+            <Section title={t("settings.general_composing", "General & Composing")} theme={theme}>
               <form onSubmit={handleSaveComposingSettings} className="flex flex-col gap-6 w-full">
                 
                 {/* Display Language Selection (Very Top of Card) */}
                 <div className="flex flex-col gap-2 pb-3">
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Display Language</label>
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("settings.display_language", "Display Language")}</label>
                   <select
                     value={language}
-                    onChange={e => setLanguage(e.target.value)}
+                    onChange={e => {
+                      const selectedLang = e.target.value;
+                      setLanguage(selectedLang);
+                      applyLanguage(selectedLang);
+                    }}
                     className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
                     style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                   >
@@ -1313,7 +1323,7 @@ const Settings = () => {
                     <option value="ml">Malayalam (മലയാളം)</option>
                     <option value="kn">Kannada (ಕನ್ನಡ)</option>
                   </select>
-                  <span className="text-xs text-gray-500">BNXmail display language preference.</span>
+                  <span className="text-xs text-gray-500">{t("settings.display_language_help", "BNXmail display language preference.")}</span>
                 </div>
 
                 {/* Input Toggles */}
@@ -1326,37 +1336,37 @@ const Settings = () => {
 
                 {/* 2. Mail View & Notifications */}
                 <div className="flex flex-col gap-4 border-t pt-6 mt-2" style={{ borderColor: theme.border }}>
-                  <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">MAIL VIEW & NOTIFICATIONS</h4>
+                  <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{t("settings.mail_view_notifications", "MAIL VIEW & NOTIFICATIONS")}</h4>
                   <div className="flex flex-col space-y-1">
-                    <ToggleRow label="Desktop Notifications for New Emails" checked={desktopNotifications} onChange={setDesktopNotifications} theme={theme} />
-                    <ToggleRow label="Conversation View (Group emails by thread)" checked={conversationView} onChange={setConversationView} theme={theme} />
+                    <ToggleRow label={t("settings.desktop_notifications", "Desktop Notifications for New Emails")} checked={desktopNotifications} onChange={setDesktopNotifications} theme={theme} />
+                    <ToggleRow label={t("settings.conversation_view", "Conversation View (Group emails by thread)")} checked={conversationView} onChange={setConversationView} theme={theme} />
                   </div>
 
                   {/* Undo Send */}
                   <div className="flex flex-col gap-2 mt-3">
-                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Undo Send Delay</label>
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("settings.undo_send_delay", "Undo Send Delay")}</label>
                     <select
                       value={undoSendDelay}
                       onChange={e => setUndoSendDelay(Number(e.target.value))}
                       className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
                       style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                     >
-                      <option value={0}>Disabled (Send instantly)</option>
-                      <option value={5}>5 seconds</option>
-                      <option value={10}>10 seconds</option>
-                      <option value={20}>20 seconds</option>
-                      <option value={30}>30 seconds</option>
+                      <option value={0}>{t("settings.undo_send_disabled", "Disabled (Send instantly)")}</option>
+                      <option value={5}>{t("settings.undo_send_5s", "5 seconds")}</option>
+                      <option value={10}>{t("settings.undo_send_10s", "10 seconds")}</option>
+                      <option value={20}>{t("settings.undo_send_20s", "20 seconds")}</option>
+                      <option value={30}>{t("settings.undo_send_30s", "30 seconds")}</option>
                     </select>
-                    <span className="text-xs text-gray-500">Grace period to cancel or undo sent emails.</span>
+                    <span className="text-xs text-gray-500">{t("settings.undo_send_help", "Grace period to cancel or undo sent emails.")}</span>
                   </div>
                 </div>
 
                 {/* 3. Default Text Style */}
                 <div className="flex flex-col gap-4 border-t pt-6 mt-2" style={{ borderColor: theme.border }}>
-                  <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">DEFAULT TEXT STYLE</h4>
+                  <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{t("settings.default_text_style", "DEFAULT TEXT STYLE")}</h4>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="flex flex-col gap-2">
-                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Font Family</span>
+                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("settings.font_family", "Font Family")}</span>
                       <select
                         value={defaultFontFamily}
                         onChange={e => setDefaultFontFamily(e.target.value)}
@@ -1375,23 +1385,23 @@ const Settings = () => {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Font Size</span>
+                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("settings.font_size", "Font Size")}</span>
                       <select
                         value={defaultFontSize}
                         onChange={e => setDefaultFontSize(e.target.value)}
                         className="w-full p-3 text-sm rounded-xl border outline-none cursor-pointer focus:ring-2 focus:border-transparent transition-all"
                         style={{ background: theme.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderColor: theme.border, color: theme.text }}
                       >
-                        <option value="Small">Small</option>
-                        <option value="Normal">Normal</option>
-                        <option value="Large">Large</option>
-                        <option value="Huge">Huge</option>
+                        <option value="Small">{t("settings.font_size_small", "Small")}</option>
+                        <option value="Normal">{t("settings.font_size_normal", "Normal")}</option>
+                        <option value="Large">{t("settings.font_size_large", "Large")}</option>
+                        <option value="Huge">{t("settings.font_size_huge", "Huge")}</option>
                       </select>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3 mt-2">
-                    <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Text Color:</span>
+                    <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{t("settings.text_color", "Text Color:")}</span>
                     <input
                       type="color"
                       value={defaultTextColor}
@@ -1402,7 +1412,7 @@ const Settings = () => {
                       className="px-3 py-1.5 text-xs rounded-lg border font-medium bg-white dark:bg-gray-800"
                       style={{ fontFamily: defaultFontFamily, color: defaultTextColor, borderColor: theme.border }}
                     >
-                      Sample Default Text Style Preview
+                      {t("settings.text_style_preview", "Sample Default Text Style Preview")}
                     </span>
                   </div>
                 </div>
@@ -1410,18 +1420,18 @@ const Settings = () => {
                 {/* 4. Email Signatures Section */}
                 <div className="flex flex-col gap-4 border-t pt-6 mt-2" style={{ borderColor: theme.border }}>
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">EMAIL SIGNATURES</h4>
+                    <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{t("settings.email_signatures", "EMAIL SIGNATURES")}</h4>
                     <button
                       type="button"
                       onClick={addSignature}
                       className="text-xs px-3 py-1.5 rounded-lg font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 transition cursor-pointer"
                     >
-                      + Add Signature
+                      {t("settings.add_signature", "+ Add Signature")}
                     </button>
                   </div>
 
                   {signatures.length === 0 ? (
-                    <p className="text-sm text-gray-500 italic">No signatures created. Click '+ Add Signature' to create one.</p>
+                    <p className="text-sm text-gray-500 italic">{t("settings.no_signatures_created", "No signatures created. Click '+ Add Signature' to create one.")}</p>
                   ) : (
                     <div className="flex flex-col gap-4">
                       {/* Select Signature Tabs */}
@@ -1433,8 +1443,8 @@ const Settings = () => {
                             onClick={() => setEditingSignatureId(sig.id)}
                             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer border ${editingSignatureId === sig.id ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:bg-transparent dark:text-gray-300 dark:hover:bg-white/5'}`}
                           >
-                            {sig.name || 'Unnamed'}
-                            {sig.isDefault && <span className="ml-2 text-[10px] bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-1 rounded-sm">Default</span>}
+                            {sig.name || t("settings.unnamed", "Unnamed")}
+                            {sig.isDefault && <span className="ml-2 text-[10px] bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-1 rounded-sm">{t("settings.default", "Default")}</span>}
                           </button>
                         ))}
                       </div>
@@ -1449,14 +1459,14 @@ const Settings = () => {
                               onChange={(e) => updateSignature(sig.id, "name", e.target.value)}
                               className="flex-1 bg-transparent border-b outline-none text-sm font-semibold focus:border-blue-500 pb-1"
                               style={{ color: theme.text, borderColor: theme.border }}
-                              placeholder="Signature Name"
+                              placeholder={t("settings.signature_name", "Signature Name")}
                             />
                             <button
                               type="button"
                               onClick={() => setDefaultSignature(sig.id)}
                               className={`text-xs px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${sig.isDefault ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10"}`}
                             >
-                              {sig.isDefault ? "Default Γ£ô" : "Set Default"}
+                              {sig.isDefault ? t("settings.is_default", "Default ✓") : t("settings.set_default", "Set Default")}
                             </button>
                             <button
                               type="button"
@@ -1467,9 +1477,9 @@ const Settings = () => {
                                 }
                               }}
                               className="text-red-500 hover:text-red-700 px-2 py-1 cursor-pointer font-bold"
-                              title="Delete Signature"
+                              title={t("settings.delete_signature", "Delete Signature")}
                             >
-                              ├ù
+                              ✕
                             </button>
                           </div>
                           <div className="bg-white text-black rounded-md overflow-hidden border">
@@ -1479,14 +1489,14 @@ const Settings = () => {
                               value={sig.content}
                               onChange={(content) => updateSignature(sig.id, "content", content)}
                               className="h-32 mb-10"
-                              placeholder="Design your signature..."
+                              placeholder={t("settings.design_signature", "Design your signature...")}
                             />
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
-                  <span className="text-xs text-gray-500">The default signature will be automatically inserted into new compose frames.</span>
+                  <span className="text-xs text-gray-500">{t("settings.default_signature_help", "The default signature will be automatically inserted into new compose frames.")}</span>
                 </div>
 
                 <button
