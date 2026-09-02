@@ -151,9 +151,9 @@ const Settings = () => {
     recoveryMethodsEnabled: true
   });
   const [connectedServices, setConnectedServices] = useState([
-    { id: "google", name: "Google Workspace / Gmail", icon: "≡ƒîÉ", connected: false },
-    { id: "outlook", name: "Microsoft Outlook / Office 365", icon: "≡ƒôº", connected: false },
-    { id: "custom_imap", name: "Custom IMAP / POP3 Mailbox", icon: "≡ƒô¼", connected: false }
+    { id: "google", name: "Google Workspace / Gmail", icon: "🌐", connected: false },
+    { id: "outlook", name: "Microsoft Outlook / Office 365", icon: "📫", connected: false },
+    { id: "custom_imap", name: "Custom IMAP / POP3 Mailbox", icon: "✉️", connected: false }
   ]);
 
   // OTP Verification states for Recovery Email & Phone
@@ -259,8 +259,8 @@ const Settings = () => {
       }
 
       const successMsg = otpTarget === "email"
-        ? `Recovery Email (${maskedContact}) Verified Successfully! Γ£ô`
-        : `Recovery Phone (${maskedContact}) Verified Successfully! Γ£ô`;
+        ? `Recovery Email (${maskedContact}) Verified Successfully! ✓`
+        : `Recovery Phone (${maskedContact}) Verified Successfully! ✓`;
 
       toast.success(successMsg, { id: "settings-save-toast", duration: 4000 });
       setShowOtpModal(false);
