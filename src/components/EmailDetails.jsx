@@ -153,23 +153,24 @@ const EmailDetails = ({
                         cleanSenderEmail.toLowerCase().includes("no-reply");
 
     const [showBlockModal, setShowBlockModal] = useState(false);
-  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockedContacts, setBlockedContacts] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
-    if (normalizedSender) {
-      blockedContactsAPI.checkBlockStatus(normalizedSender)
-        .then(res => {
-          if (isMounted && res.data) {
-            setIsBlocked(!!res.data.blocked);
-          }
-        })
-        .catch(err => {
-          console.error("Failed to check block status from backend", err);
-        });
-    }
+    blockedContactsAPI.getBlockedContacts()
+      .then(res => {
+        if (isMounted && res.data && res.data.data) {
+          const list = res.data.data.map(c => typeof c === 'string' ? c : c.email);
+          setBlockedContacts(list);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to load blocked contacts from backend", err);
+      });
     return () => { isMounted = false; };
   }, [normalizedSender]);
+
+  const isBlocked = normalizedSender ? blockedContacts.some(c => c.toLowerCase() === normalizedSender.toLowerCase()) : false;
 
   const handleToggleBlock = async () => {
     if (!normalizedSender) return;
@@ -177,12 +178,12 @@ const EmailDetails = ({
       if (isBlocked) {
         toast.loading("Unblocking sender...", { id: "block-toggle" });
         await blockedContactsAPI.unblockSender(normalizedSender);
-        setIsBlocked(false);
+        setBlockedContacts(prev => prev.filter(c => c.toLowerCase() !== normalizedSender.toLowerCase()));
         toast.success("Sender unblocked successfully.", { id: "block-toggle" });
       } else {
         toast.loading("Blocking sender...", { id: "block-toggle" });
         await blockedContactsAPI.blockSender(normalizedSender);
-        setIsBlocked(true);
+        setBlockedContacts(prev => [...prev, normalizedSender]);
         toast.success("Sender blocked successfully.", { id: "block-toggle" });
       }
       if (fetchEmails) {
